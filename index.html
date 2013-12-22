@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>game</title>
+		<link href="css/main.css" rel="stylesheet" type="text/css"/>
+    	<!-- lite version of three.js distrib   -->
+    	<script src="js/min.three.js"></script>
+    	<!-- hacked PointerLockControls.js from "three/examples/js/controls/PointerLockControls.js" -->
+		<script src="js/PointerLockControls.js"></script>
+    	<!-- jquery -->
+    	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+		<!-- low-resolution 3d model  -->
+		<script src="data.js"></script>
+    </head>
+    <body>
+	    <div id="blocker">
+	        <div id="instructions">
+	            <span style="font-size:40px">Click to play</span><br />(W, A, S, D = Move, MOUSE = Look around)
+	        </div>
+	    </div>
+
+
+		<!-- main part -->
+        <script>
+        	var DEBUG = true;
+        
+            var camera, scene, renderer, controls;
+            
+            var sphere;
+            var uploaded_area = [];
+
+            var time = Date.now();
+
+			// 3d dna molecules
+            var objects = [];
+			
+			// dark screen, when the game starts
+            var blocker = document.getElementById( 'blocker' );
+            var instructions = document.getElementById( 'instructions' );
+            
+            var position = "";
+            
+
+            function init_controls() {
+                var element = document.body;
+                var pointerlockchange = function ( event ) {
+                    if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+                        controls.enabled = true;
+                        blocker.style.display = 'none';
+                    } else {
+                        controls.enabled = false;
+                        blocker.style.display = '-webkit-box';
+                        blocker.style.display = '-moz-box';
+                        blocker.style.display = 'box';
+                        instructions.style.display = '';
+                    }
+            	}
+                var pointerlockerror = function ( event ) {
+                    instructions.style.display = '';
+                }
+
+                // Hook pointer lock state change events
+                document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+                document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+                document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+
+                document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+                document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+                document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+
+                instructions.addEventListener( 'click', function ( event ) {
+                    instructions.style.display = 'none';
+                    // Ask the browser to lock the pointer
+                    element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+                    if ( /Firefox/i.test( navigator.userAgent ) ) {
+                        var fullscreenchange = function ( event ) {
+                            if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
+                                document.removeEventListener( 'fullscreenchange', fullscreenchange );
+                                document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
+                                element.requestPointerLock();
+                            }
+                        }
+                        document.addEventListener( 'fullscreenchange', fullscreenchange, false );
+                        document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
+                        element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
+                        element.requestFullscreen();
+                    } else {
+                        element.requestPointerLock();
+                    }
+                }, false );            	
+
+            }
+            
+            
+			// the pointerLock object has different name in different browsers
+			// http://www.html5rocks.com/en/tutorials/pointerlock/intro/
+            var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+            if ( havePointerLock ) {
+            	init_controls();
+            } else {
+            	instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+            }
+            init();
+            animate();
+			
+            function init() {
+                    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 100000 );
+                    scene = new THREE.Scene();
+                    //scene.fog = new THREE.Fog( 0xffffff, 0, 2000 );
+
+                    var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+                    light.position.set( 1, 1, 1 );
+                    scene.add( light );
+                    var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
+                    light.position.set( -1, - 0.5, -1 );
+                    scene.add( light );
+
+					//from js/PointerLockControls.js
+                    controls = new THREE.PointerLockControls( camera );
+                    scene.add( controls.getObject() );
+                    
+					var color = new THREE.Color().setHSL( Math.random(),  Math.random(),  Math.random());
+					
+                    // loading 3d-model
+					// data - is an array of arrays, each array is a sequence of points of a DNA molecule
+					// each point is represented with 4 numbers x,y,z and a base index.
+					for (var chr_index = 0; chr_index < data.length; ++chr_index) {
+						chr_data = data[chr_index];
+						var CELL_SIZE = 4;
+						points_count = chr_data.length / CELL_SIZE; 
+						
+						var tube_color = new THREE.Color().setHSL( Math.random(),  Math.random(),  Math.random());
+						var material = new THREE.MeshBasicMaterial({
+								color: tube_color,
+								opacity: 1,
+								wireframe: true,
+								transparent: false
+						  });
+						 									
+						
+						var spline_points = [];
+						for (var point_index = 0; point_index < points_count; ++point_index) {
+							x = chr_data[(point_index) * CELL_SIZE];
+							y = chr_data[(point_index) * CELL_SIZE + 1];
+							z = chr_data[(point_index) * CELL_SIZE + 2];	
+							spline_points.push(new THREE.Vector3(x, y, z));									
+
+						}
+						var spline = new THREE.SplineCurve3(spline_points);
+						var segments = points_count * 2;
+						var radiusSegments = 12;
+						var tube = new THREE.TubeGeometry(spline, segments, 10, radiusSegments, false, false);
+						tube.dynamic = true;
+						tubeMesh = new THREE.Mesh(tube, material);										
+						scene.add(tubeMesh);
+						objects.push(tubeMesh);
+						
+
+                    }
+                    renderer = new THREE.WebGLRenderer();
+                    renderer.setClearColor( 0xffffff );
+                    renderer.setSize( window.innerWidth, window.innerHeight );
+
+                    document.body.appendChild( renderer.domElement );
+                    window.addEventListener( 'resize', onWindowResize, false );
+            }
+
+            function onWindowResize() {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize( window.innerWidth, window.innerHeight );
+            }
+            
+            
+            function update_model(json_points) {
+            }
+            
+            // TODO: most important function, sends requests and update the data
+            function get_points() {
+            	upload_distance  = 500;
+            	var position = controls.getObject().position;
+            	//uploaded_area works as a cash for an uploaded data
+            	//if we are inside an already uploaded region, we don't do anything
+            	for (var reg_index = 0; reg_index < uploaded_area.length; ++reg_index) {
+            		x = uploaded_area[reg_index][0];
+            		y = uploaded_area[reg_index][1]; 
+            		z = uploaded_area[reg_index][2];		
+					var inside = Math.abs(position.x - x) < upload_distance  && 
+								      Math.abs(position.y - y) < upload_distance  && 
+								      Math.abs(position.z - z) < upload_distance;
+            		if (inside) {
+            			return;
+            		}
+            	}
+            	
+            	//convert 3d slab into segments of chromosomes, which have to be updated
+            	regions = [];
+				for (var chr_index = 0; chr_index < data.length; ++chr_index) {
+					var chr_data = data[chr_index];
+					var CELL_SIZE = 4;
+					var points_count = chr_data.length / CELL_SIZE;
+					var start = -1;
+					for (var point_index = 0; point_index < points_count; ++point_index) {
+						var x = chr_data[(point_index) * CELL_SIZE];
+						var y = chr_data[(point_index) * CELL_SIZE + 1];
+						var z = chr_data[(point_index) * CELL_SIZE + 2];
+						var bp_index = chr_data[(point_index) * CELL_SIZE + 3];
+						var inside = Math.abs(position.x - x) < upload_distance && 
+								      Math.abs(position.y - y) < upload_distance && 
+								      Math.abs(position.z - z) < upload_distance;
+						if (!inside) {
+							if (start > -1) {
+								regions.push([chr_index, start, bp_index]);
+								start = -1;											
+							}
+						} else {
+							if (start == -1) {
+								start =  bp_index;
+							}									
+						}
+					}
+					if (start > -1) {
+						regions.push([chr_index, start, bp_index]);								
+					}                        	
+            	}
+            	if (regions.length) {
+            		//TODO
+					$.getJSON( "ajax/test.json", regions, update_model);      		
+            	}
+            	uploaded_area.push([position.x, position.y, position.z]);
+            	
+            	if (DEBUG) {
+	            	var color = new THREE.Color().setHSL( 0.5,  0.5,  0.5);
+					var sphere_material = new THREE.MeshBasicMaterial({
+								color: color,
+								opacity: 1,
+								wireframe: true,
+								transparent: false
+						  });
+	                sphere = new THREE.Mesh(new THREE.SphereGeometry(upload_distance, 16, 16), sphere_material);
+	                sphere.position.x = position.x;
+	                sphere.position.y = position.y;
+	                sphere.position.z = position.z;
+	                scene.add(sphere);
+               }
+
+            }
+            
+
+            function animate() {
+                    requestAnimationFrame( animate );
+                   	//request for new data
+                   	get_points();                    
+                    controls.update( Date.now() - time );
+                    renderer.render( scene, camera );
+                    time = Date.now();
+            }
+
+        </script>
+    </body>
+</html>

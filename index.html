@@ -487,7 +487,7 @@
             function PositionToString(region) {
             	var helix = region[0].split("_")[1] == "a" ? "helix A" : "helix B";
             	var info = "Selection: chromosome: " + region[0].split("_")[0] + ", " + helix;
-            	info += ", bases: " + String(region[1]) + "&ndash;" + String(region[1]);
+            	info += ", bases: " + String(region[1]) + "&ndash;" + String(region[2]);
             	return info;            	
             }
 
@@ -497,15 +497,20 @@
 			}
 
 			function UploadRegionData(region) {
-				var key = PositionToString(region);
             	var request = "start=" + String(region[1]) 
             				  + "&end=" + String(region[2])
             				  + "&chrid=" + String(region[0]);
 			    var url = "http://1kgenome.exascale.info/range?" + request;		
 			    $.getJSON(url + "?callback=?", null, 
 			    	function(regionInfo) {
-			    		console.log("data: " + regionInfo);
-			    		regionData[key] = key + "<br/>Region data:<br/><ul><li>Bases: <a target='_blank' href='" + url + "'>" + regionInfo.substring(0, 50) + "...</a><br/></ul>";
+			    		var key = PositionToString(region);
+			    		region[0] = region[0].replace("_b", "_a");
+			    		var key_a = PositionToString(region);
+			    		region[0] = region[0].replace("_a", "_b");
+			    		var key_b = PositionToString(region);
+			    		formated_data = "<br/>Region data:<br/><ul><li>Bases: <a target='_blank' href='" + url + "'>" + regionInfo.substring(0, 50) + "...</a><br/></ul>";
+			    		regionData[key_a] = key_a + formated_data;
+			    		regionData[key_b] = key_b + formated_data;
 			    		if (infoBlock.innerHTML == key) {
 			    			infoBlock.innerHTML = regionData[key];
 			    		}
@@ -526,14 +531,16 @@
             		return;
             	}
             	var region = GetSelectedTrackPoints(point, object.name);
-            	var positionStr = PositionToString(region);      	
+            	var positionStr = PositionToString(region);  
             	if (positionStr in regionData) {
             		infoBlock.innerHTML = regionData[positionStr];
             	} else {
-					infoBlock.innerHTML = positionStr;
-					UploadRegionData(region);
-           		}
-            		
+            		//show something immidiately
+            		infoBlock.innerHTML = positionStr + "<br/>data uploading...";
+            		//also works like flag: request already sent
+            		regionData[positionStr] = positionStr;
+            		UploadRegionData(region);            		
+            	}
             }
 
             function animate() {
@@ -555,7 +562,7 @@
 			
 			staticBlock = document.createElement('div');
 			staticBlock.id = "staticblock";
-			staticBlock.innerHTML = "<em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>, {phil, ruslan}@exascale.info";
+			staticBlock.innerHTML = "<em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>, {phil, ruslan}@exascale.info; <a target='_blank' href='http://www.scs.carleton.ca/'>McGill University SoCS</a>, jeromew@cs.mcgill.ca, alexander.butyaev@mail.mcgill.ca.";
 			document.body.appendChild(staticBlock); 
 				
 		</script>

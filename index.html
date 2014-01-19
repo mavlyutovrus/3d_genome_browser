@@ -2,21 +2,27 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>game</title>
-		<link href="css/main.css" rel="stylesheet" type="text/css"/>
+        <title>3DBD genome browser</title>
+		<link href="main.css" rel="stylesheet" type="text/css"/>
     	<!-- lite version of three.js distrib   -->
-    	<script src="js/min.three.js"></script>
+    	<script src="min.three.js"></script>
     	<!-- hacked PointerLockControls.js from "three/examples/js/controls/PointerLockControls.js" -->
-		<script src="js/PointerLockControls.js"></script>
+		<script src="PointerLockControls.js"></script>
     	<!-- jquery -->
     	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
 		<!-- low-resolution 3d model  -->
 		<script src="data.js"></script>
     </head>
     <body>
+        <!-- google analytics -->
+   	
+    	
+    	
+    	
 	    <div id="blocker">
 	        <div id="instructions">
-	            <span style="font-size:40px">Click to play</span><br />(W, A, S, D = Move, MOUSE = Look around)
+	            <span style="font-size:40px">Click to play</span><br />(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size)<br/>
+	            Supported browsers: Firefox, Google Chrome.
 	        </div>
 	    </div>
 
@@ -24,16 +30,34 @@
 		<!-- main part -->
         <script>
         	var DEBUG = true;
+			// zero point in local coordinates translates into zeroCoordinate in the model coordinates        
+        	var zeroCoordinate = {x : 400.0, y: 150.0, z: 0.0};
+        	// 1 point in the model coordinates =  scaleFactor points in local coordinates
+        	var scaleFactor = 10; 
+        	var blockSize = 400;
         
             var camera, scene, renderer, controls;
+            var projector = new THREE.Projector();
+            
+            var infoBlock, staticBlock;
+            
+            var selectionMesh;
+            
+            var targetBall;
+            
+            var basesInSelection = 1500;
             
             var sphere;
-            var uploaded_area = [];
+            var uploaded_area = {};
+            
+            var uploaded_splines = {};
 
             var time = Date.now();
 
 			// 3d dna molecules
             var objects = [];
+            
+            var regionData = {};
 			
 			// dark screen, when the game starts
             var blocker = document.getElementById( 'blocker' );
@@ -88,10 +112,28 @@
                     } else {
                         element.requestPointerLock();
                     }
-                }, false );            	
+                }, false );    
+                
+				{
+					
+					var scrollHandler = function (event) {
+						if (event.detail != null && event.detail < 0 || event.wheelDeltaY != null && event.wheelDeltaY > 0) {
+							basesInSelection = Math.min(3000, basesInSelection + 100);
+						} else {
+							basesInSelection = Math.max(100, basesInSelection - 100);
+						}
+					};
+					var mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
+					if (document.attachEvent) //if IE (and Opera depending on user setting)
+					    document.attachEvent("on"+mousewheelevt, scrollHandler);
+					else if (document.addEventListener) //WC3 browsers
+					    document.addEventListener(mousewheelevt, scrollHandler, false);					
+				}
 
             }
             
+            
+            var chrid2color = {};
             
 			// the pointerLock object has different name in different browsers
 			// http://www.html5rocks.com/en/tutorials/pointerlock/intro/
@@ -99,32 +141,25 @@
             if ( havePointerLock ) {
             	init_controls();
             } else {
-            	instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+            	instructions.innerHTML = "Your browser doesn\'t seem to support Pointer Lock API<br/>Supported browsers: Firefox, Google Chrome.";
             }
             init();
             animate();
-			
-            function init() {
-                    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 100000 );
-                    scene = new THREE.Scene();
-                    //scene.fog = new THREE.Fog( 0xffffff, 0, 2000 );
-
+            
+            function init_light() {
                     var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
                     light.position.set( 1, 1, 1 );
                     scene.add( light );
                     var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
                     light.position.set( -1, - 0.5, -1 );
                     scene.add( light );
-
-					//from js/PointerLockControls.js
-                    controls = new THREE.PointerLockControls( camera );
-                    scene.add( controls.getObject() );
-                    
-					var color = new THREE.Color().setHSL( Math.random(),  Math.random(),  Math.random());
-					
+            }
+            
+            function draw_low_resolution_model() {
                     // loading 3d-model
 					// data - is an array of arrays, each array is a sequence of points of a DNA molecule
-					// each point is represented with 4 numbers x,y,z and a base index.
+					// each point is represented with 4 numbers: base_index, x,y,z
+					var color = new THREE.Color().setHSL( Math.random(),  Math.random(),  Math.random());
 					for (var chr_index = 0; chr_index < data.length; ++chr_index) {
 						chr_data = data[chr_index];
 						var CELL_SIZE = 4;
@@ -136,9 +171,7 @@
 								opacity: 1,
 								wireframe: true,
 								transparent: false
-						  });
-						 									
-						
+						});
 						var spline_points = [];
 						for (var point_index = 0; point_index < points_count; ++point_index) {
 							x = chr_data[(point_index) * CELL_SIZE];
@@ -149,114 +182,382 @@
 						}
 						var spline = new THREE.SplineCurve3(spline_points);
 						var segments = points_count * 2;
-						var radiusSegments = 12;
-						var tube = new THREE.TubeGeometry(spline, segments, 10, radiusSegments, false, false);
+						var radiusSegments =  4;
+						var tube = new THREE.TubeGeometry(spline, segments, 1, radiusSegments, false, false);
 						tube.dynamic = true;
-						tubeMesh = new THREE.Mesh(tube, material);										
+						tubeMesh = new THREE.Mesh(tube, material);							
 						scene.add(tubeMesh);
 						objects.push(tubeMesh);
-						
-
-                    }
+                    }            	
+            	
+            }
+            
+            function InitSelectionMesh() {
+				var spline = new THREE.SplineCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(100, 100, 100),]);
+				var material = new THREE.LineBasicMaterial({color: 0xff0000});
+				var segments = 10;
+				var radiusSegments = 6;
+				var tube = new THREE.TubeGeometry(spline, segments, 20, radiusSegments, false, false);
+				tube.dynamic = true;
+				tube.verticesNeedUpdate = true;
+				selectionMesh = new THREE.Mesh(tube, material);
+				selectionMesh.name = "selection_mesh";
+				scene.add(selectionMesh);          	
+            }
+            
+            function UpdateTargetBallPosition() {
+				var vector = new THREE.Vector3(0, 0, 0);
+				var raycaster = projector.pickingRay(vector, camera);
+				raycaster.ray.direction.normalize().multiplyScalar(50);
+				var x = raycaster.ray.direction.x + raycaster.ray.origin.x;
+				var y = raycaster.ray.direction.y + raycaster.ray.origin.y;
+				var z = raycaster.ray.direction.z + raycaster.ray.origin.z;
+				targetBall.position.set(x,  y, z);
+				targetBall.geometry.verticesNeedUpdate = true;
+				scene.remove(targetBall);   	
+				scene.add(targetBall); 
+            }
+            
+            function InitTargetBall() {
+            	var sphere = new THREE.SphereGeometry(0.5, 10, 10);
+            	sphere.dynamic = true;
+            	targetBall = new THREE.Mesh(sphere, new THREE.LineBasicMaterial({color: 0xff0000}));
+				targetBall.name = "target_ball";            	
+				UpdateTargetBallPosition();						          	
+            }
+			
+            function init() {
+            		scene = new THREE.Scene();
+					camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 100000 );
+                    controls = new THREE.PointerLockControls( camera );
+                    scene.add( controls.getObject() );
+					//scene.fog = new THREE.Fog( 0xffffff, 0, blockSize * scaleFactor );
+					init_light(scene);    
+                    //draw_low_resolution_model();
+                  
                     renderer = new THREE.WebGLRenderer();
                     renderer.setClearColor( 0xffffff );
                     renderer.setSize( window.innerWidth, window.innerHeight );
+                    
+                    InitSelectionMesh();
+                    InitTargetBall();
 
                     document.body.appendChild( renderer.domElement );
-                    window.addEventListener( 'resize', onWindowResize, false );
+                    window.addEventListener( 'resize', onWindowResize, false );      
             }
 
             function onWindowResize() {
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
                     renderer.setSize( window.innerWidth, window.innerHeight );
+                    
             }
             
+            function Local2global(coordinates) {
+            	return {x :  zeroCoordinate.x + coordinates.x / scaleFactor, 
+            		    y : zeroCoordinate.y + coordinates.y / scaleFactor, 
+            		    z : zeroCoordinate.z + coordinates.z / scaleFactor };
+            }
+            function Global2local(coordinates) {
+            	return {x :  (coordinates.x - zeroCoordinate.x) * scaleFactor, 
+            		    y :  (coordinates.y - zeroCoordinate.y) * scaleFactor, 
+            		    z :  (coordinates.z - zeroCoordinate.z) * scaleFactor };
+            }       
             
-            function update_model(json_points) {
+            function GenerateColor() {
+            	mix = [0.8, 0.8, 0.8];
+			    var red = Math.random();
+			    var green = Math.random();
+			    var blue = Math.random();
+			    // mix the color
+			    red = (red + mix[0]) / 2;
+			    green = (green + mix[1]) / 2;
+			    blue = (blue + mix[2]) / 2;
+			    return new THREE.Color().setRGB(red, green, blue);
+            }     
+            
+            function DrawPoints(model_points) {
+            	new_tracks = model_points["data"];
+            	
+            	for (var track_index = 0; track_index < new_tracks.length; ++track_index) {
+            		chrid = new_tracks[track_index][0];
+            		chridNoStrand = chrid.substr(0, chrid.length - 2);
+            		if (!chrid2color[chridNoStrand]) {
+            			//chrid2color[chridNoStrand] = new THREE.Color().setHSL( Math.random(),  Math.random(),  Math.random());
+            			chrid2color[chridNoStrand] = GenerateColor();
+            		}
+            		track_points = new_tracks[track_index][1];
+					var tube_color = chrid2color[chridNoStrand];
+					var material = new THREE.MeshLambertMaterial( { color: tube_color, shading: THREE.SmoothShading } );
+					/*
+					var material = new THREE.MeshBasicMaterial({
+							color: tube_color,
+							opacity: 1,
+							wireframe: false,
+							transparent: false
+					  });
+					*/								
+					var spline_points = [];
+					var points_count = track_points.length;
+					for (var point_index = 0; point_index < points_count; ++point_index) {
+						var chunk = track_points[point_index];
+						var localCorodinates = Global2local( {x: chunk[2], y: chunk[3], z : chunk[4] });						
+						spline_points.push(new THREE.Vector3(localCorodinates.x, localCorodinates.y, localCorodinates.z));
+					}
+					var spline = new THREE.SplineCurve3(spline_points);
+					var segments = points_count * 2;
+					var radiusSegments = 6;
+					var tube = new THREE.TubeGeometry(spline, segments, 10, radiusSegments, false, false);
+					tube.dynamic = true;
+					var tubeMesh = new THREE.Mesh(tube, material);	
+					
+					tubeMesh.name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
+					uploaded_splines[tubeMesh.name] = [chrid, track_points];									
+					scene.add(tubeMesh);
+					objects.push(tubeMesh);
+				}
             }
             
-            // TODO: most important function, sends requests and update the data
-            function get_points() {
-            	upload_distance  = 500;
-            	var position = controls.getObject().position;
-            	//uploaded_area works as a cash for an uploaded data
-            	//if we are inside an already uploaded region, we don't do anything
-            	for (var reg_index = 0; reg_index < uploaded_area.length; ++reg_index) {
-            		x = uploaded_area[reg_index][0];
-            		y = uploaded_area[reg_index][1]; 
-            		z = uploaded_area[reg_index][2];		
-					var inside = Math.abs(position.x - x) < upload_distance  && 
-								      Math.abs(position.y - y) < upload_distance  && 
-								      Math.abs(position.z - z) < upload_distance;
-            		if (inside) {
-            			return;
+            function DrawBox(cornerModelCoordinates, edgeSize) {
+		       var vertices = [];
+		       for (var pointIndex = 0; pointIndex < 8; ++pointIndex) {
+		           var xCoord = cornerModelCoordinates.x + edgeSize * (pointIndex % 2);
+		           var yCoord = cornerModelCoordinates.y + edgeSize * ((pointIndex >> 1) % 2);
+		           var zCoord = cornerModelCoordinates.z + edgeSize * ((pointIndex >> 2) % 2);
+		           vertexLocalCoordinates = Global2local({x: xCoord, y: yCoord, z: zCoord });
+		           vertices[pointIndex] = new THREE.Vector3(vertexLocalCoordinates.x, vertexLocalCoordinates.y, vertexLocalCoordinates.z);
+		       }
+		       for (var firstIndex = 0; firstIndex < vertices.length; ++firstIndex) {
+		           for (var secondIndex = firstIndex + 1; secondIndex < vertices.length; ++secondIndex) {
+		               var matchedCoordinates = ((firstIndex % 2) == (secondIndex % 2)) ? 1 : 0;
+		               matchedCoordinates += ((firstIndex >> 1) % 2 == (secondIndex >> 1) % 2) ? 1 : 0;
+		               matchedCoordinates += ((firstIndex >> 2) % 2 == (secondIndex >> 2) % 2) ? 1 : 0;
+		               if (matchedCoordinates == 2) {
+						   var material = new THREE.LineBasicMaterial({color: 0x0000ff});
+						   var geometry = new THREE.Geometry();
+						   geometry.vertices.push(vertices[firstIndex]);
+						   geometry.vertices.push(vertices[secondIndex]);	               	
+						   var line = new THREE.Line(geometry, material);
+						   scene.add(line);
+		               }
+		           }           
+		       }      
+            }
+            
+            function UploadPoints(blockCornerCoordinates) {
+            	overlap = blockSize * 0.2;
+            	var request = "xstart=" + String(blockCornerCoordinates.x - overlap) 
+            				  + "&xend=" + String(blockCornerCoordinates.x + blockSize + overlap)
+            				  + "&zstart=" + String(blockCornerCoordinates.z - overlap)      
+            				  + "&zend=" + String(blockCornerCoordinates.z + blockSize + overlap)  
+            				  + "&ystart=" + String(blockCornerCoordinates.y - overlap)      
+            				  + "&yend=" + String(blockCornerCoordinates.y + blockSize + overlap);  	
+			    var url = "http://1kgenome.exascale.info/js_test?" + request;
+			    $.getJSON(url + "?callback=?", null, 
+			    	function(model_points) {
+			    		DrawPoints(model_points);
+			    	}
+			    );
+            }
+            
+            function GetBlockIndices(modelPosition) {
+            	blockOffset = blockSize / 2;
+		        var blockIndexX = Math.floor((modelPosition.x + blockOffset) / blockSize);
+		        var blockIndexY = Math.floor((modelPosition.y + blockOffset) / blockSize);
+		        var blockIndexZ = Math.floor((modelPosition.z + blockOffset) / blockSize);   
+		        //System.out.println(String.format("%f %f %f -> %d %d %d", x, y, z, blockIndexX, blockIndexY, blockIndexZ));
+		        return {x : blockIndexX, y : blockIndexY, z : blockIndexZ };
+            }
+            
+            function GetBlockCornerCoordinates(blockIndices) {
+            	blockOffset = blockSize / 2;
+            	var xCoord = blockIndices.x * blockSize - blockOffset;
+            	var yCoord = blockIndices.y * blockSize - blockOffset;
+            	var zCoord = blockIndices.z * blockSize - blockOffset;
+            	return {x : xCoord, y: yCoord, z: zCoord};
+            }
+            
+            function Coords2Str(coordinates) {
+            	return String(coordinates.x) + ":" + String(coordinates.y) + ":" + String(coordinates.z);
+            }
+            
+            function UpdateModel() {
+            	var modelPosition = Local2global(controls.getObject().position);
+            	var blockIndices = GetBlockIndices(modelPosition);
+            	var blockIndicesStr = Coords2Str(blockIndices);
+            	if (blockIndicesStr in uploaded_area) {
+            		return;            		
+            	}
+            	uploaded_area[blockIndicesStr] = true;
+            	var blockCornerCoordinates = GetBlockCornerCoordinates(blockIndices);
+            	DrawBox(blockCornerCoordinates, blockSize);
+            	UploadPoints(blockCornerCoordinates);
+            }
+            
+            function GetIntersection() {
+            	var vector = new THREE.Vector3(0, 0, 0);
+            	var raycaster = projector.pickingRay(vector, camera);
+            	var intersects = raycaster.intersectObjects(objects);
+				if (intersects.length == 0) {
+					return null;
+				}
+				return intersects[0];
+            }
+            
+            function GetSelectedTrackPoints(intersectPoint, trackName) {
+            	var intersectInModelCoordinates = Local2global(intersectPoint);
+            	var trackPoints = uploaded_splines[trackName][1];
+            	var chrid = trackName.split("-")[0];
+            	var closestPoint = -1;
+            	var minDistance = -1;
+            	for (var pointIndex = 0; pointIndex < trackPoints.length; ++pointIndex) {
+            		var x = trackPoints[pointIndex][2];
+            		var y = trackPoints[pointIndex][3];
+            		var z = trackPoints[pointIndex][4];
+            		var distance = Math.pow(intersectInModelCoordinates.x - x, 2) + 
+            						Math.pow(intersectInModelCoordinates.y - y, 2) +
+            						Math.pow(intersectInModelCoordinates.z - z, 2);
+            		if (minDistance == -1 || distance < minDistance) {
+            			minDistance = distance;
+            			closestPoint = pointIndex;
             		}
             	}
-            	
-            	//convert 3d slab into segments of chromosomes, which have to be updated
-            	regions = [];
-				for (var chr_index = 0; chr_index < data.length; ++chr_index) {
-					var chr_data = data[chr_index];
-					var CELL_SIZE = 4;
-					var points_count = chr_data.length / CELL_SIZE;
-					var start = -1;
-					for (var point_index = 0; point_index < points_count; ++point_index) {
-						var x = chr_data[(point_index) * CELL_SIZE];
-						var y = chr_data[(point_index) * CELL_SIZE + 1];
-						var z = chr_data[(point_index) * CELL_SIZE + 2];
-						var bp_index = chr_data[(point_index) * CELL_SIZE + 3];
-						var inside = Math.abs(position.x - x) < upload_distance && 
-								      Math.abs(position.y - y) < upload_distance && 
-								      Math.abs(position.z - z) < upload_distance;
-						if (!inside) {
-							if (start > -1) {
-								regions.push([chr_index, start, bp_index]);
-								start = -1;											
-							}
-						} else {
-							if (start == -1) {
-								start =  bp_index;
-							}									
-						}
-					}
-					if (start > -1) {
-						regions.push([chr_index, start, bp_index]);								
-					}                        	
-            	}
-            	if (regions.length) {
-            		//TODO
-					$.getJSON( "ajax/test.json", regions, update_model);      		
-            	}
-            	uploaded_area.push([position.x, position.y, position.z]);
-            	
-            	if (DEBUG) {
-	            	var color = new THREE.Color().setHSL( 0.5,  0.5,  0.5);
-					var sphere_material = new THREE.MeshBasicMaterial({
-								color: color,
+			    
+			    var start = closestPoint;
+			    while (start > 0 && Math.abs(trackPoints[start][1] - trackPoints[closestPoint][1]) < basesInSelection / 2) {
+			    	--start;
+			    }
+			    var end = closestPoint;
+			    while (end < trackPoints.length - 1 && Math.abs(trackPoints[end][1] - trackPoints[closestPoint][1]) < basesInSelection / 2) {
+			    	++end;
+			    }
+			    
+			   	function Interpolate(point, otherPoint, bpIndexNeed) {
+			   		var bpIndex = trackPoints[point][1];
+			   		var bpIndexOther = trackPoints[otherPoint][1];
+			   		var coeff = (bpIndexNeed - bpIndex) / (bpIndexOther - bpIndex);
+			   		var xCoord = trackPoints[point][2] + (trackPoints[otherPoint][2] - trackPoints[point][2]) * coeff;
+			   		var yCoord = trackPoints[point][3] + (trackPoints[otherPoint][3] - trackPoints[point][3]) * coeff;
+			   		var zCoord = trackPoints[point][4] + (trackPoints[otherPoint][4] - trackPoints[point][4]) * coeff;
+			   		return {x: xCoord, y: yCoord, z: zCoord};
+			   	}
+			   	
+		   		var otherPoint = start < trackPoints.length - 1 ? start + 1 : start;
+		   		var exactStartPosition = Interpolate(start, otherPoint, trackPoints[closestPoint][1] - basesInSelection / 2);
+		   		otherPoint = end > 0 ? end - 1 : end;
+		   		var exactEndPosition = Interpolate(end, otherPoint, trackPoints[closestPoint][1] + basesInSelection / 2);
+				
+				var selectionTrackPoints = [Global2local(exactStartPosition)];
+				for (var pointIndex = start + 1; pointIndex < end; ++pointIndex) {
+					selectionTrackPoints.push(Global2local({x: trackPoints[pointIndex][2], y: trackPoints[pointIndex][3], z: trackPoints[pointIndex][4]}));
+				}
+				selectionTrackPoints.push(Global2local(exactEndPosition));
+				
+				{
+					var spline = new THREE.SplineCurve3(selectionTrackPoints);
+					var segments = basesInSelection / 50;
+					var radiusSegments = 6;
+					var tube = new THREE.TubeGeometry(spline, segments, 20, radiusSegments, false, false);
+					tube.dynamic = true;
+					scene.remove(selectionMesh);
+					{
+						var material = new THREE.MeshBasicMaterial({
+								color: 0xff0000,
 								opacity: 1,
 								wireframe: true,
 								transparent: false
-						  });
-	                sphere = new THREE.Mesh(new THREE.SphereGeometry(upload_distance, 16, 16), sphere_material);
-	                sphere.position.x = position.x;
-	                sphere.position.y = position.y;
-	                sphere.position.z = position.z;
-	                scene.add(sphere);
-               }
-
+						});						
+						
+						selectionMesh = new THREE.Mesh(tube, material);
+						selectionMesh.geometry.verticesNeedUpdate = true;
+						scene.add(selectionMesh);
+					}
+					
+				}
+				
+				return [chrid, trackPoints[closestPoint][1] - basesInSelection / 2, 
+							trackPoints[closestPoint][1] + basesInSelection / 2]; 	
             }
             
+            function ClearInfo() {
+            	infoBlock.innerHTML = "";
+            }
+            
+            
+            function PositionToString(region) {
+            	var helix = region[0].split("_")[1] == "a" ? "helix A" : "helix B";
+            	var info = "Selection: chromosome: " + region[0].split("_")[0] + ", " + helix;
+            	info += ", bases: " + String(region[1]) + "&ndash;" + String(region[1]);
+            	return info;            	
+            }
+
+			function Popup(data) {
+				var popup = window.open("","MsgWindow","width=200,height=100");
+				popup.document.write("<p>" + data + "</p>");								
+			}
+
+			function UploadRegionData(region) {
+				var key = PositionToString(region);
+            	var request = "start=" + String(region[1]) 
+            				  + "&end=" + String(region[2])
+            				  + "&chrid=" + String(region[0]);
+			    var url = "http://1kgenome.exascale.info/range?" + request;		
+			    $.getJSON(url + "?callback=?", null, 
+			    	function(regionInfo) {
+			    		console.log("data: " + regionInfo);
+			    		regionData[key] = key + "<br/>Region data:<br/><ul><li>Bases: <a target='_blank' href='" + url + "'>" + regionInfo.substring(0, 50) + "...</a><br/></ul>";
+			    		if (infoBlock.innerHTML == key) {
+			    			infoBlock.innerHTML = regionData[key];
+			    		}
+			    	}
+			    ); 		
+			}
+            
+            function UpdateInfo() {
+            	intersection = GetIntersection();
+            	if (intersection == null) {
+            		ClearInfo();
+            		return;
+            	}
+            	object = intersection.object;
+            	point = intersection.point;
+            	if (object.name == "") {
+            		ClearInfo();
+            		return;
+            	}
+            	var region = GetSelectedTrackPoints(point, object.name);
+            	var positionStr = PositionToString(region);      	
+            	if (positionStr in regionData) {
+            		infoBlock.innerHTML = regionData[positionStr];
+            	} else {
+					infoBlock.innerHTML = positionStr;
+					UploadRegionData(region);
+           		}
+            		
+            }
 
             function animate() {
                     requestAnimationFrame( animate );
-                   	//request for new data
-                   	get_points();                    
+                    UpdateTargetBallPosition();
+                    UpdateInfo();
+                   	UpdateModel();
                     controls.update( Date.now() - time );
                     renderer.render( scene, camera );
                     time = Date.now();
             }
 
         </script>
+        
+        <script>
+        	infoBlock = document.createElement('div');
+			infoBlock.id = "infoblock";
+			document.body.appendChild(infoBlock); 
+			
+			staticBlock = document.createElement('div');
+			staticBlock.id = "staticblock";
+			staticBlock.innerHTML = "<em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>, {phil, ruslan}@exascale.info";
+			document.body.appendChild(staticBlock); 
+				
+		</script>
     </body>
 </html>

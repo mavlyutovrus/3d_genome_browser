@@ -274,7 +274,68 @@
 			    green = (green + mix[1]) / 2;
 			    blue = (blue + mix[2]) / 2;
 			    return new THREE.Color().setRGB(red, green, blue);
-            }     
+            }
+            
+            function DrawSNPs(positions, track_points) {
+            	var track_points_position = 0;
+            	for (var point_index = 0; point_index < positions.length; ++point_index) {
+            		var base_index = positions[point_index][0];
+            		var snp_id = String(positions[point_index][1]);
+            		while (track_points_position < track_points.length && track_points[track_points_position][1] <=  base_index) {
+            			++track_points_position;
+            		}
+            		if (track_points_position > 0 && track_points_position < track_points.length) {
+            			var prev_base_index = track_points[track_points_position - 1][1];
+            			var curr_base_index = track_points[track_points_position][1];
+            			var coefficient = (base_index - prev_base_index) / (curr_base_index - prev_base_index);
+            			var x = (1 - coefficient) * track_points[track_points_position - 1][2] + coefficient * track_points[track_points_position][2];
+            			var y = (1 - coefficient) * track_points[track_points_position - 1][3] + coefficient * track_points[track_points_position][3];
+            			var z = (1 - coefficient) * track_points[track_points_position - 1][4] + coefficient * track_points[track_points_position][4];
+            			var localCoords = Global2local({ x: x, y : y, z : z });
+		            	var sphere = new THREE.SphereGeometry(12, 10, 10);
+		            	var snp_ball = new THREE.Mesh(sphere, new THREE.LineBasicMaterial({color: 0xff0000}));
+						snp_ball.name = "rs" + snp_id;            	
+						snp_ball.position.set(localCoords.x,  localCoords.y, localCoords.z);
+						scene.add(snp_ball); 
+            		}
+            	}
+				//console.log(String(positions[0][0]) + " " + String(track_points[0][1]));
+            }
+            
+            function UploadRegionSNP(chr, track_points) {
+        		var request = "chr=" + chr + "&start=" + String(track_points[0][1]) +
+        						 "&end=" + String(track_points[track_points.length - 1][1]); 
+			    var url = "http://1kgenome.exascale.info/js_snp?" + request;
+			    $.getJSON(url + "?callback=?", null, 
+			    	function(positions) {
+			    		DrawSNPs(positions, track_points);
+			    	}
+			    ); 	
+            }
+            
+            function UploadSNP(new_model_points) {
+            	var new_tracks = new_model_points["data"];
+            	var longest = -1;
+            	var length = 0;
+            	for (var track_index = 0; track_index < new_tracks.length; ++track_index) {
+            		var track_points = new_tracks[track_index][1];
+            		if (track_points.length > length) {
+            			longest = track_index;
+            			length = track_points.length;
+            		}
+            	}
+            	for (var track_index = longest; track_index < longest + 1; ++track_index) {
+            		var chrid = new_tracks[track_index][0];
+            		var chridNoStrand = chrid.substr(0, chrid.length - 2);
+            		var chridOnlyNumber = chridNoStrand;
+            		if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
+            			chridOnlyNumber = chridOnlyNumber.substr(0, chridOnlyNumber.length - 1);
+            		}
+            		var track_points = new_tracks[track_index][1];
+            		UploadRegionSNP(chridOnlyNumber, track_points);
+				}
+            }
+                        
             
             function DrawPoints(model_points) {
             	new_tracks = model_points["data"];
@@ -343,7 +404,7 @@
 		           }           
 		       }      
             }
-            
+
             function UploadPoints(blockCornerCoordinates) {
             	overlap = blockSize * 0.2;
             	var request = "xstart=" + String(blockCornerCoordinates.x - overlap) 
@@ -356,6 +417,7 @@
 			    $.getJSON(url + "?callback=?", null, 
 			    	function(model_points) {
 			    		DrawPoints(model_points);
+			    		//UploadSNP(model_points);
 			    	}
 			    );
             }
@@ -480,7 +542,9 @@
             }
             
             function ClearInfo() {
-            	infoBlock.innerHTML = "";
+            	if (infoBlock) {
+            		infoBlock.innerHTML = "";
+            	}
             }
             
             
@@ -504,18 +568,58 @@
 			    $.getJSON(url + "?callback=?", null, 
 			    	function(regionInfo) {
 			    		var key = PositionToString(region);
-			    		region[0] = region[0].replace("_b", "_a");
-			    		var key_a = PositionToString(region);
-			    		region[0] = region[0].replace("_a", "_b");
-			    		var key_b = PositionToString(region);
-			    		formated_data = "<br/>Region data:<br/><ul><li>Bases: <a target='_blank' href='" + url + "'>" + regionInfo.substring(0, 50) + "...</a><br/></ul>";
-			    		regionData[key_a] = key_a + formated_data;
-			    		regionData[key_b] = key_b + formated_data;
+			    		var chrid = region[0];
+			    		chrid = chrid.replace("_b", "_a");
+			    		var key_a = PositionToString([chrid, region[1], region[2]]);
+			    		chrid = chrid.replace("_a", "_b");
+			    		var key_b = PositionToString([chrid, region[1], region[2]]);
+			    		formated_data = "Bases: <a target='_blank' href='" + url + "'>" + regionInfo.substring(0, 50) + "...</a>";
+			    		regionData[key_a][1] = formated_data;
+			    		regionData[key_b][1] = formated_data;
+			    		infoBlock.innerHTML = regionData[key];
+			    		/*
 			    		if (infoBlock.innerHTML == key) {
 			    			infoBlock.innerHTML = regionData[key];
+			    		} else {
+			    			console.log("da fuck: " + infoBlock.innerHTML);
 			    		}
+			    		*/
 			    	}
-			    ); 		
+			    ); 	
+			    
+			    {//SNPs
+			    	var chrid = String(region[0]);
+            		var chridNoStrand = chrid.substr(0, chrid.length - 2);
+            		var chridOnlyNumber = chridNoStrand;
+            		if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
+            			chridOnlyNumber = chridOnlyNumber.substr(0, chridOnlyNumber.length - 1);
+            		}
+			    	
+	        		var request = "chr=" + chridOnlyNumber + "&start=" + String(region[1]) +
+	        						 "&end=" + String(region[2]); 
+				    var url = "http://1kgenome.exascale.info/js_snp?" + request;
+				    $.getJSON(url + "?callback=?", null, 
+				    	function(positions) {
+				    		snips = "";
+			            	for (var point_index = 0; point_index < positions.length; ++point_index) {
+			            		var base_index = positions[point_index][0];
+			            		var snp_id = "rs" + String(positions[point_index][1]);
+			            		snips += " " + snp_id + ";";
+			            	}
+			            	formated_data = "SNPs:" + snips;
+			            	var key = PositionToString(region);
+				    		var chrid = region[0];
+				    		chrid = chrid.replace("_b", "_a");
+				    		var key_a = PositionToString([chrid, region[1], region[2]]);
+				    		chrid = chrid.replace("_a", "_b");
+				    		var key_b = PositionToString([chrid, region[1], region[2]]);
+				    		regionData[key_a][2] = formated_data;
+				    		regionData[key_b][2] = formated_data;
+				    		infoBlock.innerHTML = regionData[key];
+				    	}
+				    );
+			    }		    
+
 			}
             
             function UpdateInfo() {
@@ -533,12 +637,13 @@
             	var region = GetSelectedTrackPoints(point, object.name);
             	var positionStr = PositionToString(region);  
             	if (positionStr in regionData) {
-            		infoBlock.innerHTML = regionData[positionStr];
+            		infoBlock.innerHTML = regionData[positionStr][0] + "<br/>" + regionData[positionStr][1] + "<br/>" + regionData[positionStr][2]; 
             	} else {
             		//show something immidiately
             		infoBlock.innerHTML = positionStr + "<br/>data uploading...";
-            		//also works like flag: request already sent
-            		regionData[positionStr] = positionStr;
+            		//also works like flag: request is already sent
+            		regionData[PositionToString([region[0].replace("_b", "_a"), region[1], region[2]])] = [positionStr, "", ""];
+            		regionData[PositionToString([region[0].replace("_a", "_b"), region[1], region[2]])] = [positionStr, "", ""];
             		UploadRegionData(region);            		
             	}
             }

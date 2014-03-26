@@ -30,6 +30,10 @@ THREE.PointerLockControls = function ( camera ) {
 
 	var PI_2 = Math.PI / 2;
 
+	var onMouseClick = function ( event ) {
+		alert('Click!');
+	}
+
 	var onMouseMove = function ( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -43,6 +47,7 @@ THREE.PointerLockControls = function ( camera ) {
 		pitchObject.rotation.x  = Math.max(Math.min(pitchObject.rotation.x, Math.PI / 2.0), -Math.PI / 2.0); 
 
 	};
+
 
 	var onKeyDown = function ( event ) {
 
@@ -76,7 +81,12 @@ THREE.PointerLockControls = function ( camera ) {
 				if ( canJump === true ) velocity.y += 10;
 				canJump = false;
 				break;
-
+			// case 71: // g
+			// 	alert('do here anything!');
+			// 	break;
+			 // default:
+			 // 	console.log(event.keyCode);
+			 // 	break
 		}
 
 	};
@@ -116,6 +126,7 @@ THREE.PointerLockControls = function ( camera ) {
 	document.addEventListener( 'mousemove', onMouseMove, false );
 	document.addEventListener( 'keydown', onKeyDown, false );
 	document.addEventListener( 'keyup', onKeyUp, false );
+	document.addEventListener( 'contextmenu', onMouseClick, false);
 
 	this.enabled = false;
 

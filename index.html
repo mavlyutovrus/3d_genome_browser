@@ -5,30 +5,73 @@
         <title>3DBD genome browser</title>
 		<link href="main.css" rel="stylesheet" type="text/css"/>
     	<!-- lite version of three.js distrib   -->
-    	<script src="min.three.js"></script>
+    	<script src="js/min.three.js"></script>
     	<!-- hacked PointerLockControls.js from "three/examples/js/controls/PointerLockControls.js" -->
-		<script src="PointerLockControls.js"></script>
+		<script src="js/PointerLockControls.js"></script>
     	<!-- jquery -->
     	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+
+        <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+        
+        <script type='text/javascript' src='js/DAT.GUI.min.js'></script>
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+
+        <script>
+              $(function() {
+                $( "#tabs" ).tabs();
+              });
+        </script>
+
+
+        <style>canvas { width: 100%; height: 100% }</style>
 		<!-- low-resolution 3d model  -->
-		<script src="data.js"></script>
+		<!--<script src="data.js"></script>-->
+        
+
     </head>
     <body>
         <!-- google analytics -->
-   	
-    	
-    	
-    	
-	    <div id="blocker">
-	        <div id="instructions">
-	            <span style="font-size:40px">Click to play</span><br />(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size)<br/>
-	            Supported browsers: Firefox, Google Chrome.
-	        </div>
-	    </div>
-
+        <div id="tabs">
+          <ul>
+            <li><a href="#tabs-0">Welcome Page/UI</a></li>
+            <li><a href="#tabs-1">Genome Browser</a></li>
+            <li><a href="#tabs-2">Something else</a></li>
+            <li><a href="#tabs-3">Contact us</a></li>
+          </ul>
+          <div id="tabs-0">
+            <p>Welcome to 3D Genome Browser page</p>
+            <p><input id = "incoords" type="text" title="The format of data 'x,y,z'." size="40">
+                <p>
+                    <button type="button" onclick="var incoords = document.getElementById('incoords').value; if (validate(incoords)) {ChangeCameraPosition(incoords); $('#tabs').tabs('option', 'active', 1); } else {window.alert('Wrong format of input data. It should be [x,y,z] where any symbol(s) except for numeric could be separators');}">Action</button>
+                </p>
+            </p>
+          </div>
+          <div id="tabs-1">
+                <div id="blocker">
+                    <div id="instructions">
+                        <span style="font-size:40px">Click to play</span><br />(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size)<br/>
+                        Supported browsers: Firefox, Google Chrome.
+                    </div>
+                </div>
+          </div>
+          <div id="tabs-2">
+            <p></p>
+          </div>
+          <div id="tabs-3">
+            <p><em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>, {phil, ruslan}@exascale.info; <a target='_blank' href='http://www.cs.mcgill.ca/'>McGill University SoCS</a>, jeromew@cs.mcgill.ca, alexander.butyaev@mail.mcgill.ca.</p>
+          </div>
+        </div>
 
 		<!-- main part -->
         <script>
+            var deb_var;
+            var lastBlockIndicesStr;
+            var radiusSphere = 40, segmentsWidth = 32, segmentsHeight = 16; //sphere zone parameters
+            var maxRadiusSphere = 140, minRadiusSphere = 20;
+            var regexpPattern = /[^\d]*([\d]+)[^\d]+([\d]+)[^\d]+([\d]+)[^\d]*/; //format smth(0+) [num] smth(1+) [num] smth(1+) [num] smth(0+)
+            var divElement;
+            var test_mesh;
         	var DEBUG = true;
 			// zero point in local coordinates translates into zeroCoordinate in the model coordinates        
         	var zeroCoordinate = {x : 400.0, y: 150.0, z: 0.0};
@@ -51,11 +94,14 @@
             var uploaded_area = {};
             
             var uploaded_splines = {};
+            var uploaded_splines_selection = {};
 
             var time = Date.now();
 
 			// 3d dna molecules
             var objects = [];
+
+            var lines = [];
             
             var regionData = {};
 			
@@ -64,6 +110,27 @@
             var instructions = document.getElementById( 'instructions' );
             
             var position = "";
+            
+
+            var snp_chip_seq_window;
+
+            var is_plane_mode = true; //start with plane mode
+            // var gui = new dat.GUI();
+            // var folder1;
+            // var mainObjX;
+            // var mainObjY;
+            // var mainObjZ;
+
+            function validate(incoords) {
+                return (incoords.match(regexpPattern) != null);
+            }
+
+            function ChangeCameraPosition(incoords) {
+                
+                var str = incoords.replace(regexpPattern, "$1:$2:$3");
+                var arr = str.split(':');
+                controls.getObject().position = new THREE.Vector3(parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]));
+            }
             
 
             function init_controls() {
@@ -115,23 +182,212 @@
                 }, false );    
                 
 				{
-					
+                    var GKeyDownHandler = function (event) {
+                        var element = document.body;
+                        if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element )
+                            switch ( event.keyCode ) {
+                                case 71: //g
+                                    if (!is_plane_mode) {
+                                        var _intersection = GetIntersection();
+                                        if (_intersection == null) {
+                                            alert("Point the area firstly!")
+                                            return;
+                                        }
+                                        init_new_window_SNP_CHIP_SEQ(_intersection.point);
+                                    }
+                                    break;
+                                case 67: //c - change mode from plane to vollume
+                                    is_plane_mode = !is_plane_mode;
+                                    break;    
+                            }
+                    }
+
+                    //scrolling event
 					var scrollHandler = function (event) {
 						if (event.detail != null && event.detail < 0 || event.wheelDeltaY != null && event.wheelDeltaY > 0) {
 							basesInSelection = Math.min(3000, basesInSelection + 100);
+                            radiusSphere = Math.min(maxRadiusSphere, radiusSphere + 10);
 						} else {
 							basesInSelection = Math.max(100, basesInSelection - 100);
+                            radiusSphere = Math.max(minRadiusSphere, radiusSphere -10);
 						}
 					};
 					var mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
-					if (document.attachEvent) //if IE (and Opera depending on user setting)
-					    document.attachEvent("on"+mousewheelevt, scrollHandler);
+					if (document.attachEvent) //if IE (and Opera depending on user setting) 
+                    {
+                        document.attachEvent("on"+mousewheelevt, scrollHandler);
+                        document.attachEvent("onkeydown", GKeyDownHandler);
+                    }
 					else if (document.addEventListener) //WC3 browsers
-					    document.addEventListener(mousewheelevt, scrollHandler, false);					
+                    {
+                        document.addEventListener(mousewheelevt, scrollHandler, false);
+                        document.addEventListener("keydown", GKeyDownHandler, false);
+                    }    
 				}
+            }
 
+            function buildCubeDataStructure(model_points) {
+                 uploaded_splines_selection = {};
+                 var new_cube_tracks = model_points["data"];
+                
+                 for (var track_index = 0; track_index < new_cube_tracks.length; ++track_index) {
+                    chrid = new_tracks[track_index][0];
+                    chridNoStrand = chrid.substr(0, chrid.length - 2);
+                    track_points = new_tracks[track_index][1];
+                    var tubeMesh_name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
+                    uploaded_splines_selection[tubeMesh_name] = uploaded_splines[tubeMesh_name];
+                    uploaded_splines_selection[tubeMesh_name][2] = track_points[0][1];
+                    uploaded_splines_selection[tubeMesh_name][3] = track_points[track_points.length - 1][1];
+                }
             }
             
+
+            function init_new_window_SNP_CHIP_SEQ (intersectPoint) {
+                snp_chip_seq_window = window.open("",/*index2.html",*/"_blank","dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
+                snp_chip_seq_window.document.write('<html><head><title>Information!</title><link rel="stylesheet" type="text/css" href="newTable.css"></head><body></body></html>')
+
+
+                var body=snp_chip_seq_window.document.getElementsByTagName('body')[0];
+                var s=snp_chip_seq_window.document.createElement('script');
+                s.setAttribute('src','TableFilter/tablefilter_all_min.js');
+                s.setAttribute('type','text/javascript');
+                snp_chip_seq_window.document.getElementsByTagName('head')[0].appendChild(s);
+
+                var tbl=snp_chip_seq_window.document.createElement('table');
+                
+                tbl.setAttribute('id','newtable');
+                var tbdy=snp_chip_seq_window.document.createElement('tbody');
+
+                var trL=snp_chip_seq_window.document.createElement('tr');
+                    var th=snp_chip_seq_window.document.createElement('th');
+                    th.appendChild(snp_chip_seq_window.document.createTextNode('Position'))
+                    trL.appendChild(th);
+
+                    th=snp_chip_seq_window.document.createElement('th');
+                    th.appendChild(snp_chip_seq_window.document.createTextNode('SNP'))
+                    trL.appendChild(th);
+
+                    th=snp_chip_seq_window.document.createElement('th');
+                    th.appendChild(snp_chip_seq_window.document.createTextNode('Transcription Factor'))
+                    trL.appendChild(th);
+
+                    th=snp_chip_seq_window.document.createElement('th');
+                    th.appendChild(snp_chip_seq_window.document.createTextNode('Level'))
+                    trL.appendChild(th);
+
+                tbdy.appendChild(trL);
+
+                var intersectInModelCoordinates = Local2global(intersectPoint);
+
+                var request = "xstart=" + String(intersectInModelCoordinates.x - radiusSphere) 
+                              + "&xend=" + String(intersectInModelCoordinates.x + radiusSphere)
+                              + "&zstart=" + String(intersectInModelCoordinates.z - radiusSphere)      
+                              + "&zend=" + String(intersectInModelCoordinates.z + radiusSphere)  
+                              + "&ystart=" + String(intersectInModelCoordinates.y - radiusSphere)      
+                              + "&yend=" + String(intersectInModelCoordinates.y + radiusSphere);
+                var url = "http://1kgenome.exascale.info/js_test?" + request;
+                $.getJSON(url + "?callback=?", null, 
+                    function(model_points) {
+                        var new_cube_tracks = model_points["data"];
+                        
+                        for (var track_index = 0; track_index < new_cube_tracks.length; ++track_index) {
+                            chrid = new_cube_tracks[track_index][0];
+                            chridNoStrand = chrid.substr(0, chrid.length - 2);
+                            track_points = new_cube_tracks[track_index][1];
+                            var tubeMesh_name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
+
+                            var chridOnlyNumber = chridNoStrand;
+                            if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
+                                chridOnlyNumber = chridOnlyNumber.substr(0, chridOnlyNumber.length - 1);
+                            }
+                            var requestCHIP = "chr=" + chridOnlyNumber 
+                              + "&start=" + track_points[0][1]
+                              + "&end=" + track_points[track_points.length - 1][1];
+                            var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
+
+                            $.getJSON(urlCHIP + "?callback=?", null, 
+                                function(model_points) {
+                                    var chipseq_tracks = model_points;
+                                    for (var track_index_CHIP = 0; track_index_CHIP < chipseq_tracks.length; ++track_index_CHIP) {
+                                          var start_pos = chipseq_tracks[track_index_CHIP][0];
+                                          var end_pos = chipseq_tracks[track_index_CHIP][1];
+                                          var TF_name = chipseq_tracks[track_index_CHIP][2];
+                                          var affect_level = chipseq_tracks[track_index_CHIP][3];
+                                          console.log(TF_name);
+                                          
+
+                                          var requestSNP = "chr=" + chridOnlyNumber 
+                                              + "&start=" + start_pos
+                                              + "&end=" + end_pos;
+                                          var urlSNP = "http://1kgenome.exascale.info/js_snp?" + requestSNP;
+                                          tempArray[urlSNP] = [chipseq_tracks[track_index_CHIP][0], chipseq_tracks[track_index_CHIP][1,chipseq_tracks[track_index_CHIP][2],chipseq_tracks[track_index_CHIP][3]];
+                                          $.getJSON(urlSNP + "?callback=?", null, 
+                                                function(positions) {
+                                                    console.log(urlSNP);
+                                                    for (var point_index = 0; point_index < positions.length; ++point_index) {
+                                                        var tr=snp_chip_seq_window.document.createElement('tr');
+                                                        //position
+                                                        var td=snp_chip_seq_window.document.createElement('td');
+                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(positions[point_index][0])));
+                                                        tr.appendChild(td)
+                                                        //snp
+                                                        td=snp_chip_seq_window.document.createElement('td');
+                                                        td.appendChild(snp_chip_seq_window.document.createTextNode("rs" + String(positions[point_index][1])));
+                                                        tr.appendChild(td)
+                                                        //TF
+                                                        td=snp_chip_seq_window.document.createElement('td');
+                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(tempArray)));
+                                                        tr.appendChild(td);
+                                                        //Level
+                                                        td=snp_chip_seq_window.document.createElement('td');
+                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(affect_level)));
+                                                        tr.appendChild(td)
+                                                        tbdy.appendChild(tr);
+                                                    }
+                                                    var tr=snp_chip_seq_window.document.createElement('tr');
+                                                    //position
+                                                    var td=snp_chip_seq_window.document.createElement('td');
+                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
+                                                    tr.appendChild(td)
+                                                    //snp
+                                                    td=snp_chip_seq_window.document.createElement('td');
+                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
+                                                    tr.appendChild(td)
+                                                    //TF
+                                                    td=snp_chip_seq_window.document.createElement('td');
+                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
+                                                    tr.appendChild(td);
+                                                    //Level
+                                                    td=snp_chip_seq_window.document.createElement('td');
+                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
+                                                    tr.appendChild(td)
+                                                    tbdy.appendChild(tr); 
+                                                }
+
+                                          );  
+                                                         
+                                    }
+
+
+                                }
+                            );
+
+                        }
+                    }
+                );
+                
+                tbl.appendChild(tbdy);
+                body.appendChild(tbl);
+                s=snp_chip_seq_window.document.createElement('script');
+                s.setAttribute('type','text/javascript');
+                s.appendChild(snp_chip_seq_window.document.createTextNode('setFilterGrid("newtable");'));
+                body.appendChild(s);
+
+                 setFilterGrid("newtable1");
+
+            }
+
+
             
             var chrid2color = {};
             
@@ -202,6 +458,7 @@
 				tube.verticesNeedUpdate = true;
 				selectionMesh = new THREE.Mesh(tube, material);
 				selectionMesh.name = "selection_mesh";
+                test_mesh = selectionMesh;
 				scene.add(selectionMesh);          	
             }
             
@@ -242,9 +499,35 @@
                     InitSelectionMesh();
                     InitTargetBall();
 
-                    document.body.appendChild( renderer.domElement );
-                    window.addEventListener( 'resize', onWindowResize, false );      
+                    divElement = document.getElementById("tabs-1");
+                    // renderer.domElement.oncontextmenu = function() {
+                    //     alert('right click!');
+                    // }
+
+                    divElement.appendChild( renderer.domElement );
+
+                    // document.body.appendChild( renderer.domElement );
+                    window.addEventListener( 'resize', onWindowResize, false );   
+                    
+                    
+                    //GUI part. Alexander
+                    /*folder1 = gui.addFolder('Coordinates');
+                    mainObjX = folder1.add( controls.getObject().position, 'x' );
+                    mainObjY = folder1.add( controls.getObject().position, 'y' );
+                    mainObjZ = folder1.add( controls.getObject().position, 'z' );
+                    folder1.close();                    
+                    gui.open();*/
+                    
+                    //GUI part. Alexander
             }
+            
+            /*function updateGUI() {
+                requestAnimationFrame(updateGUI);
+                // Iterate over all controllers
+                for (var i in folder1.__controllers) {
+                    folder1.__controllers[i].updateDisplay();
+                }
+            }*/
 
             function onWindowResize() {
                     camera.aspect = window.innerWidth / window.innerHeight;
@@ -299,7 +582,6 @@
 						scene.add(snp_ball); 
             		}
             	}
-				//console.log(String(positions[0][0]) + " " + String(track_points[0][1]));
             }
             
             function UploadRegionSNP(chr, track_points) {
@@ -337,7 +619,7 @@
             }
                         
             
-            function DrawPoints(model_points) {
+            function DrawPoints(model_points, blockIndicesStr, blockIndices) {
             	new_tracks = model_points["data"];
             	
             	for (var track_index = 0; track_index < new_tracks.length; ++track_index) {
@@ -371,11 +653,14 @@
 					var tube = new THREE.TubeGeometry(spline, segments, 10, radiusSegments, false, false);
 					tube.dynamic = true;
 					var tubeMesh = new THREE.Mesh(tube, material);	
+                    tubeMesh.userData = [blockIndicesStr, blockIndices];
 					
 					tubeMesh.name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
-					uploaded_splines[tubeMesh.name] = [chrid, track_points];									
+					uploaded_splines[tubeMesh.name] = [chrid, track_points];								
 					scene.add(tubeMesh);
 					objects.push(tubeMesh);
+                    console.log('Hi')
+
 				}
             }
             
@@ -394,7 +679,7 @@
 		               matchedCoordinates += ((firstIndex >> 1) % 2 == (secondIndex >> 1) % 2) ? 1 : 0;
 		               matchedCoordinates += ((firstIndex >> 2) % 2 == (secondIndex >> 2) % 2) ? 1 : 0;
 		               if (matchedCoordinates == 2) {
-						   var material = new THREE.LineBasicMaterial({color: 0x0000ff});
+						   var material = new THREE.LineBasicMaterial({color: 0x0000af});
 						   var geometry = new THREE.Geometry();
 						   geometry.vertices.push(vertices[firstIndex]);
 						   geometry.vertices.push(vertices[secondIndex]);	               	
@@ -405,7 +690,7 @@
 		       }      
             }
 
-            function UploadPoints(blockCornerCoordinates) {
+            function UploadPoints(blockCornerCoordinates, blockIndicesStr, blockIndices) {
             	overlap = blockSize * 0.2;
             	var request = "xstart=" + String(blockCornerCoordinates.x - overlap) 
             				  + "&xend=" + String(blockCornerCoordinates.x + blockSize + overlap)
@@ -416,7 +701,7 @@
 			    var url = "http://1kgenome.exascale.info/js_test?" + request;
 			    $.getJSON(url + "?callback=?", null, 
 			    	function(model_points) {
-			    		DrawPoints(model_points);
+			    		DrawPoints(model_points, blockIndicesStr, blockIndices);
 			    		//UploadSNP(model_points);
 			    	}
 			    );
@@ -440,7 +725,12 @@
             }
             
             function Coords2Str(coordinates) {
-            	return String(coordinates.x) + ":" + String(coordinates.y) + ":" + String(coordinates.z);
+                return String(coordinates.x) + ":" + String(coordinates.y) + ":" + String(coordinates.z);
+            }
+
+            function Str2Coords(coorLine) {
+                var arr = coorLine.split(':');
+                return {x : parseInt(arr[0]), y : parseInt(arr[1]), z : parseInt(arr[2]) };
             }
             
             function UpdateModel() {
@@ -448,14 +738,153 @@
             	var blockIndices = GetBlockIndices(modelPosition);
             	var blockIndicesStr = Coords2Str(blockIndices);
             	if (blockIndicesStr in uploaded_area) {
-            		return;            		
-            	}
-            	uploaded_area[blockIndicesStr] = true;
-            	var blockCornerCoordinates = GetBlockCornerCoordinates(blockIndices);
-            	DrawBox(blockCornerCoordinates, blockSize);
-            	UploadPoints(blockCornerCoordinates);
+                    // if (uploaded_area[blockIndicesStr]) // if it is SOMEHOW is still true
+                        // return;
+            		// recreate textures in the particular cube (Tube Mesh to Line)
+                    // RecreateTexturesInCube(blockIndicesStr);
+            	} else {
+                    uploaded_area[blockIndicesStr] = true;
+                    var blockCornerCoordinates = GetBlockCornerCoordinates(blockIndices);
+                    DrawBox(blockCornerCoordinates, blockSize);
+                    UploadPoints(blockCornerCoordinates, blockIndicesStr, blockIndices);
+
+                }
+                
+                //delete textures in the others cube only if 
+                if (lastBlockIndicesStr != blockIndicesStr) {
+                    
+                    DeleteTexturesFromCubes2(blockIndicesStr, blockIndices);
+                    lastBlockIndicesStr = blockIndicesStr;
+                    console.log(lastBlockIndicesStr + " ::VS::" + blockIndicesStr + "  " + (lastBlockIndicesStr == blockIndicesStr));
+                }
+
+                
             }
-            
+
+            //Line to Tube Mesh version
+            function RecreateTexturesInCube(blockIndicesStr) {
+                var lastObserved = {};
+                var linesIndcesToDelete = [];
+                var objectsIndcesToDelete = [];
+                var tempUserData;
+                for (var _obj in lines) {
+                    tempUserData = lines[_obj].userData;
+                    if (tempUserData == blockIndicesStr && (!(uploaded_area[tempUserData]) ||(tempUserData in lastObserved))) {
+                        if (!(tempUserData in lastObserved)) {
+                            uploaded_area[tempUserData] = true;
+                            lastObserved[tempUserData] = true;
+                        }
+                        var material = new THREE.MeshLambertMaterial( { color: lines[_obj].material.color, shading: THREE.SmoothShading } );
+                        var spline = new THREE.SplineCurve3(lines[_obj].geometry.vertices);
+                        var radiusSegments = 6;
+                        var tube = new THREE.TubeGeometry(spline, lines[_obj].geometry.segments, 10, radiusSegments, false, false);
+                        tube.dynamic = true;
+                        var tubeMesh = new THREE.Mesh(tube, material);  
+                        tubeMesh.userData = lines[_obj].userData;
+                        tubeMesh.name = lines[_obj].name;
+                        tubeMesh.userData = tempUserData;
+                        objectsIndcesToDelete[_obj] = true;
+                        scene.add(tubeMesh);
+                        objects.push(tubeMesh);
+                        scene.remove(lines[_obj]);
+                        lines[_obj].material.dispose();
+                        lines[_obj].geometry.dispose();
+                        objectsIndcesToDelete.push(_obj);
+                    }
+                }
+                if (lines.length>0 && objectsIndcesToDelete.length > 0){
+                    objectsIndcesToDelete.sort(function(a,b){return b - a});
+                    for (var i in objectsIndcesToDelete) {
+                        lines.splice(objectsIndcesToDelete[i], 1);
+                    }
+                }
+            }
+
+            //Tube Mesh to Line version
+            function DeleteTexturesFromCubes(blockIndicesStr, blockIndices) {
+                var materialImpl, geometryImpl;
+                var lastObserved = {};
+                var objectsIndcesToDelete = [];
+                var tempUserData, tempUserDataCoord;
+                for (var _obj in objects) {
+                    tempUserData = objects[_obj].userData[0];
+                    tempUserDataCoord = objects[_obj].userData[1];
+
+                    // console.log("blockIndicesStr = ", tempUserData, "|",blockIndicesStr,"; uploaded_area[objects[_obj].userData] = ", uploaded_area[tempUserData], " , ", (tempUserData in lastObserved));
+                    if (tempUserData != blockIndicesStr && (uploaded_area[tempUserData] || (tempUserData in lastObserved) )) {
+
+                        if (!(tempUserData in lastObserved)) {
+                            uploaded_area[tempUserData] = false;
+                            lastObserved[tempUserData] = true;
+                        }
+                        
+
+                        var line_color = objects[_obj].material.color;
+                        materialImpl = new THREE.LineBasicMaterial({
+                            color: line_color
+                        });
+                        geometryImpl = new THREE.Geometry();
+                        var _points = objects[_obj].geometry.path.points;
+                        for (var _vert in _points) {
+                            geometryImpl.vertices.push(_points[_vert]);  
+                        }
+                        geometryImpl.segments = objects[_obj].geometry.segments;
+
+                        var line = new THREE.Line(geometryImpl, materialImpl);
+                        line.name = objects[_obj].name;
+                        line.userData = [tempUserData,tempUserDataCoord];
+                        scene.remove(objects[_obj]);
+                        objects[_obj].material.dispose();
+                        objects[_obj].geometry.dispose();
+                        objectsIndcesToDelete.push(_obj);
+
+                        scene.add(line);
+                        lines.push(line);
+                    }
+                }
+                
+                if (objects.length>0 && objectsIndcesToDelete.length>0) {
+                    // console.log("objects.length = ",objects.length, " ; delObjects = ", objectsIndcesToDelete.length);
+                    objectsIndcesToDelete.sort(function(a,b){return b - a});
+                    for (var i in objectsIndcesToDelete) {
+                        // console.log("i = " , objectsIndcesToDelete[i], "; ", objects);
+                        objects.splice(objectsIndcesToDelete[i],1);
+
+                    }
+                    // console.log(objects.length);
+                }
+            } 
+
+            //Delete Mesh out of the alowed space region
+            function DeleteTexturesFromCubes2(blockIndicesStr, blockIndices) {
+                var objectsIndcesToDelete = [];
+                var tempUserData, tempUserDataCoord;
+                var distanceToDelete = 1;
+                for (var _obj in objects) {
+                        // console.log("Alex = " + _obj)
+                        tempUserData = objects[_obj].userData[0];
+                        tempUserDataCoord = objects[_obj].userData[1];
+
+                        if (tempUserData != blockIndicesStr && !(blockIndices.x - tempUserDataCoord.x <= distanceToDelete && blockIndices.x - tempUserDataCoord.x >= (-1*distanceToDelete) && blockIndices.y - tempUserDataCoord.y <= distanceToDelete && blockIndices.y - tempUserDataCoord.y >= (-1*distanceToDelete) && blockIndices.z - tempUserDataCoord.z <= distanceToDelete && blockIndices.z - tempUserDataCoord.z >= (-1*distanceToDelete))) {
+                            
+                            if (tempUserData in uploaded_area) delete uploaded_area[tempUserData];
+
+                            objectsIndcesToDelete[_obj] = true;
+
+                            scene.remove(objects[_obj]);
+                            objects[_obj].material.dispose();
+                            objects[_obj].geometry.dispose();
+                            objectsIndcesToDelete.push(_obj);
+                        }
+                }
+                if (objects.length>0 && objectsIndcesToDelete.length>0) {
+                    objectsIndcesToDelete.sort(function(a,b){return b - a});
+                    for (var i in objectsIndcesToDelete) {
+                        objects.splice(objectsIndcesToDelete[i],1);
+                    }
+                }   
+            }
+
             function GetIntersection() {
             	var vector = new THREE.Vector3(0, 0, 0);
             	var raycaster = projector.pickingRay(vector, camera);
@@ -468,6 +897,8 @@
             
             function GetSelectedTrackPoints(intersectPoint, trackName) {
             	var intersectInModelCoordinates = Local2global(intersectPoint);
+
+                // trackPoints from 3dQuery
             	var trackPoints = uploaded_splines[trackName][1];
             	var chrid = trackName.split("-")[0];
             	var closestPoint = -1;
@@ -515,27 +946,52 @@
 				}
 				selectionTrackPoints.push(Global2local(exactEndPosition));
 				
-				{
-					var spline = new THREE.SplineCurve3(selectionTrackPoints);
-					var segments = basesInSelection / 50;
-					var radiusSegments = 6;
-					var tube = new THREE.TubeGeometry(spline, segments, 20, radiusSegments, false, false);
-					tube.dynamic = true;
-					scene.remove(selectionMesh);
-					{
-						var material = new THREE.MeshBasicMaterial({
-								color: 0xff0000,
-								opacity: 1,
-								wireframe: true,
-								transparent: false
-						});						
-						
-						selectionMesh = new THREE.Mesh(tube, material);
-						selectionMesh.geometry.verticesNeedUpdate = true;
-						scene.add(selectionMesh);
-					}
-					
-				}
+
+                //draw selection old - plane
+                if (is_plane_mode)
+                {
+                    var spline = new THREE.SplineCurve3(selectionTrackPoints);
+                    var segments = basesInSelection / 50;
+                    var radiusSegments = 6;
+                    var tube = new THREE.TubeGeometry(spline, segments, 20, radiusSegments, false, false);
+                    tube.dynamic = true;
+                    scene.remove(selectionMesh);
+                    {
+                        var material = new THREE.MeshBasicMaterial({
+                                color: 0xff0000,
+                                opacity: 1,
+                                wireframe: true,
+                                transparent: false
+                        });                     
+                        
+                        selectionMesh = new THREE.Mesh(tube, material);
+                        selectionMesh.geometry.verticesNeedUpdate = true;
+                        scene.add(selectionMesh);
+                    }
+                    
+                } else
+				//draw selection new - cube
+                {
+                    var cube = new THREE.CubeGeometry(radiusSphere*2,radiusSphere*2,radiusSphere*2, 5, 5, 5);
+                    cube.dynamic = true;
+                    scene.remove(selectionMesh);
+                    {
+                        var material = new THREE.MeshBasicMaterial({
+                                color: 0xff0000,
+                                opacity: 1,
+                                wireframe: true,
+                                transparent: false
+                        });                     
+                        
+                        selectionMesh = new THREE.Mesh(cube, material);
+                        selectionMesh.position = new THREE.Vector3(intersectPoint.x, intersectPoint.y, intersectPoint.z);
+                        // selectionMesh.geometry.verticesNeedUpdate = true;
+                        scene.add(selectionMesh);
+                    }
+                    
+                }
+
+                
 				
 				return [chrid, trackPoints[closestPoint][1] - basesInSelection / 2, 
 							trackPoints[closestPoint][1] + basesInSelection / 2]; 	
@@ -589,6 +1045,7 @@
 			    
 			    {//SNPs
 			    	var chrid = String(region[0]);
+                    console.log(chrid);
             		var chridNoStrand = chrid.substr(0, chrid.length - 2);
             		var chridOnlyNumber = chridNoStrand;
             		if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
@@ -621,6 +1078,61 @@
 			    }		    
 
 			}
+
+            function UpdateInfoVollume() {
+                intersection = GetIntersection();
+                if (intersection == null) {
+                    ClearInfo();
+                    return;
+                }
+                object = intersection.object;
+                point = intersection.point;
+                if (object.name == "") {
+                    ClearInfo();
+                    return;
+                }
+
+                var region = GetSelectedTrackPointsVollume(point);
+
+            }
+
+            function GetSelectedTrackPointsVollume3Dquery(intersectPoint, trackName) {
+                var intersectInModelCoordinates = Local2global(intersectPoint);
+
+                var request = "xstart=" + String(point.x - radiusSphere) 
+                              + "&xend=" + String(point.x + radiusSphere)
+                              + "&zstart=" + String(point.z - radiusSphere)      
+                              + "&zend=" + String(point.z + radiusSphere)  
+                              + "&ystart=" + String(point.y - radiusSphere)      
+                              + "&yend=" + String(point.y - radiusSphere);      
+                var url = "http://1kgenome.exascale.info/js_test?" + request;
+                $.getJSON(url + "?callback=?", null, 
+                    function(model_points) {
+                        buildCubeDataStructure(model_points);
+                        //UploadSNP(model_points);
+                    }
+                );
+
+                //draw selection new - cube
+                {
+                    var cube = new THREE.CubeGeometry(radiusSphere*2,radiusSphere*2,radiusSphere*2, 5, 5, 5);
+                    cube.dynamic = true;
+                    scene.remove(selectionMesh);
+                    {
+                        var material = new THREE.MeshBasicMaterial({
+                                color: 0xff0000,
+                                opacity: 1,
+                                wireframe: true,
+                                transparent: false
+                        });                     
+                        
+                        selectionMesh = new THREE.Mesh(cube, material);
+                        selectionMesh.position = new THREE.Vector3(intersectPoint.x, intersectPoint.y, intersectPoint.z);
+                        // selectionMesh.geometry.verticesNeedUpdate = true;
+                        scene.add(selectionMesh);
+                    }
+                }
+            }
             
             function UpdateInfo() {
             	intersection = GetIntersection();
@@ -653,6 +1165,8 @@
                     UpdateTargetBallPosition();
                     UpdateInfo();
                    	UpdateModel();
+                        
+                    // updateGUI();    
                     controls.update( Date.now() - time );
                     renderer.render( scene, camera );
                     time = Date.now();
@@ -663,12 +1177,14 @@
         <script>
         	infoBlock = document.createElement('div');
 			infoBlock.id = "infoblock";
-			document.body.appendChild(infoBlock); 
+			// document.body.appendChild(infoBlock); 
+            divElement.appendChild(infoBlock);
 			
-			staticBlock = document.createElement('div');
+			/*staticBlock = document.createElement('div');
 			staticBlock.id = "staticblock";
 			staticBlock.innerHTML = "<em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>, {phil, ruslan}@exascale.info; <a target='_blank' href='http://www.scs.carleton.ca/'>McGill University SoCS</a>, jeromew@cs.mcgill.ca, alexander.butyaev@mail.mcgill.ca.";
-			document.body.appendChild(staticBlock); 
+			// document.body.appendChild(staticBlock); 
+            divElement.appendChild(staticBlock);*/
 				
 		</script>
     </body>

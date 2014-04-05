@@ -4,18 +4,23 @@
         <meta charset="utf-8">
         <title>3DBD genome browser</title>
 		<link href="main.css" rel="stylesheet" type="text/css"/>
-    	<!-- lite version of three.js distrib   -->
-    	<script src="js/min.three.js"></script>
-    	<!-- hacked PointerLockControls.js from "three/examples/js/controls/PointerLockControls.js" -->
-		<script src="js/PointerLockControls.js"></script>
-    	<!-- jquery -->
-    	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href="js/messi/messi.min.css" />
+        <!-- jquery -->
+        <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
         <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
-        
-        <script type='text/javascript' src='js/DAT.GUI.min.js'></script>
-        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+        <!-- lite version of three.js distrib   -->
+        <script src="js/min.three.js"></script>
+
+    	<!-- hacked PointerLockControls.js from "three/examples/js/controls/PointerLockControls.js" -->
+		<script src="js/PointerLockControls.js"></script>
+    	
+        <script type='text/javascript' src='js/messi/messi.min.js'></script>
+
+        <script src="TextMessages.js"></script>
+
+        <!--script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script-->
 
         <script>
               $(function() {
@@ -23,21 +28,32 @@
               });
         </script>
 
-
-        <style>canvas { width: 100%; height: 100% }</style>
 		<!-- low-resolution 3d model  -->
 		<!--<script src="data.js"></script>-->
         
-
     </head>
     <body>
+        <!-- Share scripts for FB/ Twt-->
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "http://connect.facebook.net/us_US/all.js#xfbml=1";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+        </script>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+        </script>
+
+
+        
         <!-- google analytics -->
         <div id="tabs">
           <ul>
-            <li><a href="#tabs-0">Welcome Page/UI</a></li>
-            <li><a href="#tabs-1">Genome Browser</a></li>
-            <li><a href="#tabs-2">Something else</a></li>
-            <li><a href="#tabs-3">Contact us</a></li>
+            <li><a id="href_tabs-0" href="#tabs-0">Welcome Page/UI</a></li>
+            <li><a id="href_tabs-1" href="#tabs-1">Genome Browser</a></li>
+            <li><a id="href_tabs-2" href="#tabs-2">Something else</a></li>
+            <li><a id="href_tabs-3" href="#tabs-3">Contact us</a></li>
           </ul>
           <div id="tabs-0">
             <p>Welcome to 3D Genome Browser page</p>
@@ -50,7 +66,8 @@
           <div id="tabs-1">
                 <div id="blocker">
                     <div id="instructions">
-                        <span style="font-size:40px">Click to play</span><br />(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size)<br/>
+                        <span style="font-size:40px">Click to "Science"</span><br/>(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size<br/>C = Change mode, T = color CHIP-Seq data under the CHIPSEQ mode, Tab = for more information<br/>G = get relation between Transcription Factors and SNPs only under cubic mode (doesn't work properly))<br/>
+
                         Supported browsers: Firefox, Google Chrome.
                     </div>
                 </div>
@@ -59,17 +76,55 @@
             <p></p>
           </div>
           <div id="tabs-3">
-            <p><em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>, {phil, ruslan}@exascale.info; <a target='_blank' href='http://www.cs.mcgill.ca/'>McGill University SoCS</a>, jeromew@cs.mcgill.ca, alexander.butyaev@mail.mcgill.ca.</p>
+            <p><em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>:
+                <a style="color: rgb(0,0,255)" href="mailto:phil@exascale.info?subject=[3D Genome Browser]">Philippe Cudre-Mauroux</a>, <a style="color: rgb(0,0,255)" href="mailto:ruslan@exascale.info?subject=[3D Genome Browser]">Ruslan Mavlyutov</a>; <a target='_blank' href='http://csb.cs.mcgill.ca/'>McGill University SoCS</a>: <a style="color: rgb(0,0,255)" href="mailto:jeromew@cs.mcgill.ca?subject=[3D Genome Browser]">Jérôme Waldispühl</a>, <a style="color: rgb(0,0,255)" href="mailto:alexander.butyaev@mail.mcgill.ca?subject=[3D Genome Browser]">Alexander Butyaev</a>.</p>
+            
+            <!--Share conteiner -->
+            <div>
+                <div class="button twitter" data-type="button_count"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://1kgenome.exascale.info" data-text="The best 3D Genome Browser">Tweet</a></div>
+                <div class="fb-share-button" data-href="https://1kgenome.exascale.info" data-type="button_count" data-text="The best 3D Genome Browser">
+                </div>
+                <div class="g-plusone" data-size="tall" data-href="http://1kgenome.exascale.info" data-text="The best 3D Genome Browser" data-annotation="inline" data-width="300" ></div>
+                <!--div class="g-plusone" data-annotation="inline" data-width="300"></div-->
+                <!--g:plusone></g:plusone>
+                <script type="text/javascript">
+                    window.___gcfg = {
+                        lang: 'en-US'
+                    };
+                    (function() {
+                        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+                        po.src = 'https://apis.google.com/js/platform.js';
+                        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+                    })();
+                </script-->
+            <!--/div-->
+
+
+
           </div>
         </div>
 
 		<!-- main part -->
         <script>
+            var lastRegion;
+            var arrayOfCHIPCoveredTubes = [];
+            var lastMode;
+            var _messi;
+            var is_modal_opened = false;
+            var mod_message_div;
+            var MAX_CHIP_LVL = 1000;
+            var percentColors = [
+                { pct: 0.0, color: { r: 0x00, g: 0xff, b: 0 } },
+                { pct: 0.5, color: { r: 0x88, g: 0x88, b: 0 } },
+                { pct: 1.0, color: { r: 0xff, g: 0x00, b: 0 } } ];
+            var current_cell_line = 'K562';
+            var is_coloring_of_chipseq = false;
             var deb_var;
             var lastBlockIndicesStr;
             var radiusSphere = 40, segmentsWidth = 32, segmentsHeight = 16; //sphere zone parameters
             var maxRadiusSphere = 140, minRadiusSphere = 20;
             var regexpPattern = /[^\d]*([\d]+)[^\d]+([\d]+)[^\d]+([\d]+)[^\d]*/; //format smth(0+) [num] smth(1+) [num] smth(1+) [num] smth(0+)
+            var regexpPatternURL = /([\dXY]{1,2})[^\d]+([\d]+)[^\d]+([\d]+)/ ;
             var divElement;
             var test_mesh;
         	var DEBUG = true;
@@ -94,12 +149,15 @@
             var uploaded_area = {};
             
             var uploaded_splines = {};
+            var uploaded_splines_chip = {};
             var uploaded_splines_selection = {};
 
             var time = Date.now();
 
 			// 3d dna molecules
             var objects = [];
+
+            var chipObjects = [];
 
             var lines = [];
             
@@ -115,6 +173,9 @@
             var snp_chip_seq_window;
 
             var is_plane_mode = true; //start with plane mode
+            var mode_name;
+            var mode_id = 0;
+            var NUMBER_OF_MODES = 3;
             // var gui = new dat.GUI();
             // var folder1;
             // var mainObjX;
@@ -131,20 +192,57 @@
                 var arr = str.split(':');
                 controls.getObject().position = new THREE.Vector3(parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]));
             }
+
+            function changeModeIndicator() {
+                switch(mode_id) {
+                    case 0: //plane mode
+                        if (lastMode == 2) cleanCHIPSEQdata();
+                        mode_name = 'Plane mode';
+                        $('p#textmode').text(mode_name+' (TAB for info)');
+                        lastMode = 0;
+                        break;
+                    case 1: //cubic mode
+                        if (lastMode == 2) cleanCHIPSEQdata();
+                        mode_name = 'Cubic mode';
+                        $('p#textmode').text(mode_name+' (TAB for info)');
+                        lastMode = 1;
+                        break;
+                    case 2: //CHiP-SEQ mode
+                        scene.remove(selectionMesh);
+                        mode_name = 'CHiP-Seq mode';
+                        $('p#textmode').text(mode_name+' (TAB for info)');
+                        lastMode = 2;
+                        break;
+                    default:
+                        $('p#textmode').text('');
+                        break;
+                }
+            }
             
+            function cleanCHIPSEQdata() {
+                for (var indx in chipObjects) {
+                    scene.remove(chipObjects[indx]);
+                }
+                chipObjects = [];
+                uploaded_splines_chip = {};
+                arrayOfCHIPCoveredTubes = [];
+            }
 
             function init_controls() {
                 var element = document.body;
                 var pointerlockchange = function ( event ) {
-                    if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+                    // console.log( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element);
+                    if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
                         controls.enabled = true;
                         blocker.style.display = 'none';
+                        changeModeIndicator();
                     } else {
                         controls.enabled = false;
                         blocker.style.display = '-webkit-box';
                         blocker.style.display = '-moz-box';
                         blocker.style.display = 'box';
-                        instructions.style.display = '';
+                        if (!is_modal_opened) instructions.style.display = '';
+                        $('p#textmode').text('');
                     }
             	}
                 var pointerlockerror = function ( event ) {
@@ -186,19 +284,56 @@
                         var element = document.body;
                         if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element )
                             switch ( event.keyCode ) {
-                                case 71: //g
-                                    if (!is_plane_mode) {
+                                case 84: //t
+                                    // if (is_plane_mode) {
+                                    if (mode_id == 2) {
                                         var _intersection = GetIntersection();
                                         if (_intersection == null) {
-                                            alert("Point the area firstly!")
+                                            alert("Point the area firstly!");
+                                            return;
+                                        }
+
+                                        if (_intersection.object.name == "") {
+                                            return;
+                                        }
+
+                                        if ($.inArray(_intersection.object.name, arrayOfCHIPCoveredTubes) != -1)
+                                            return;
+                                        
+                                        arrayOfCHIPCoveredTubes.push(_intersection.object.name);
+                                        myfoo(_intersection); //should be renamed
+                                    }
+                                    break;
+                                case 71: //g
+                                    // if (!is_plane_mode) {
+                                    if (mode_id == 1) {
+                                        var _intersection = GetIntersection();
+                                        if (_intersection == null) {
+                                            alert("Point the area firstly!");
                                             return;
                                         }
                                         init_new_window_SNP_CHIP_SEQ(_intersection.point);
                                     }
                                     break;
-                                case 67: //c - change mode from plane to vollume
-                                    is_plane_mode = !is_plane_mode;
-                                    break;    
+                                case 67: //c - change mode
+                                    // is_plane_mode = !is_plane_mode;
+                                    mode_id ++;
+                                    if (mode_id >= NUMBER_OF_MODES) mode_id = 0;
+                                    changeModeIndicator();
+                                    break;  
+                                case 9: //tab - information about current mode
+                                    is_modal_opened = true;
+                                    $('p#textmode').text('');
+                                    document.exitPointerLock = document.exitPointerLock ||
+                                                                document.mozExitPointerLock ||
+                                                                document.webkitExitPointerLock;
+                                    document.exitPointerLock();
+                                    _messi = new Messi(textMessages[mode_name], {title: mode_name, titleClass: 'success', buttons: [{id: 0, label: 'Ok', val: 'O'}], 
+                                        callback: function(val) { element.requestPointerLock = element.requestPointerLock ||
+                                                                     element.mozRequestPointerLock ||
+                                                                     element.webkitRequestPointerLock;
+                                        element.requestPointerLock(); is_modal_opened = false;}});
+                                    return false;
                             }
                     }
 
@@ -222,8 +357,89 @@
                     {
                         document.addEventListener(mousewheelevt, scrollHandler, false);
                         document.addEventListener("keydown", GKeyDownHandler, false);
-                    }    
+                    }
 				}
+            }
+
+            function myfoo(_intersection) {
+                var name = _intersection.object.name;
+                var requestCHIP = name.replace(regexpPatternURL, "chr=$1&start=$2&end=$3&celline="+current_cell_line);
+
+                var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
+
+                $.getJSON(urlCHIP + "?callback=?", null, 
+                    function(data) {
+                        drawChipSeqData(data, _intersection);
+                    }
+                );
+                //maybe here it is reasonable to make sleep while we dont have response
+            }
+
+            function drawChipSeqData(data, _intersection) {
+                var name = _intersection.object.name;
+                var vertices = _intersection.object.geometry.vertices;
+                var aLen = vertices.length;
+                var chrIDRange = (name.replace(regexpPatternURL, "$1"));
+                var startRange = parseInt(name.replace(regexpPatternURL, "$2"));
+                var endRange = parseInt(name.replace(regexpPatternURL, "$3"));
+                var unit = (endRange - startRange)/(aLen-1);
+                var aStart, aEnd; //in array of vertices proportionally
+                var chipVertices;
+                var chipName;
+                deb_var = data;
+                for (var indx in data) {
+                    if (startRange >= data[indx][0])
+                        aStart = 0;
+                    else
+                        aStart = Math.ceil((data[indx][0]-startRange)/unit);
+                    
+                    if (endRange <= data[indx][1])
+                        aEnd = aLen-1;
+                    else
+                        aEnd = Math.floor((data[indx][1]-startRange)/unit);
+                    var tube_color = getColorForPercentage(data[indx][3]);
+                    var material = new THREE.MeshLambertMaterial( { color: tube_color, shading: THREE.SmoothShading } );
+                    chipVertices = [];
+                    
+                    for (var pointIndex = aStart; pointIndex <= aEnd; ++pointIndex) {
+                        chipVertices.push(vertices[pointIndex])
+                    }
+                    deb_var=  chipVertices;
+                    var spline = new THREE.SplineCurve3(chipVertices);
+                    
+                    var segments = chipVertices.length * 2;
+                    var radiusSegments = 5;
+                    var tube = new THREE.TubeGeometry( spline, segments, 10, radiusSegments, false, false);
+                    tube.dynamic = true;
+                    var tubeMesh = new THREE.Mesh(tube, material);  
+                    // tubeMesh.userData = [blockIndicesStr, blockIndices];//?
+                    
+                    tubeMesh.name = chrIDRange + "-" + String(data[indx][0]) + "-"  + String(data[indx][1]);
+                    uploaded_splines_chip[tubeMesh.name] = [chrid, chipVertices];                                
+                    scene.add(tubeMesh);
+                    chipObjects.push(tubeMesh);
+                }
+            }
+
+            function getColorForPercentage(chipLvl) {
+                var pct = chipLvl/MAX_CHIP_LVL;
+                for (var i = 1; i < percentColors.length - 1; i++) {
+                    if (pct < percentColors[i].pct) {
+                        break;
+                    }
+                }
+                var lower = percentColors[i - 1];
+                var upper = percentColors[i];
+                var range = upper.pct - lower.pct;
+                var rangePct = (pct - lower.pct) / range;
+                var pctLower = 1 - rangePct;
+                var pctUpper = rangePct;
+                var color = {
+                    r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper)/255,
+                    g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper)/255,
+                    b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)/255
+                };
+                return new THREE.Color().setRGB(color.r, color.g, color.b);
             }
 
             function buildCubeDataStructure(model_points) {
@@ -241,7 +457,7 @@
                 }
             }
             
-
+            /*doesn't work properly*/
             function init_new_window_SNP_CHIP_SEQ (intersectPoint) {
                 snp_chip_seq_window = window.open("",/*index2.html",*/"_blank","dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
                 snp_chip_seq_window.document.write('<html><head><title>Information!</title><link rel="stylesheet" type="text/css" href="newTable.css"></head><body></body></html>')
@@ -287,7 +503,8 @@
                               + "&yend=" + String(intersectInModelCoordinates.y + radiusSphere);
                 var url = "http://1kgenome.exascale.info/js_test?" + request;
                 $.getJSON(url + "?callback=?", null, 
-                    function(model_points) {
+                    function(model_points, textStatus, jqXHR) {
+                        deb_var = jqXHR;
                         var new_cube_tracks = model_points["data"];
                         
                         for (var track_index = 0; track_index < new_cube_tracks.length; ++track_index) {
@@ -302,7 +519,8 @@
                             }
                             var requestCHIP = "chr=" + chridOnlyNumber 
                               + "&start=" + track_points[0][1]
-                              + "&end=" + track_points[track_points.length - 1][1];
+                              + "&end=" + track_points[track_points.length - 1][1]
+                              + "&celline=" + current_cell_line;
                             var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
 
                             $.getJSON(urlCHIP + "?callback=?", null, 
@@ -313,17 +531,16 @@
                                           var end_pos = chipseq_tracks[track_index_CHIP][1];
                                           var TF_name = chipseq_tracks[track_index_CHIP][2];
                                           var affect_level = chipseq_tracks[track_index_CHIP][3];
-                                          console.log(TF_name);
+                                          //console.log(TF_name);
                                           
 
                                           var requestSNP = "chr=" + chridOnlyNumber 
                                               + "&start=" + start_pos
                                               + "&end=" + end_pos;
                                           var urlSNP = "http://1kgenome.exascale.info/js_snp?" + requestSNP;
-                                          tempArray[urlSNP] = [chipseq_tracks[track_index_CHIP][0], chipseq_tracks[track_index_CHIP][1,chipseq_tracks[track_index_CHIP][2],chipseq_tracks[track_index_CHIP][3]];
+                                          // tempArray[urlSNP] = [chipseq_tracks[track_index_CHIP][0], chipseq_tracks[track_index_CHIP][1],chipseq_tracks[track_index_CHIP][2],chipseq_tracks[track_index_CHIP][3]];
                                           $.getJSON(urlSNP + "?callback=?", null, 
                                                 function(positions) {
-                                                    console.log(urlSNP);
                                                     for (var point_index = 0; point_index < positions.length; ++point_index) {
                                                         var tr=snp_chip_seq_window.document.createElement('tr');
                                                         //position
@@ -336,7 +553,7 @@
                                                         tr.appendChild(td)
                                                         //TF
                                                         td=snp_chip_seq_window.document.createElement('td');
-                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(tempArray)));
+                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(TF_name)));
                                                         tr.appendChild(td);
                                                         //Level
                                                         td=snp_chip_seq_window.document.createElement('td');
@@ -384,7 +601,6 @@
                 body.appendChild(s);
 
                  setFilterGrid("newtable1");
-
             }
 
 
@@ -500,34 +716,14 @@
                     InitTargetBall();
 
                     divElement = document.getElementById("tabs-1");
-                    // renderer.domElement.oncontextmenu = function() {
-                    //     alert('right click!');
-                    // }
+                    
 
                     divElement.appendChild( renderer.domElement );
 
                     // document.body.appendChild( renderer.domElement );
                     window.addEventListener( 'resize', onWindowResize, false );   
                     
-                    
-                    //GUI part. Alexander
-                    /*folder1 = gui.addFolder('Coordinates');
-                    mainObjX = folder1.add( controls.getObject().position, 'x' );
-                    mainObjY = folder1.add( controls.getObject().position, 'y' );
-                    mainObjZ = folder1.add( controls.getObject().position, 'z' );
-                    folder1.close();                    
-                    gui.open();*/
-                    
-                    //GUI part. Alexander
             }
-            
-            /*function updateGUI() {
-                requestAnimationFrame(updateGUI);
-                // Iterate over all controllers
-                for (var i in folder1.__controllers) {
-                    folder1.__controllers[i].updateDisplay();
-                }
-            }*/
 
             function onWindowResize() {
                     camera.aspect = window.innerWidth / window.innerHeight;
@@ -752,15 +948,14 @@
                 
                 //delete textures in the others cube only if 
                 if (lastBlockIndicesStr != blockIndicesStr) {
-                    
                     DeleteTexturesFromCubes2(blockIndicesStr, blockIndices);
                     lastBlockIndicesStr = blockIndicesStr;
-                    console.log(lastBlockIndicesStr + " ::VS::" + blockIndicesStr + "  " + (lastBlockIndicesStr == blockIndicesStr));
                 }
 
                 
             }
 
+            /*@depricated*/
             //Line to Tube Mesh version
             function RecreateTexturesInCube(blockIndicesStr) {
                 var lastObserved = {};
@@ -860,28 +1055,29 @@
                 var objectsIndcesToDelete = [];
                 var tempUserData, tempUserDataCoord;
                 var distanceToDelete = 1;
-                for (var _obj in objects) {
-                        // console.log("Alex = " + _obj)
+                //for (var _obj in objects) {
+                for (var _obj = 0; _obj < objects.length; ++_obj) {
                         tempUserData = objects[_obj].userData[0];
                         tempUserDataCoord = objects[_obj].userData[1];
 
                         if (tempUserData != blockIndicesStr && !(blockIndices.x - tempUserDataCoord.x <= distanceToDelete && blockIndices.x - tempUserDataCoord.x >= (-1*distanceToDelete) && blockIndices.y - tempUserDataCoord.y <= distanceToDelete && blockIndices.y - tempUserDataCoord.y >= (-1*distanceToDelete) && blockIndices.z - tempUserDataCoord.z <= distanceToDelete && blockIndices.z - tempUserDataCoord.z >= (-1*distanceToDelete))) {
                             
                             if (tempUserData in uploaded_area) delete uploaded_area[tempUserData];
-
-                            objectsIndcesToDelete[_obj] = true;
-
                             scene.remove(objects[_obj]);
-                            objects[_obj].material.dispose();
-                            objects[_obj].geometry.dispose();
+
+                            delete uploaded_splines[objects[_obj].name];
+                            // objects[_obj].material.dispose(); //useless
+                            // objects[_obj].geometry.dispose();
+                            
                             objectsIndcesToDelete.push(_obj);
                         }
                 }
                 if (objects.length>0 && objectsIndcesToDelete.length>0) {
-                    objectsIndcesToDelete.sort(function(a,b){return b - a});
-                    for (var i in objectsIndcesToDelete) {
-                        objects.splice(objectsIndcesToDelete[i],1);
-                    }
+                    // objectsIndcesToDelete.sort(function(a,b){return b - a});
+                    // for (var i in objectsIndcesToDelete) {
+                    //     objects.splice(objectsIndcesToDelete[i],1);
+                    // }
+                    objects = $.grep(objects, function(v,i){return $.inArray(i,objectsIndcesToDelete)==-1});
                 }   
             }
 
@@ -897,7 +1093,6 @@
             
             function GetSelectedTrackPoints(intersectPoint, trackName) {
             	var intersectInModelCoordinates = Local2global(intersectPoint);
-
                 // trackPoints from 3dQuery
             	var trackPoints = uploaded_splines[trackName][1];
             	var chrid = trackName.split("-")[0];
@@ -948,7 +1143,8 @@
 				
 
                 //draw selection old - plane
-                if (is_plane_mode)
+                // if (is_plane_mode)
+                if (mode_id == 0)
                 {
                     var spline = new THREE.SplineCurve3(selectionTrackPoints);
                     var segments = basesInSelection / 50;
@@ -956,6 +1152,8 @@
                     var tube = new THREE.TubeGeometry(spline, segments, 20, radiusSegments, false, false);
                     tube.dynamic = true;
                     scene.remove(selectionMesh);
+
+                    delete selectionMesh;
                     {
                         var material = new THREE.MeshBasicMaterial({
                                 color: 0xff0000,
@@ -969,7 +1167,7 @@
                         scene.add(selectionMesh);
                     }
                     
-                } else
+                } else if (mode_id == 1)
 				//draw selection new - cube
                 {
                     var cube = new THREE.CubeGeometry(radiusSphere*2,radiusSphere*2,radiusSphere*2, 5, 5, 5);
@@ -1000,7 +1198,9 @@
             function ClearInfo() {
             	if (infoBlock) {
             		infoBlock.innerHTML = "";
+                    lastRegion = [];
             	}
+
             }
             
             
@@ -1029,7 +1229,7 @@
 			    		var key_a = PositionToString([chrid, region[1], region[2]]);
 			    		chrid = chrid.replace("_a", "_b");
 			    		var key_b = PositionToString([chrid, region[1], region[2]]);
-			    		formated_data = "Bases: <a target='_blank' href='" + url + "'>" + regionInfo.substring(0, 50) + "...</a>";
+			    		formated_data = "<br/>@Bases: <a target='_blank' style=\"color: rgb(0,255,0)\" href='http://1kgenome.exascale.info/range?" + request + "'>" + regionInfo.substring(0, 50) + "...</a>";
 			    		regionData[key_a][1] = formated_data;
 			    		regionData[key_b][1] = formated_data;
 			    		infoBlock.innerHTML = regionData[key];
@@ -1045,7 +1245,7 @@
 			    
 			    {//SNPs
 			    	var chrid = String(region[0]);
-                    console.log(chrid);
+                    // console.log(chrid);
             		var chridNoStrand = chrid.substr(0, chrid.length - 2);
             		var chridOnlyNumber = chridNoStrand;
             		if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
@@ -1060,10 +1260,11 @@
 				    		snips = "";
 			            	for (var point_index = 0; point_index < positions.length; ++point_index) {
 			            		var base_index = positions[point_index][0];
-			            		var snp_id = "rs" + String(positions[point_index][1]);
-			            		snips += " " + snp_id + ";";
+			            		var snp_id = /*"rs" + */String(positions[point_index][1]);
+			            		snips += " <a target=\"_blank\" style=\"color: rgb(255,255,0)\" href=\"http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?rs="+snp_id+"\">rs"+snp_id+"</a>;";
 			            	}
-			            	formated_data = "SNPs:" + snips;
+
+			            	formated_data = "<br/>@SNPs:" + snips;
 			            	var key = PositionToString(region);
 				    		var chrid = region[0];
 				    		chrid = chrid.replace("_b", "_a");
@@ -1136,21 +1337,30 @@
             
             function UpdateInfo() {
             	intersection = GetIntersection();
-            	if (intersection == null) {
+            	if (intersection == null || mode_id == 2) {
             		ClearInfo();
             		return;
             	}
             	object = intersection.object;
             	point = intersection.point;
             	if (object.name == "") {
-            		ClearInfo();
+                    ClearInfo();
             		return;
             	}
+
+                if ((typeof uploaded_splines[object.name] === 'undefined')) {
+                    console.log("Warning: undefined!!!"); 
+                    ClearInfo();
+                    return;
+                }
+
+                // TODO: Here we should change the mode
             	var region = GetSelectedTrackPoints(point, object.name);
-            	var positionStr = PositionToString(region);  
-            	if (positionStr in regionData) {
-            		infoBlock.innerHTML = regionData[positionStr][0] + "<br/>" + regionData[positionStr][1] + "<br/>" + regionData[positionStr][2]; 
-            	} else {
+            	var positionStr = PositionToString(region);
+            	if (positionStr in regionData && (lastRegion==null || lastRegion[0] != regionData[positionStr][0] && lastRegion[1] != regionData[positionStr][1] && lastRegion[2] != regionData[positionStr][2])) {
+            		infoBlock.innerHTML = regionData[positionStr];
+                    lastRegion = regionData[positionStr];
+            	} else if (!(positionStr in regionData)) {
             		//show something immidiately
             		infoBlock.innerHTML = positionStr + "<br/>data uploading...";
             		//also works like flag: request is already sent
@@ -1179,6 +1389,12 @@
 			infoBlock.id = "infoblock";
 			// document.body.appendChild(infoBlock); 
             divElement.appendChild(infoBlock);
+            mod_message_div = document.createElement('p');
+            mod_message_div.id = "textmode";
+            mod_message_div.style = "display:none";
+            mod_message_div.appendChild(document.createTextNode(""));
+            divElement.appendChild(mod_message_div);
+
 			
 			/*staticBlock = document.createElement('div');
 			staticBlock.id = "staticblock";

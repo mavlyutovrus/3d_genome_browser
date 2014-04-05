@@ -30,10 +30,6 @@ THREE.PointerLockControls = function ( camera ) {
 
 	var PI_2 = Math.PI / 2;
 
-	var onMouseClick = function ( event ) {
-		alert('Click!');
-	}
-
 	var onMouseMove = function ( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -84,9 +80,9 @@ THREE.PointerLockControls = function ( camera ) {
 			// case 71: // g
 			// 	alert('do here anything!');
 			// 	break;
-			 // default:
-			 // 	console.log(event.keyCode);
-			 // 	break
+			  default:
+			  	console.log(event.keyCode);
+			  	break
 		}
 
 	};
@@ -126,7 +122,6 @@ THREE.PointerLockControls = function ( camera ) {
 	document.addEventListener( 'mousemove', onMouseMove, false );
 	document.addEventListener( 'keydown', onKeyDown, false );
 	document.addEventListener( 'keyup', onKeyUp, false );
-	document.addEventListener( 'contextmenu', onMouseClick, false);
 
 	this.enabled = false;
 

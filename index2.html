@@ -1,17 +1,306 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My first Three.js app</title>
-    <style>canvas { width: 100%; height: 100% }</style>
+    <title>Informationi</title>
     <script src="TableFilter/tablefilter_all.js" language="javascript" type="text/javascript"></script>
+    <!--link rel="stylesheet" type="text/css" href="newTable.css"-->
     <!-- jquery -->
     <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
     <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
-    <script type="text/javascript" src="http://www.kunalbabre.com/projects/table2CSV.js" > </script> 
+    <!--script type="text/javascript" src="http://www.kunalbabre.com/projects/table2CSV.js" > </script--> 
+    <script type="text/javascript" src="js/table2CSV.js" > </script>
   </head>
   <body>
-    <table id="table1" cellpadding="0" cellspacing="0">
+    <script>
+        var MAX_WAIT_INTERVAL = 10000;
+        var waitInterval = 0;
+        var resp_count = 0;
+        var req_count = 0;
+        var current_cell_line = 'K562';
+        var urlParams;
+        var deb_var;
+        (window.onpopstate = function () {
+            var match,
+                pl     = /\+/g,  // Regex for replacing addition symbol with a space
+                search = /([^&=]+)=?([^&]*)/g,
+                decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+                query  = window.location.search.substring(1);
+
+            urlParams = {};
+            while (match = search.exec(query))
+               urlParams[decode(match[1])] = decode(match[2]);
+        })();
+
+        if (urlParams["isplane"] === "true") {
+            var requestCHIP = "chr=" + urlParams["chr"] 
+                              + "&start=" + urlParams["start"]
+                              + "&end=" + urlParams["end"]
+                              + "&celline=" + current_cell_line; //should be parameter from URL
+            var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
+            $.getJSON(urlCHIP + "?callback=?", null, 
+                    function(data) {
+                      planeBuildTable(data);  
+                    });
+
+
+        } else if (urlParams["isplane"] === "false"){
+            var requestCHIP = "xstart="+ urlParams["xstart"] +"&xend="+ urlParams["xend"] +"&zstart="+ urlParams["zstart"] +"&zend="+ urlParams["zend"] +"&ystart="+ urlParams["ystart"] +"&yend="+ urlParams["yend"];
+            var urlCHIP = 'http://1kgenome.exascale.info/js_test?' + requestCHIP;
+            console.log(urlCHIP);
+            $.getJSON(urlCHIP + "?callback=?", null, 
+                    function(data) {
+                      cubicBuildTable(data);  
+                    });
+        }
+
+        function cubicBuildTable(data) {
+            deb_var = data;
+            if (data.length==0) {
+                var body = document.getElementsByTagName('body')[0];
+                var h2 = document.createElement('h2');
+                var el = document.createTextNode('There is no data to represent');
+                h2.appendChild(el);
+                body.appendChild(h2);
+                return;
+            }
+
+            var body = document.getElementsByTagName('body')[0];
+            var tbl = document.createElement('table');
+                
+            tbl.setAttribute('id','table1');
+            var tbdy = document.createElement('tbody');
+
+            var trL = document.createElement('tr');
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode('Chromosome'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Position'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('SNP'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Transcription Factor'))
+            trL.appendChild(th);
+
+            th= document.createElement('th');
+            th.appendChild(document.createTextNode('Level'));
+            trL.appendChild(th);
+
+            tbdy.appendChild(trL);
+
+            var new_cube_tracks = data["data"];
+
+            for (var track_index = 0; track_index < new_cube_tracks.length; ++track_index) {
+                var chrid = new_cube_tracks[track_index][0];
+                var chridNoStrand = chrid.substr(0, chrid.length - 2);
+                var track_points = new_cube_tracks[track_index][1];
+
+                var start_pos, end_pos, TF_name, affect_level, snpArray, chr_id;
+                
+                
+
+                var chridOnlyNumber = chridNoStrand;
+                if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
+                    chridOnlyNumber = chridOnlyNumber.substr(0, chridOnlyNumber.length - 1);
+                }
+                var requestCHIP = "chr=" + chridOnlyNumber 
+                  + "&start=" + track_points[0][1]
+                  + "&end=" + track_points[track_points.length - 1][1]
+                  + "&celline=" + current_cell_line;
+                var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
+                req_count += 1;
+                $.getJSON(urlCHIP + "?callback=?", null, 
+                    function(data) {
+                        resp_count += 1;
+                        for (var track_index_CHIP = 0; track_index_CHIP < data.length; ++track_index_CHIP) {
+                            chr_id = data[track_index_CHIP][0];
+                            start_pos = data[track_index_CHIP][1];
+                            end_pos = data[track_index_CHIP][2];
+                            TF_name = data[track_index_CHIP][3];
+                            affect_level = data[track_index_CHIP][4];
+                            snpArray = data[track_index_CHIP][6];
+                            for (var track_internal_index = 0; track_internal_index < snpArray.length; ++track_internal_index) {
+                                var tr=document.createElement('tr');
+                                // Chromosome
+                                var td=document.createElement('td');
+                                td.appendChild(document.createTextNode(String(chr_id)));
+                                tr.appendChild(td)
+                                //position
+                                var td=document.createElement('td');
+                                td.appendChild(document.createTextNode(String(snpArray[track_internal_index][0])));
+                                tr.appendChild(td)
+                                //snp
+                                td=document.createElement('td');
+                                td.appendChild(document.createTextNode("rs" + String(snpArray[track_internal_index][1])));
+                                tr.appendChild(td)
+                                //TF
+                                td=document.createElement('td');
+                                td.appendChild(document.createTextNode(String(TF_name)));
+                                tr.appendChild(td);
+                                //Level
+                                td=document.createElement('td');
+                                td.appendChild(document.createTextNode(String(affect_level)));
+                                tr.appendChild(td)
+                                tbdy.appendChild(tr);
+                            }
+                        }
+                    }
+                );
+            }
+
+            tbl.appendChild(tbdy);
+            body.appendChild(tbl);
+
+            waitFunction();
+
+            
+        }
+
+        function waitFunction(){
+            if (resp_count < req_count && waitInterval < MAX_WAIT_INTERVAL) {
+                waitInterval = waitInterval + 500;
+                setTimeout(waitFunction, 500);
+            } else {
+                var newtable_Props = {  
+                                highlight_keywords: true,
+                                on_keyup: true,  
+                                on_keyup_delay: 0,  
+                                single_search_filter: false
+                            };   
+                var tf1 = setFilterGrid("table1", newtable_Props);
+
+                $(document).ready(function() {
+             
+                    $('#table1').each(function() {
+                      var $table = $(this);
+                   
+                      var $button = $("<button type='button'>");
+                      $button.text("Export to CSV");
+                      $button.insertAfter($table);
+                   
+                      $button.click(function() {
+                        var csv = $table.table2CSV({delivery:'value'});
+                        window.location.href = 'data:text/csv;charset=UTF-8,'
+                                              + encodeURIComponent(csv);
+                      });
+                    });
+                  })
+            }
+        }
+
+        function planeBuildTable(data) {
+            if (data.length==0) {
+                var body = document.getElementsByTagName('body')[0];
+                var h2 = document.createElement('h2');
+                var el = document.createTextNode('There is no data to represent');
+                h2.appendChild(el);
+                body.appendChild(h2);
+                return;
+            }
+
+            var start_pos, end_pos, TF_name, affect_level, snpArray, chr_id;
+            var body = document.getElementsByTagName('body')[0];
+            var tbl = document.createElement('table');
+                
+            tbl.setAttribute('id','table1');
+            var tbdy = document.createElement('tbody');
+
+            var trL = document.createElement('tr');
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode('Chromosome'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Position'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('SNP'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Transcription Factor'))
+            trL.appendChild(th);
+
+            th= document.createElement('th');
+            th.appendChild(document.createTextNode('Level'))
+            trL.appendChild(th);
+
+            tbdy.appendChild(trL);
+
+            for (var track_index_CHIP = 0; track_index_CHIP < data.length; ++track_index_CHIP) {
+                chr_id = data[track_index_CHIP][0];
+                start_pos = data[track_index_CHIP][1];
+                end_pos = data[track_index_CHIP][2];
+                TF_name = data[track_index_CHIP][3];
+                affect_level = data[track_index_CHIP][4];
+                snpArray = data[track_index_CHIP][6];///Закончил тут
+
+                for (var track_internal_index = 0; track_internal_index < snpArray.length; ++track_internal_index) {
+                    var tr=document.createElement('tr');
+                    //chromosome
+                    var td=document.createElement('td');
+                    td.appendChild(document.createTextNode(String(chr_id)));
+                    tr.appendChild(td)
+                    //position
+                    td=document.createElement('td');
+                    td.appendChild(document.createTextNode(String(snpArray[track_internal_index][0])));
+                    tr.appendChild(td)
+                    //snp
+                    td=document.createElement('td');
+                    td.appendChild(document.createTextNode("rs" + String(snpArray[track_internal_index][1])));
+                    tr.appendChild(td)
+                    //TF
+                    td=document.createElement('td');
+                    td.appendChild(document.createTextNode(String(TF_name)));
+                    tr.appendChild(td);
+                    //Level
+                    td=document.createElement('td');
+                    td.appendChild(document.createTextNode(String(affect_level)));
+                    tr.appendChild(td)
+                    tbdy.appendChild(tr);
+                }
+            }
+
+            tbl.appendChild(tbdy);
+            body.appendChild(tbl);
+
+            var newtable_Props = {  
+                            highlight_keywords: true,
+                            on_keyup: true,  
+                            on_keyup_delay: 0,  
+                            single_search_filter: false
+                        };   
+            var tf1 = setFilterGrid("table1", newtable_Props);
+
+            $(document).ready(function() {
+         
+                $('#table1').each(function() {
+                  var $table = $(this);
+               
+                  var $button = $("<button type='button'>");
+                  $button.text("Export to CSV");
+                  $button.insertAfter($table);
+               
+                  $button.click(function() {
+                    var csv = $table.table2CSV({delivery:'value'});
+                    window.location.href = 'data:text/csv;charset=UTF-8,'
+                                          + encodeURIComponent(csv);
+                  });
+                });
+              })
+
+            }
+
+    </script>
+
+    <!--table id="table1" cellpadding="0" cellspacing="0">
     <caption>WORLD INTERNET USAGE AND POPULATION STATISTICS</caption>
     <tr>
         <th>World Regions</th>
@@ -69,33 +358,10 @@
         <td>53.5 %</td>
         <td>1.7 %</td>
     </tr>
-  </table>
+  </table-->
     <script language="javascript" type="text/javascript">
     //<![CDATA[ 
-    var newtable_Props = {  
-                    highlight_keywords: true,
-                    on_keyup: true,  
-                    on_keyup_delay: 0,  
-                    single_search_filter: false
-                };   
-    var tf1 = setFilterGrid("table1", newtable_Props);
-
-    $(document).ready(function() {
- 
-        $('#table1').each(function() {
-          var $table = $(this);
-       
-          var $button = $("<button type='button'>");
-          $button.text("Export to CSV");
-          $button.insertAfter($table);
-       
-          $button.click(function() {
-            var csv = $table.table2CSV({delivery:'value'});
-            window.location.href = 'data:text/csv;charset=UTF-8,'
-                                  + encodeURIComponent(csv);
-          });
-        });
-      })
+    
     //]]>
     </script>
   </body>

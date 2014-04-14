@@ -66,7 +66,7 @@
           <div id="tabs-1">
                 <div id="blocker">
                     <div id="instructions">
-                        <span style="font-size:40px">Click to "Science"</span><br/>(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size<br/>C = Change mode, T = color CHIP-Seq data under the CHIPSEQ mode, Tab = for more information<br/>G = get relation between Transcription Factors and SNPs only under cubic mode (doesn't work properly))<br/>
+                        <span style="font-size:40px">Click to "Science"</span><br/>(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size<br/>C = Change mode, Left Click = color CHIP-Seq data under the CHIPSEQ mode, Tab = for more information<br/>G = get relation between Transcription Factors and SNPs only under cubic mode (doesn't work properly))<br/>
 
                         Supported browsers: Firefox, Google Chrome.
                     </div>
@@ -106,7 +106,9 @@
 
 		<!-- main part -->
         <script>
-            var lastRegion;
+            var rgn;//made it global for table
+
+            var lastRegion, lastIntersection;
             var arrayOfCHIPCoveredTubes = [];
             var lastMode;
             var _messi;
@@ -176,11 +178,6 @@
             var mode_name;
             var mode_id = 0;
             var NUMBER_OF_MODES = 3;
-            // var gui = new dat.GUI();
-            // var folder1;
-            // var mainObjX;
-            // var mainObjY;
-            // var mainObjZ;
 
             function validate(incoords) {
                 return (incoords.match(regexpPattern) != null);
@@ -257,6 +254,29 @@
                 document.addEventListener( 'pointerlockerror', pointerlockerror, false );
                 document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
                 document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+                window.addEventListener( "oncontextmenu", function ( event ) { 
+                    if (controls.enabled==true)
+                        alert("Alex"); 
+                }, false );
+                
+                window.addEventListener("click",function(e) {
+                if(controls.enabled==true) {
+                        if (mode_id == 2) { // only for CHIP-SEq mode
+                            var _intersection = GetIntersection();
+                            if (_intersection == null) {
+                                alert("Point the area firstly!");
+                                return;
+                            }
+                            if (_intersection.object.name == "")
+                                return;
+                            if ($.inArray(_intersection.object.name, arrayOfCHIPCoveredTubes) != -1)
+                                return;
+                            
+                            arrayOfCHIPCoveredTubes.push(_intersection.object.name);
+                            drawChipSeqDataRunner(_intersection); //should be renamed
+                        }
+                    }
+                });
 
                 instructions.addEventListener( 'click', function ( event ) {
                     instructions.style.display = 'none';
@@ -284,35 +304,27 @@
                         var element = document.body;
                         if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element )
                             switch ( event.keyCode ) {
-                                case 84: //t
-                                    // if (is_plane_mode) {
-                                    if (mode_id == 2) {
-                                        var _intersection = GetIntersection();
-                                        if (_intersection == null) {
-                                            alert("Point the area firstly!");
-                                            return;
-                                        }
-
-                                        if (_intersection.object.name == "") {
-                                            return;
-                                        }
-
-                                        if ($.inArray(_intersection.object.name, arrayOfCHIPCoveredTubes) != -1)
-                                            return;
-                                        
-                                        arrayOfCHIPCoveredTubes.push(_intersection.object.name);
-                                        myfoo(_intersection); //should be renamed
-                                    }
-                                    break;
+                                /*moved to the left click event for the window*/
+                                // case 84: //t
+                                    
+                                //     break;
                                 case 71: //g
                                     // if (!is_plane_mode) {
-                                    if (mode_id == 1) {
+                                    if (mode_id == 0) {
                                         var _intersection = GetIntersection();
                                         if (_intersection == null) {
                                             alert("Point the area firstly!");
                                             return;
                                         }
-                                        init_new_window_SNP_CHIP_SEQ(_intersection.point);
+                                        init_new_window_SNP_CHIP_SEQ(rgn, true);
+                                    } else if (mode_id == 1) {
+                                        var _intersection = GetIntersection();
+                                        if (_intersection == null) {
+                                            alert("Point the area firstly!");
+                                            return;
+                                        }
+
+                                        init_new_window_SNP_CHIP_SEQ(_intersection.point, false);
                                     }
                                     break;
                                 case 67: //c - change mode
@@ -361,7 +373,7 @@
 				}
             }
 
-            function myfoo(_intersection) {
+            function drawChipSeqDataRunner(_intersection) {
                 var name = _intersection.object.name;
                 var requestCHIP = name.replace(regexpPatternURL, "chr=$1&start=$2&end=$3&celline="+current_cell_line);
 
@@ -372,14 +384,13 @@
                         drawChipSeqData(data, _intersection);
                     }
                 );
-                //maybe here it is reasonable to make sleep while we dont have response
             }
 
             function drawChipSeqData(data, _intersection) {
                 var name = _intersection.object.name;
                 var vertices = _intersection.object.geometry.vertices;
                 var aLen = vertices.length;
-                var chrIDRange = (name.replace(regexpPatternURL, "$1"));
+                // var chrIDRange = (name.replace(regexpPatternURL, "$1"));
                 var startRange = parseInt(name.replace(regexpPatternURL, "$2"));
                 var endRange = parseInt(name.replace(regexpPatternURL, "$3"));
                 var unit = (endRange - startRange)/(aLen-1);
@@ -388,16 +399,16 @@
                 var chipName;
                 deb_var = data;
                 for (var indx in data) {
-                    if (startRange >= data[indx][0])
+                    if (startRange >= data[indx][1])
                         aStart = 0;
                     else
-                        aStart = Math.ceil((data[indx][0]-startRange)/unit);
+                        aStart = Math.ceil((data[indx][1]-startRange)/unit);
                     
-                    if (endRange <= data[indx][1])
+                    if (endRange <= data[indx][2])
                         aEnd = aLen-1;
                     else
-                        aEnd = Math.floor((data[indx][1]-startRange)/unit);
-                    var tube_color = getColorForPercentage(data[indx][3]);
+                        aEnd = Math.floor((data[indx][2]-startRange)/unit);
+                    var tube_color = getColorForPercentage(data[indx][4]);
                     var material = new THREE.MeshLambertMaterial( { color: tube_color, shading: THREE.SmoothShading } );
                     chipVertices = [];
                     
@@ -414,8 +425,8 @@
                     var tubeMesh = new THREE.Mesh(tube, material);  
                     // tubeMesh.userData = [blockIndicesStr, blockIndices];//?
                     
-                    tubeMesh.name = chrIDRange + "-" + String(data[indx][0]) + "-"  + String(data[indx][1]);
-                    uploaded_splines_chip[tubeMesh.name] = [chrid, chipVertices];                                
+                    tubeMesh.name = data[indx][0] + "-" + String(data[indx][1]) + "-"  + String(data[indx][2]);
+                    uploaded_splines_chip[tubeMesh.name] = [data[indx][0], data[indx][1], data[indx][2], data[indx][3], data[indx][4]];                                
                     scene.add(tubeMesh);
                     chipObjects.push(tubeMesh);
                 }
@@ -457,12 +468,40 @@
                 }
             }
             
-            /*doesn't work properly*/
-            function init_new_window_SNP_CHIP_SEQ (intersectPoint) {
-                snp_chip_seq_window = window.open("",/*index2.html",*/"_blank","dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
-                snp_chip_seq_window.document.write('<html><head><title>Information!</title><link rel="stylesheet" type="text/css" href="newTable.css"></head><body></body></html>')
+            function init_new_window_SNP_CHIP_SEQ (intersectPoint, isPlaneMode) {
 
-
+                
+                if (isPlaneMode) {
+                    var _rgn = intersectPoint;
+                    var chrid = String(_rgn[0]);
+                    // console.log(chrid);
+                    var chridNoStrand = chrid.substr(0, chrid.length - 2);
+                    var chridOnlyNumber = chridNoStrand;
+                    if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
+                        chridOnlyNumber = chridOnlyNumber.substr(0, chridOnlyNumber.length - 1);
+                    }
+                    snp_chip_seq_window = window.open("index2.html?isplane="+isPlaneMode+"&chr=" + chridOnlyNumber 
+                              + "&start=" + String(_rgn[1])
+                              + "&end=" + String(_rgn[2])      
+                            /*+ "&celline="+ current_cell_line*/, //parameter of celline - will be hardcoded in the index2.html
+                              "_blank", "dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
+                    return;
+                } else {
+                    var intersectInModelCoordinates = Local2global(intersectPoint);
+                    snp_chip_seq_window = window.open("index2.html?isplane="+isPlaneMode+"&xstart=" + String(intersectInModelCoordinates.x - radiusSphere) 
+                              + "&xend=" + String(intersectInModelCoordinates.x + radiusSphere)
+                              + "&zstart=" + String(intersectInModelCoordinates.z - radiusSphere)      
+                              + "&zend=" + String(intersectInModelCoordinates.z + radiusSphere)  
+                              + "&ystart=" + String(intersectInModelCoordinates.y - radiusSphere)      
+                              + "&yend=" + String(intersectInModelCoordinates.y + radiusSphere)
+                            /*+ "&celline="+ current_cell_line*/, //parameter of celline - will be hardcoded in the index2.html
+                              "_blank", "dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
+                    return;    
+                }
+                
+                // snp_chip_seq_window = window.open("",/*index2.html",*/"_blank","dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
+                // snp_chip_seq_window.document.write('<html><head><title>Information!</title><link rel="stylesheet" type="text/css" href="newTable.css"></head><body></body></html>')
+                
                 var body=snp_chip_seq_window.document.getElementsByTagName('body')[0];
                 var s=snp_chip_seq_window.document.createElement('script');
                 s.setAttribute('src','TableFilter/tablefilter_all_min.js');
@@ -493,7 +532,7 @@
 
                 tbdy.appendChild(trL);
 
-                var intersectInModelCoordinates = Local2global(intersectPoint);
+                
 
                 var request = "xstart=" + String(intersectInModelCoordinates.x - radiusSphere) 
                               + "&xend=" + String(intersectInModelCoordinates.x + radiusSphere)
@@ -527,10 +566,10 @@
                                 function(model_points) {
                                     var chipseq_tracks = model_points;
                                     for (var track_index_CHIP = 0; track_index_CHIP < chipseq_tracks.length; ++track_index_CHIP) {
-                                          var start_pos = chipseq_tracks[track_index_CHIP][0];
-                                          var end_pos = chipseq_tracks[track_index_CHIP][1];
-                                          var TF_name = chipseq_tracks[track_index_CHIP][2];
-                                          var affect_level = chipseq_tracks[track_index_CHIP][3];
+                                          var start_pos = chipseq_tracks[track_index_CHIP][1];
+                                          var end_pos = chipseq_tracks[track_index_CHIP][2];
+                                          var TF_name = chipseq_tracks[track_index_CHIP][3];
+                                          var affect_level = chipseq_tracks[track_index_CHIP][4];
                                           //console.log(TF_name);
                                           
 
@@ -1081,10 +1120,25 @@
                 }   
             }
 
+            function GetIntersectionCHIPSEQ() {
+                var vector = new THREE.Vector3(0, 0, 0);
+                var raycaster = projector.pickingRay(vector, camera);
+                var closestObjectDistance;
+                var intersects = raycaster.intersectObjects(chipObjects);
+                if (intersects.length == 0) {
+                    return null;
+                }
+                closestObjectDistance = intersects[0].distance;
+                intersects = $.grep(intersects, function(v){return v.distance <= closestObjectDistance + 5});
+                return intersects;
+            }
+
             function GetIntersection() {
             	var vector = new THREE.Vector3(0, 0, 0);
             	var raycaster = projector.pickingRay(vector, camera);
-            	var intersects = raycaster.intersectObjects(objects);
+            	
+                // var intersects = raycaster.intersectObjects(objects);
+                var intersects = raycaster.intersectObjects(objects);
 				if (intersects.length == 0) {
 					return null;
 				}
@@ -1199,6 +1253,7 @@
             	if (infoBlock) {
             		infoBlock.innerHTML = "";
                     lastRegion = [];
+                    rgn = [];
             	}
 
             }
@@ -1335,9 +1390,35 @@
                 }
             }
             
+            function UpdateInfoChipSeq() {
+                intersection = GetIntersectionCHIPSEQ();
+                if (intersection == null) {
+                    ClearInfo();
+                    return;
+                }
+                
+                var temp;
+                if (typeof lastIntersection  != 'undefined' && intersection[0].point.x == lastIntersection.x && intersection[0].point.y == lastIntersection.y && intersection[0].point.z == lastIntersection.z) {
+                    return;
+                } else {
+                    ClearInfo();
+                    for (var inter_indx in intersection) {
+                        temp = uploaded_splines_chip[intersection[inter_indx].object.name];
+                        // infoBlock.innerHTML += intersection[inter_indx].object.name + "; ";
+                        infoBlock.innerHTML += "<a target='_blank' style='color: rgb(255,255,0)' href='http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr"+temp[0]+"%3A"+temp[1]+"-"+temp[2]+"' >"+temp[0]+"-"+temp[1] + ":"+temp[2] + " -> " + temp[3] + "("+temp[4]+")</a>; ";
+                    }
+                    lastIntersection = intersection[0].point;
+                }
+            }
+
             function UpdateInfo() {
+                if (mode_id == 2) {
+                    UpdateInfoChipSeq();
+                    return;
+                }
+
             	intersection = GetIntersection();
-            	if (intersection == null || mode_id == 2) {
+            	if (intersection == null) {
             		ClearInfo();
             		return;
             	}
@@ -1356,6 +1437,7 @@
 
                 // TODO: Here we should change the mode
             	var region = GetSelectedTrackPoints(point, object.name);
+                rgn = region;
             	var positionStr = PositionToString(region);
             	if (positionStr in regionData && (lastRegion==null || lastRegion[0] != regionData[positionStr][0] && lastRegion[1] != regionData[positionStr][1] && lastRegion[2] != regionData[positionStr][2])) {
             		infoBlock.innerHTML = regionData[positionStr];

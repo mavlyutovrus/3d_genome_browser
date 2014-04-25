@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>3DBD genome browser</title>
-		<link href="main.css" rel="stylesheet" type="text/css"/>
+		<link href="css/main.css" rel="stylesheet" type="text/css"/>
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
         <link rel="stylesheet" href="js/messi/messi.min.css" />
         <!-- jquery -->
@@ -11,14 +11,16 @@
         <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
         <!-- lite version of three.js distrib   -->
-        <script src="js/min.three.js"></script>
+        <!--script src="js/min.three.js"></script-->
+        <script type="text/javascript" src="js/three.min_new.js"></script>
+        <script type="text/javascript" src="js/threeoctree.js"></script>
 
     	<!-- hacked PointerLockControls.js from "three/examples/js/controls/PointerLockControls.js" -->
 		<script src="js/PointerLockControls.js"></script>
     	
         <script type='text/javascript' src='js/messi/messi.min.js'></script>
 
-        <script src="TextMessages.js"></script>
+        <script src="content/TextMessages.js"></script>
 
         <!--script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script-->
 
@@ -66,7 +68,7 @@
           <div id="tabs-1">
                 <div id="blocker">
                     <div id="instructions">
-                        <span style="font-size:40px">Click to "Science"</span><br/>(W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size<br/>C = Change mode, Left Click = color CHIP-Seq data under the CHIPSEQ mode, Tab = for more information<br/>G = get relation between Transcription Factors and SNPs only under cubic mode (doesn't work properly))<br/>
+                        <span style="font-size:40px">Click to Explore</span><br/>W, A, S, D = Move, MOUSE = Look around, SCROLL = +/- selection size<br/>C = Change mode, Left Click = <i>CUBIC mode:</i> explore SNPs in cubic area; <i>CHIPSEQ mode:</i> color CHIP-Seq data, Tab = for more information<br/>G = get relation between Transcription Factors and SNPs (<i>PLANE</i> and <i>CUBIC mode</i>)<br/>
 
                         Supported browsers: Firefox, Google Chrome.
                     </div>
@@ -106,6 +108,14 @@
 
 		<!-- main part -->
         <script>
+            var globalArrayForWindow;
+
+            var MAX_WAIT_INTERVAL = 10000;
+            var waitInterval = 0;
+            var resp_count = 0;
+            var req_count = 0;
+            var tableStrContent = '';
+
             var rgn;//made it global for table
 
             var lastRegion, lastIntersection;
@@ -126,7 +136,7 @@
             var radiusSphere = 40, segmentsWidth = 32, segmentsHeight = 16; //sphere zone parameters
             var maxRadiusSphere = 140, minRadiusSphere = 20;
             var regexpPattern = /[^\d]*([\d]+)[^\d]+([\d]+)[^\d]+([\d]+)[^\d]*/; //format smth(0+) [num] smth(1+) [num] smth(1+) [num] smth(0+)
-            var regexpPatternURL = /([\dXY]{1,2})[^\d]+([\d]+)[^\d]+([\d]+)/ ;
+            var regexpPatternURL = /([\dXY]{1,2})[_]*([abAB]*)[^\d]+([\d]+)[^\d]+([\d]+)/ ;
             var divElement;
             var test_mesh;
         	var DEBUG = true;
@@ -191,6 +201,9 @@
             }
 
             function changeModeIndicator() {
+                //maybe it's not necessary 
+                ClearInfo();
+
                 switch(mode_id) {
                     case 0: //plane mode
                         if (lastMode == 2) cleanCHIPSEQdata();
@@ -255,13 +268,24 @@
                 document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
                 document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
                 window.addEventListener( "oncontextmenu", function ( event ) { 
-                    if (controls.enabled==true)
-                        alert("Alex"); 
                 }, false );
                 
                 window.addEventListener("click",function(e) {
-                if(controls.enabled==true) {
-                        if (mode_id == 2) { // only for CHIP-SEq mode
+                if(controls.enabled == true) {
+                        if (mode_id == 1) { // only cubic mode
+                            is_modal_opened = true;
+                            $('p#textmode').text('');
+                            document.exitPointerLock = document.exitPointerLock ||
+                                                        document.mozExitPointerLock ||
+                                                        document.webkitExitPointerLock;
+                            document.exitPointerLock();
+                            tableStrContent = '';
+                            buildCubeDataStructureSNPs(searchOctree())
+
+                            waitFunction();
+
+                            return false;
+                        } else if (mode_id == 2) { // only for CHIP-SEq mode
                             var _intersection = GetIntersection();
                             if (_intersection == null) {
                                 alert("Point the area firstly!");
@@ -351,13 +375,17 @@
 
                     //scrolling event
 					var scrollHandler = function (event) {
-						if (event.detail != null && event.detail < 0 || event.wheelDeltaY != null && event.wheelDeltaY > 0) {
-							basesInSelection = Math.min(3000, basesInSelection + 100);
-                            radiusSphere = Math.min(maxRadiusSphere, radiusSphere + 10);
-						} else {
-							basesInSelection = Math.max(100, basesInSelection - 100);
-                            radiusSphere = Math.max(minRadiusSphere, radiusSphere -10);
-						}
+                        var element = document.body;
+                        if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ){
+                            if (event.detail != null && event.detail < 0 || event.wheelDeltaY != null && event.wheelDeltaY > 0) {
+                                basesInSelection = Math.min(3000, basesInSelection + 100);
+                                radiusSphere = Math.min(maxRadiusSphere, radiusSphere + 10);
+                            } else {
+                                basesInSelection = Math.max(100, basesInSelection - 100);
+                                radiusSphere = Math.max(minRadiusSphere, radiusSphere -10);
+                            }    
+                        }
+						
 					};
 					var mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 					if (document.attachEvent) //if IE (and Opera depending on user setting) 
@@ -373,9 +401,35 @@
 				}
             }
 
+            function waitFunction(){
+                console.log(req_count  + " : " + resp_count);
+                if (resp_count < req_count && waitInterval < MAX_WAIT_INTERVAL) {
+                    waitInterval = waitInterval + 50;
+                    setTimeout(waitFunction, 50);
+                } else {
+                    var element = document.body;
+                    _messi = new Messi(tableStrContent, {title: 'Cubic data', center: false, viewport: {top: '5vh', left: '30%'}, titleClass: 'success', buttons: [{id: 0, label: 'Ok', val: 'O'}], 
+                                            callback: function(val) { element.requestPointerLock = element.requestPointerLock ||
+                                                                         element.mozRequestPointerLock ||
+                                                                         element.webkitRequestPointerLock;
+                                            element.requestPointerLock(); is_modal_opened = false;}});
+                }
+            }
+
+            function drawModalWindowTable(meshesSearch) {
+
+
+                var element = document.body;
+                    _messi = new Messi(tableStrContent, {title: 'Cubic data', center: false, viewport: {top: '5vh', left: '30%'}, titleClass: 'success', buttons: [{id: 0, label: 'Ok', val: 'O'}], 
+                                            callback: function(val) { element.requestPointerLock = element.requestPointerLock ||
+                                                                         element.mozRequestPointerLock ||
+                                                                         element.webkitRequestPointerLock;
+                                            element.requestPointerLock(); is_modal_opened = false;}});
+            }
+
             function drawChipSeqDataRunner(_intersection) {
                 var name = _intersection.object.name;
-                var requestCHIP = name.replace(regexpPatternURL, "chr=$1&start=$2&end=$3&celline="+current_cell_line);
+                var requestCHIP = name.replace(regexpPatternURL, "chr=$1&start=$3&end=$4&celline="+current_cell_line);
 
                 var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
 
@@ -390,9 +444,8 @@
                 var name = _intersection.object.name;
                 var vertices = _intersection.object.geometry.vertices;
                 var aLen = vertices.length;
-                // var chrIDRange = (name.replace(regexpPatternURL, "$1"));
-                var startRange = parseInt(name.replace(regexpPatternURL, "$2"));
-                var endRange = parseInt(name.replace(regexpPatternURL, "$3"));
+                var startRange = parseInt(name.replace(regexpPatternURL, "$3"));
+                var endRange = parseInt(name.replace(regexpPatternURL, "$4"));
                 var unit = (endRange - startRange)/(aLen-1);
                 var aStart, aEnd; //in array of vertices proportionally
                 var chipVertices;
@@ -452,25 +505,8 @@
                 };
                 return new THREE.Color().setRGB(color.r, color.g, color.b);
             }
-
-            function buildCubeDataStructure(model_points) {
-                 uploaded_splines_selection = {};
-                 var new_cube_tracks = model_points["data"];
-                
-                 for (var track_index = 0; track_index < new_cube_tracks.length; ++track_index) {
-                    chrid = new_tracks[track_index][0];
-                    chridNoStrand = chrid.substr(0, chrid.length - 2);
-                    track_points = new_tracks[track_index][1];
-                    var tubeMesh_name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
-                    uploaded_splines_selection[tubeMesh_name] = uploaded_splines[tubeMesh_name];
-                    uploaded_splines_selection[tubeMesh_name][2] = track_points[0][1];
-                    uploaded_splines_selection[tubeMesh_name][3] = track_points[track_points.length - 1][1];
-                }
-            }
             
             function init_new_window_SNP_CHIP_SEQ (intersectPoint, isPlaneMode) {
-
-                
                 if (isPlaneMode) {
                     var _rgn = intersectPoint;
                     var chrid = String(_rgn[0]);
@@ -488,158 +524,28 @@
                     return;
                 } else {
                     var intersectInModelCoordinates = Local2global(intersectPoint);
-                    snp_chip_seq_window = window.open("index2.html?isplane="+isPlaneMode+"&xstart=" + String(intersectInModelCoordinates.x - radiusSphere) 
-                              + "&xend=" + String(intersectInModelCoordinates.x + radiusSphere)
-                              + "&zstart=" + String(intersectInModelCoordinates.z - radiusSphere)      
-                              + "&zend=" + String(intersectInModelCoordinates.z + radiusSphere)  
-                              + "&ystart=" + String(intersectInModelCoordinates.y - radiusSphere)      
-                              + "&yend=" + String(intersectInModelCoordinates.y + radiusSphere)
+                    globalArrayForWindow = searchOctree();
+                    var result = '';
+                    for (var indx in globalArrayForWindow) {
+                        result += globalArrayForWindow[indx].chr + "-" + globalArrayForWindow[indx].helix + ":";
+                        for (var indx2 in globalArrayForWindow[indx].intervals) {
+                            result += globalArrayForWindow[indx].intervals[indx2].start + "_" + globalArrayForWindow[indx].intervals[indx2].end + "-";
+                        }
+                        result += ";";
+                    }
+                    var radiusSphereGlobal = radiusSphere/scaleFactor;
+                    snp_chip_seq_window = window.open("index2.html?isplane="+isPlaneMode+"&path=" + result
+                        // "&xstart=" + String(intersectInModelCoordinates.x - radiusSphereGlobal) 
+                        //       + "&xend=" + String(intersectInModelCoordinates.x + radiusSphereGlobal)
+                        //       + "&zstart=" + String(intersectInModelCoordinates.z - radiusSphereGlobal)      
+                        //       + "&zend=" + String(intersectInModelCoordinates.z + radiusSphereGlobal)  
+                        //       + "&ystart=" + String(intersectInModelCoordinates.y - radiusSphereGlobal)      
+                        //       + "&yend=" + String(intersectInModelCoordinates.y + radiusSphereGlobal)
                             /*+ "&celline="+ current_cell_line*/, //parameter of celline - will be hardcoded in the index2.html
                               "_blank", "dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
                     return;    
                 }
                 
-                // snp_chip_seq_window = window.open("",/*index2.html",*/"_blank","dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
-                // snp_chip_seq_window.document.write('<html><head><title>Information!</title><link rel="stylesheet" type="text/css" href="newTable.css"></head><body></body></html>')
-                
-                var body=snp_chip_seq_window.document.getElementsByTagName('body')[0];
-                var s=snp_chip_seq_window.document.createElement('script');
-                s.setAttribute('src','TableFilter/tablefilter_all_min.js');
-                s.setAttribute('type','text/javascript');
-                snp_chip_seq_window.document.getElementsByTagName('head')[0].appendChild(s);
-
-                var tbl=snp_chip_seq_window.document.createElement('table');
-                
-                tbl.setAttribute('id','newtable');
-                var tbdy=snp_chip_seq_window.document.createElement('tbody');
-
-                var trL=snp_chip_seq_window.document.createElement('tr');
-                    var th=snp_chip_seq_window.document.createElement('th');
-                    th.appendChild(snp_chip_seq_window.document.createTextNode('Position'))
-                    trL.appendChild(th);
-
-                    th=snp_chip_seq_window.document.createElement('th');
-                    th.appendChild(snp_chip_seq_window.document.createTextNode('SNP'))
-                    trL.appendChild(th);
-
-                    th=snp_chip_seq_window.document.createElement('th');
-                    th.appendChild(snp_chip_seq_window.document.createTextNode('Transcription Factor'))
-                    trL.appendChild(th);
-
-                    th=snp_chip_seq_window.document.createElement('th');
-                    th.appendChild(snp_chip_seq_window.document.createTextNode('Level'))
-                    trL.appendChild(th);
-
-                tbdy.appendChild(trL);
-
-                
-
-                var request = "xstart=" + String(intersectInModelCoordinates.x - radiusSphere) 
-                              + "&xend=" + String(intersectInModelCoordinates.x + radiusSphere)
-                              + "&zstart=" + String(intersectInModelCoordinates.z - radiusSphere)      
-                              + "&zend=" + String(intersectInModelCoordinates.z + radiusSphere)  
-                              + "&ystart=" + String(intersectInModelCoordinates.y - radiusSphere)      
-                              + "&yend=" + String(intersectInModelCoordinates.y + radiusSphere);
-                var url = "http://1kgenome.exascale.info/js_test?" + request;
-                $.getJSON(url + "?callback=?", null, 
-                    function(model_points, textStatus, jqXHR) {
-                        deb_var = jqXHR;
-                        var new_cube_tracks = model_points["data"];
-                        
-                        for (var track_index = 0; track_index < new_cube_tracks.length; ++track_index) {
-                            chrid = new_cube_tracks[track_index][0];
-                            chridNoStrand = chrid.substr(0, chrid.length - 2);
-                            track_points = new_cube_tracks[track_index][1];
-                            var tubeMesh_name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
-
-                            var chridOnlyNumber = chridNoStrand;
-                            if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
-                                chridOnlyNumber = chridOnlyNumber.substr(0, chridOnlyNumber.length - 1);
-                            }
-                            var requestCHIP = "chr=" + chridOnlyNumber 
-                              + "&start=" + track_points[0][1]
-                              + "&end=" + track_points[track_points.length - 1][1]
-                              + "&celline=" + current_cell_line;
-                            var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
-
-                            $.getJSON(urlCHIP + "?callback=?", null, 
-                                function(model_points) {
-                                    var chipseq_tracks = model_points;
-                                    for (var track_index_CHIP = 0; track_index_CHIP < chipseq_tracks.length; ++track_index_CHIP) {
-                                          var start_pos = chipseq_tracks[track_index_CHIP][1];
-                                          var end_pos = chipseq_tracks[track_index_CHIP][2];
-                                          var TF_name = chipseq_tracks[track_index_CHIP][3];
-                                          var affect_level = chipseq_tracks[track_index_CHIP][4];
-                                          //console.log(TF_name);
-                                          
-
-                                          var requestSNP = "chr=" + chridOnlyNumber 
-                                              + "&start=" + start_pos
-                                              + "&end=" + end_pos;
-                                          var urlSNP = "http://1kgenome.exascale.info/js_snp?" + requestSNP;
-                                          // tempArray[urlSNP] = [chipseq_tracks[track_index_CHIP][0], chipseq_tracks[track_index_CHIP][1],chipseq_tracks[track_index_CHIP][2],chipseq_tracks[track_index_CHIP][3]];
-                                          $.getJSON(urlSNP + "?callback=?", null, 
-                                                function(positions) {
-                                                    for (var point_index = 0; point_index < positions.length; ++point_index) {
-                                                        var tr=snp_chip_seq_window.document.createElement('tr');
-                                                        //position
-                                                        var td=snp_chip_seq_window.document.createElement('td');
-                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(positions[point_index][0])));
-                                                        tr.appendChild(td)
-                                                        //snp
-                                                        td=snp_chip_seq_window.document.createElement('td');
-                                                        td.appendChild(snp_chip_seq_window.document.createTextNode("rs" + String(positions[point_index][1])));
-                                                        tr.appendChild(td)
-                                                        //TF
-                                                        td=snp_chip_seq_window.document.createElement('td');
-                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(TF_name)));
-                                                        tr.appendChild(td);
-                                                        //Level
-                                                        td=snp_chip_seq_window.document.createElement('td');
-                                                        td.appendChild(snp_chip_seq_window.document.createTextNode(String(affect_level)));
-                                                        tr.appendChild(td)
-                                                        tbdy.appendChild(tr);
-                                                    }
-                                                    var tr=snp_chip_seq_window.document.createElement('tr');
-                                                    //position
-                                                    var td=snp_chip_seq_window.document.createElement('td');
-                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
-                                                    tr.appendChild(td)
-                                                    //snp
-                                                    td=snp_chip_seq_window.document.createElement('td');
-                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
-                                                    tr.appendChild(td)
-                                                    //TF
-                                                    td=snp_chip_seq_window.document.createElement('td');
-                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
-                                                    tr.appendChild(td);
-                                                    //Level
-                                                    td=snp_chip_seq_window.document.createElement('td');
-                                                    td.appendChild(snp_chip_seq_window.document.createTextNode('------'));
-                                                    tr.appendChild(td)
-                                                    tbdy.appendChild(tr); 
-                                                }
-
-                                          );  
-                                                         
-                                    }
-
-
-                                }
-                            );
-
-                        }
-                    }
-                );
-                
-                tbl.appendChild(tbdy);
-                body.appendChild(tbl);
-                s=snp_chip_seq_window.document.createElement('script');
-                s.setAttribute('type','text/javascript');
-                s.appendChild(snp_chip_seq_window.document.createTextNode('setFilterGrid("newtable");'));
-                body.appendChild(s);
-
-                 setFilterGrid("newtable1");
             }
 
 
@@ -700,7 +606,6 @@
 						scene.add(tubeMesh);
 						objects.push(tubeMesh);
                     }            	
-            	
             }
             
             function InitSelectionMesh() {
@@ -737,12 +642,103 @@
 				targetBall.name = "target_ball";            	
 				UpdateTargetBallPosition();						          	
             }
+
+            function getPositionRangeFromCubeIntersection(meshesSearch) {
+                var resultSet = [];
+                var verts;
+                var POSSIBLE_HOLE_IN_VERTICES = 5;
+                var mentionedMeshes = [];
+                var name, vertices, aLen, startRange, endRange, unit;
+                var aStart, aEnd, counter, chr, helix;
+                var tempObject;
+                for (var _mesh in meshesSearch) {
+                    name = meshesSearch[_mesh].object.name;
+
+                    if (mentionedMeshes != null && ($.inArray(name, mentionedMeshes) != -1)) {
+                        continue;
+                    }
+                    mentionedMeshes.push(name);
+                    tempObject = [];
+
+                    //proportional calculations
+                    verts = meshesSearch[_mesh].object.geometry.vertices;
+                    aLen = verts.length;
+                    chr = (name.replace(regexpPatternURL, "$1"));
+                    helix = (name.replace(regexpPatternURL, "$2"));
+                    startRange = parseInt(name.replace(regexpPatternURL, "$3"));
+                    endRange = parseInt(name.replace(regexpPatternURL, "$4"));
+                    unit = (endRange - startRange)/(aLen-1);
+
+                    aStart = -1;
+                    aEnd = -1;
+                    counter == 0;
+                    for (var _v in verts) {
+                        if (intersection.point.x - radiusSphere <= verts[_v].x &&
+                            intersection.point.x + radiusSphere >= verts[_v].x &&
+                            intersection.point.y - radiusSphere <= verts[_v].y &&
+                            intersection.point.y + radiusSphere >= verts[_v].y &&
+                            intersection.point.z - radiusSphere <= verts[_v].z &&
+                            intersection.point.z + radiusSphere >= verts[_v].z) {
+
+                            if (aStart == -1) {
+                                aStart = _v;
+                                aEnd = _v;
+                                counter = 0;
+                            } else {
+                                aEnd = _v;
+                                counter = 0;
+                            }
+                        } else {
+                            if (aEnd != -1) {
+                                counter++;
+
+                                //define the beginning of the line
+                                if (counter == POSSIBLE_HOLE_IN_VERTICES) {
+                                    if (aStart == 0) {
+                                        aStart = startRange; //reassign variable from index to value (position)
+                                    } else {
+                                        aStart = Math.ceil(startRange + unit * (aStart - 1)); //!! Artificially increase of observed area
+                                    }
+
+                                    if (aEnd == verts.length - 1) {
+                                        aEnd = endRange; //reassign variable from index to value (position)
+                                    } else {
+                                        // console.log(aEnd);
+                                        // console.log( startRange +"+"+unit +" * ("+aEnd + " + 1)");
+                                        var aEndClone = aEnd - 1+1; //weird hint to change from the string
+                                        aEnd = Math.floor(startRange + unit * (aEndClone + 1));
+                                        // console.log(aEnd);
+                                    }
+
+                                    tempObject.push({start: aStart, end: aEnd});
+                                    aStart = -1;
+                                    aEnd = -1;
+                                }
+                            }
+                        }
+                    }
+                    if (tempObject.length != 0)
+                        resultSet.push({chr: chr, intervals: tempObject, size: tempObject.length, helix: helix}); 
+                }
+                return resultSet;
+            }
+
+            function searchOctree() {
+                intersectionImpl = GetIntersection().point;
+                var rayCaster = new THREE.Raycaster( new THREE.Vector3().copy( intersectionImpl ), new THREE.Vector3(0,0,radiusSphere).normalize() );
+                // var radiusSearch = radiusSphere;
+                var meshesSearch = octree.search( rayCaster.ray.origin, radiusSphere, true, rayCaster.ray.direction ); 
+                // intersections = rayCaster.intersectOctreeObjects( meshesSearch, true);
+
+                return getPositionRangeFromCubeIntersection(meshesSearch);
+            }
 			
             function init() {
             		scene = new THREE.Scene();
 					camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 100000 );
                     controls = new THREE.PointerLockControls( camera );
                     scene.add( controls.getObject() );
+
 					//scene.fog = new THREE.Fog( 0xffffff, 0, blockSize * scaleFactor );
 					init_light(scene);    
                     //draw_low_resolution_model();
@@ -753,6 +749,16 @@
                     
                     InitSelectionMesh();
                     InitTargetBall();
+
+                    // create octree
+                    octree = new THREE.Octree( {
+                      undeferred: false,
+                      depthMax: Infinity,
+                      objectsThreshold: 8,
+                      overlapPct: 0.15
+                       // ,
+                       // scene: scene
+                    } );
 
                     divElement = document.getElementById("tabs-1");
                     
@@ -892,10 +898,10 @@
 					
 					tubeMesh.name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
 					uploaded_splines[tubeMesh.name] = [chrid, track_points];								
-					scene.add(tubeMesh);
+					octree.add(tubeMesh, {useFaces: false, useVertices: true});
+                    scene.add(tubeMesh);
 					objects.push(tubeMesh);
                     console.log('Hi')
-
 				}
             }
             
@@ -989,105 +995,8 @@
                 if (lastBlockIndicesStr != blockIndicesStr) {
                     DeleteTexturesFromCubes2(blockIndicesStr, blockIndices);
                     lastBlockIndicesStr = blockIndicesStr;
-                }
-
-                
+                }   
             }
-
-            /*@depricated*/
-            //Line to Tube Mesh version
-            function RecreateTexturesInCube(blockIndicesStr) {
-                var lastObserved = {};
-                var linesIndcesToDelete = [];
-                var objectsIndcesToDelete = [];
-                var tempUserData;
-                for (var _obj in lines) {
-                    tempUserData = lines[_obj].userData;
-                    if (tempUserData == blockIndicesStr && (!(uploaded_area[tempUserData]) ||(tempUserData in lastObserved))) {
-                        if (!(tempUserData in lastObserved)) {
-                            uploaded_area[tempUserData] = true;
-                            lastObserved[tempUserData] = true;
-                        }
-                        var material = new THREE.MeshLambertMaterial( { color: lines[_obj].material.color, shading: THREE.SmoothShading } );
-                        var spline = new THREE.SplineCurve3(lines[_obj].geometry.vertices);
-                        var radiusSegments = 6;
-                        var tube = new THREE.TubeGeometry(spline, lines[_obj].geometry.segments, 10, radiusSegments, false, false);
-                        tube.dynamic = true;
-                        var tubeMesh = new THREE.Mesh(tube, material);  
-                        tubeMesh.userData = lines[_obj].userData;
-                        tubeMesh.name = lines[_obj].name;
-                        tubeMesh.userData = tempUserData;
-                        objectsIndcesToDelete[_obj] = true;
-                        scene.add(tubeMesh);
-                        objects.push(tubeMesh);
-                        scene.remove(lines[_obj]);
-                        lines[_obj].material.dispose();
-                        lines[_obj].geometry.dispose();
-                        objectsIndcesToDelete.push(_obj);
-                    }
-                }
-                if (lines.length>0 && objectsIndcesToDelete.length > 0){
-                    objectsIndcesToDelete.sort(function(a,b){return b - a});
-                    for (var i in objectsIndcesToDelete) {
-                        lines.splice(objectsIndcesToDelete[i], 1);
-                    }
-                }
-            }
-
-            //Tube Mesh to Line version
-            function DeleteTexturesFromCubes(blockIndicesStr, blockIndices) {
-                var materialImpl, geometryImpl;
-                var lastObserved = {};
-                var objectsIndcesToDelete = [];
-                var tempUserData, tempUserDataCoord;
-                for (var _obj in objects) {
-                    tempUserData = objects[_obj].userData[0];
-                    tempUserDataCoord = objects[_obj].userData[1];
-
-                    // console.log("blockIndicesStr = ", tempUserData, "|",blockIndicesStr,"; uploaded_area[objects[_obj].userData] = ", uploaded_area[tempUserData], " , ", (tempUserData in lastObserved));
-                    if (tempUserData != blockIndicesStr && (uploaded_area[tempUserData] || (tempUserData in lastObserved) )) {
-
-                        if (!(tempUserData in lastObserved)) {
-                            uploaded_area[tempUserData] = false;
-                            lastObserved[tempUserData] = true;
-                        }
-                        
-
-                        var line_color = objects[_obj].material.color;
-                        materialImpl = new THREE.LineBasicMaterial({
-                            color: line_color
-                        });
-                        geometryImpl = new THREE.Geometry();
-                        var _points = objects[_obj].geometry.path.points;
-                        for (var _vert in _points) {
-                            geometryImpl.vertices.push(_points[_vert]);  
-                        }
-                        geometryImpl.segments = objects[_obj].geometry.segments;
-
-                        var line = new THREE.Line(geometryImpl, materialImpl);
-                        line.name = objects[_obj].name;
-                        line.userData = [tempUserData,tempUserDataCoord];
-                        scene.remove(objects[_obj]);
-                        objects[_obj].material.dispose();
-                        objects[_obj].geometry.dispose();
-                        objectsIndcesToDelete.push(_obj);
-
-                        scene.add(line);
-                        lines.push(line);
-                    }
-                }
-                
-                if (objects.length>0 && objectsIndcesToDelete.length>0) {
-                    // console.log("objects.length = ",objects.length, " ; delObjects = ", objectsIndcesToDelete.length);
-                    objectsIndcesToDelete.sort(function(a,b){return b - a});
-                    for (var i in objectsIndcesToDelete) {
-                        // console.log("i = " , objectsIndcesToDelete[i], "; ", objects);
-                        objects.splice(objectsIndcesToDelete[i],1);
-
-                    }
-                    // console.log(objects.length);
-                }
-            } 
 
             //Delete Mesh out of the alowed space region
             function DeleteTexturesFromCubes2(blockIndicesStr, blockIndices) {
@@ -1105,17 +1014,12 @@
                             scene.remove(objects[_obj]);
 
                             delete uploaded_splines[objects[_obj].name];
-                            // objects[_obj].material.dispose(); //useless
-                            // objects[_obj].geometry.dispose();
+                            octree.remove(objects[_obj]);
                             
                             objectsIndcesToDelete.push(_obj);
                         }
                 }
                 if (objects.length>0 && objectsIndcesToDelete.length>0) {
-                    // objectsIndcesToDelete.sort(function(a,b){return b - a});
-                    // for (var i in objectsIndcesToDelete) {
-                    //     objects.splice(objectsIndcesToDelete[i],1);
-                    // }
                     objects = $.grep(objects, function(v,i){return $.inArray(i,objectsIndcesToDelete)==-1});
                 }   
             }
@@ -1194,8 +1098,6 @@
 					selectionTrackPoints.push(Global2local({x: trackPoints[pointIndex][2], y: trackPoints[pointIndex][3], z: trackPoints[pointIndex][4]}));
 				}
 				selectionTrackPoints.push(Global2local(exactEndPosition));
-				
-
                 //draw selection old - plane
                 // if (is_plane_mode)
                 if (mode_id == 0)
@@ -1242,9 +1144,6 @@
                     }
                     
                 }
-
-                
-				
 				return [chrid, trackPoints[closestPoint][1] - basesInSelection / 2, 
 							trackPoints[closestPoint][1] + basesInSelection / 2]; 	
             }
@@ -1335,59 +1234,101 @@
 
 			}
 
-            function UpdateInfoVollume() {
-                intersection = GetIntersection();
-                if (intersection == null) {
-                    ClearInfo();
-                    return;
-                }
-                object = intersection.object;
-                point = intersection.point;
-                if (object.name == "") {
-                    ClearInfo();
-                    return;
-                }
+            /*@deprecated*/
+            function buildCubeDataStructure(model_points) {
+                 var new_cube_tracks = model_points["data"];
+                    if (new_cube_tracks.length == 0) {
+                        console.log("NULL");
+                        resp_count++;
+                        return;
+                    }
+                 for (var track_index = 0; track_index < new_cube_tracks.length; ++track_index) {
+                    chrid = new_cube_tracks[track_index][0];
+                    chridNoStrand = chrid.substr(0, chrid.length - 2);
+                    var chridOnlyNumber = chridNoStrand;
+                    if (chridOnlyNumber[chridOnlyNumber.length - 1] == "a") {
+                        chridOnlyNumber = chridOnlyNumber.substr(0, chridOnlyNumber.length - 1);
+                    }
 
-                var region = GetSelectedTrackPointsVollume(point);
+                    track_points = new_cube_tracks[track_index][1];
+                    var request = "chr=" + chridOnlyNumber + "&start=" + String(track_points[0][1]) +
+                                     "&end=" + String(track_points[track_points.length - 1][1]); 
+                    var url = "http://1kgenome.exascale.info/js_snp?" + request;
+                    req_count++;
+                    $.getJSON(url + "?callback=?", null, 
+                        function(positions) {
+                            snips = "";
+                            for (var point_index = 0; point_index < positions.length; ++point_index) {
+                                var base_index = positions[point_index][0];
+                                var snp_id = /*"rs" + */String(positions[point_index][1]);
+                                snips += " <a target=\"_blank\" style=\"color: rgb(0,0,255)\" href=\"http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?rs="+snp_id+"\">rs"+snp_id+"</a>;";
+                            }
+                            // infoBlock.innerHTML += snips;
+                            if (tableStrContent.length == 0) tableStrContent += snips;
+                            else tableStrContent += "<br>" + snips;
 
+                            console.log("Alexander");
+                            resp_count++;
+                        }
+                    );
+                }
+                req_count--;
             }
 
-            function GetSelectedTrackPointsVollume3Dquery(intersectPoint, trackName) {
-                var intersectInModelCoordinates = Local2global(intersectPoint);
+            function buildCubeDataStructureSNPs(resultSet) {
+                    if (resultSet == null || resultSet.length == 0) {
+                        console.log("EMPTY area - you should not see this");
+                        return;
+                    }
+                 for (var track_index in resultSet) {
+                    var chridOnlyNumber = resultSet[track_index].chr;
+                    for (var intervals_indx in resultSet[track_index].intervals) {
+                        var request = "chr=" + chridOnlyNumber + "&start=" + String(resultSet[track_index].intervals[intervals_indx].start) +
+                                     "&end=" + String(resultSet[track_index].intervals[intervals_indx].end); 
+                        var url = "http://1kgenome.exascale.info/js_snp?" + request;
+                        req_count++;
+                        $.getJSON(url + "?callback=?", null, 
+                            function(positions) {
+                                snips = "";
+                                for (var point_index = 0; point_index < positions.length; ++point_index) {
+                                    var base_index = positions[point_index][0];
+                                    var snp_id = /*"rs" + */String(positions[point_index][1]);
+                                    snips += " <a target=\"_blank\" style=\"color: rgb(0,0,255)\" href=\"http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?rs="+snp_id+"\">rs"+snp_id+"</a>;";
+                                }
+                                if (tableStrContent.length == 0) tableStrContent += snips;
+                                else tableStrContent += "<br>" + snips;
 
-                var request = "xstart=" + String(point.x - radiusSphere) 
-                              + "&xend=" + String(point.x + radiusSphere)
-                              + "&zstart=" + String(point.z - radiusSphere)      
-                              + "&zend=" + String(point.z + radiusSphere)  
-                              + "&ystart=" + String(point.y - radiusSphere)      
-                              + "&yend=" + String(point.y - radiusSphere);      
+                                console.log("Alexander");
+                                resp_count++;
+                            }
+                        );
+                    }
+                }
+            }
+
+            function GetSelectedTrackPointsVollume3Dquery(intersectPoint) {
+                var intersectInModelCoordinates = Local2global(intersectPoint);
+                
+                var radiusSphereGlobal = 2 * radiusSphere/scaleFactor;
+
+                tableStrContent = '';
+                console.log("Clean tableStrContent");
+                req_count =1;
+                resp_count = 0;
+                var request = "xstart=" + String(intersectInModelCoordinates.x - radiusSphereGlobal) 
+                              + "&xend=" + String(intersectInModelCoordinates.x + radiusSphereGlobal)
+                              + "&zstart=" + String(intersectInModelCoordinates.z - radiusSphereGlobal)      
+                              + "&zend=" + String(intersectInModelCoordinates.z + radiusSphereGlobal)  
+                              + "&ystart=" + String(intersectInModelCoordinates.y - radiusSphereGlobal)      
+                              + "&yend=" + String(intersectInModelCoordinates.y + radiusSphereGlobal);      
                 var url = "http://1kgenome.exascale.info/js_test?" + request;
                 $.getJSON(url + "?callback=?", null, 
                     function(model_points) {
                         buildCubeDataStructure(model_points);
-                        //UploadSNP(model_points);
                     }
                 );
 
-                //draw selection new - cube
-                {
-                    var cube = new THREE.CubeGeometry(radiusSphere*2,radiusSphere*2,radiusSphere*2, 5, 5, 5);
-                    cube.dynamic = true;
-                    scene.remove(selectionMesh);
-                    {
-                        var material = new THREE.MeshBasicMaterial({
-                                color: 0xff0000,
-                                opacity: 1,
-                                wireframe: true,
-                                transparent: false
-                        });                     
-                        
-                        selectionMesh = new THREE.Mesh(cube, material);
-                        selectionMesh.position = new THREE.Vector3(intersectPoint.x, intersectPoint.y, intersectPoint.z);
-                        // selectionMesh.geometry.verticesNeedUpdate = true;
-                        scene.add(selectionMesh);
-                    }
-                }
+                
             }
             
             function UpdateInfoChipSeq() {
@@ -1417,11 +1358,39 @@
                     return;
                 }
 
-            	intersection = GetIntersection();
-            	if (intersection == null) {
-            		ClearInfo();
-            		return;
-            	}
+                intersection = GetIntersection();
+                if (intersection == null) {
+                    ClearInfo();
+                    return;
+                }
+
+                if (mode_id == 1) {
+
+                    ClearInfo();
+                    //draw selection new - cube
+                    {
+                        var cube = new THREE.CubeGeometry(radiusSphere*2,radiusSphere*2,radiusSphere*2, 5, 5, 5);
+                        cube.dynamic = true;
+                        scene.remove(selectionMesh);
+                        {
+                            var material = new THREE.MeshBasicMaterial({
+                                    color: 0xff0000,
+                                    opacity: 1,
+                                    wireframe: true,
+                                    transparent: false
+                            });
+                            selectionMesh = new THREE.Mesh(cube, material);
+                            selectionMesh.position = new THREE.Vector3(intersection.point.x, intersection.point.y, intersection.point.z);
+                            scene.add(selectionMesh);
+                        }
+                    }
+                    // if (typeof lastIntersection  == 'undefined' || intersection.point.x != lastIntersection.x || intersection.point.y != lastIntersection.y || intersection.point.z != lastIntersection.z) {
+                    //     GetSelectedTrackPointsVollume3Dquery(intersection.point);
+                    //     lastIntersection = intersection.point;
+                    // }
+                    return;
+                }
+
             	object = intersection.object;
             	point = intersection.point;
             	if (object.name == "") {
@@ -1435,7 +1404,7 @@
                     return;
                 }
 
-                // TODO: Here we should change the mode
+
             	var region = GetSelectedTrackPoints(point, object.name);
                 rgn = region;
             	var positionStr = PositionToString(region);
@@ -1461,6 +1430,7 @@
                     // updateGUI();    
                     controls.update( Date.now() - time );
                     renderer.render( scene, camera );
+                    octree.update();
                     time = Date.now();
             }
 

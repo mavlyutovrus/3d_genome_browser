@@ -3,12 +3,18 @@
   <head>
     <title>Informationi</title>
     <script src="TableFilter/tablefilter_all.js" language="javascript" type="text/javascript"></script>
-    <!--link rel="stylesheet" type="text/css" href="newTable.css"-->
+    <!--link rel="stylesheet" type="text/css" href="css/newTable.css"-->
     <!-- jquery -->
     <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
     <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
-    <!--script type="text/javascript" src="http://www.kunalbabre.com/projects/table2CSV.js" > </script--> 
+    <style>
+        body {
+            background-image:url("js/messi/img/iStock_000018677755Small_v2.png");
+            background-repeat:no-repeat;
+            background-attachment:fixed;
+        }
+    </style>
     <script type="text/javascript" src="js/table2CSV.js" > </script>
   </head>
   <body>
@@ -45,15 +51,129 @@
 
 
         } else if (urlParams["isplane"] === "false"){
-            var requestCHIP = "xstart="+ urlParams["xstart"] +"&xend="+ urlParams["xend"] +"&zstart="+ urlParams["zstart"] +"&zend="+ urlParams["zend"] +"&ystart="+ urlParams["ystart"] +"&yend="+ urlParams["yend"];
-            var urlCHIP = 'http://1kgenome.exascale.info/js_test?' + requestCHIP;
-            console.log(urlCHIP);
-            $.getJSON(urlCHIP + "?callback=?", null, 
-                    function(data) {
-                      cubicBuildTable(data);  
-                    });
+            var urlStringPath = urlParams["path"];
+
+            cubicBuildTableImpl(urlStringPath);
+            
+            
+
+            // var requestCHIP = "xstart="+ urlParams["xstart"] +"&xend="+ urlParams["xend"] +"&zstart="+ urlParams["zstart"] +"&zend="+ urlParams["zend"] +"&ystart="+ urlParams["ystart"] +"&yend="+ urlParams["yend"];
+            // var urlCHIP = 'http://1kgenome.exascale.info/js_test?' + requestCHIP;
+            // console.log(urlCHIP);
+            // $.getJSON(urlCHIP + "?callback=?", null, 
+            //         function(data) {
+            //           cubicBuildTable(data);  
+            //         });
         }
 
+        function cubicBuildTableImpl(urlStringPath) {
+
+            if (urlStringPath.length==0) {
+                var body = document.getElementsByTagName('body')[0];
+                var h2 = document.createElement('h2');
+                var el = document.createTextNode('There is no data to represent');
+                h2.appendChild(el);
+                body.appendChild(h2);
+                return;
+            }
+
+            var body = document.getElementsByTagName('body')[0];
+            var tbl = document.createElement('table');
+                
+            tbl.setAttribute('id','table1');
+            var tbdy = document.createElement('tbody');
+
+            var trL = document.createElement('tr');
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode('Chromosome'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Position'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('SNP'))
+            trL.appendChild(th);
+
+            th = document.createElement('th');
+            th.appendChild(document.createTextNode('Transcription Factor'))
+            trL.appendChild(th);
+
+            th= document.createElement('th');
+            th.appendChild(document.createTextNode('Level'));
+            trL.appendChild(th);
+
+            tbdy.appendChild(trL);
+
+            var chrHelixStartEndArray = urlStringPath.split(";");
+            
+            for (var indx_lvl0=0;  indx_lvl0 < chrHelixStartEndArray.length - 1; indx_lvl0++) {
+                if (typeof chrHelixStartEndArray[indx_lvl0] != 'string' || typeof chrHelixStartEndArray[indx_lvl0] == 'undefined' || chrHelixStartEndArray[indx_lvl0] == null) continue;
+                var chrHelixStartEndStrandArray = chrHelixStartEndArray[indx_lvl0].split(":");
+                var chromosome_helix = chrHelixStartEndStrandArray[0].split('-');
+                var chr = chromosome_helix[0];
+                var helix = chromosome_helix[1];
+                var start_endArray = chrHelixStartEndStrandArray[1].split('-');
+
+                for (var indx_lvl1 = 0; indx_lvl1 < start_endArray.length - 1; indx_lvl1++) {
+                    console.log(start_endArray.length - 1);
+                    if (typeof start_endArray[indx_lvl1] != 'string' || typeof start_endArray[indx_lvl1] == 'undefined' || typeof start_endArray[indx_lvl1] == null ) continue;
+                    var ar = start_endArray[indx_lvl1].split("_");
+                    var requestCHIP = "chr=" + chr 
+                              + "&start=" + ar[0]
+                              + "&end=" + ar[1]
+                              + "&celline=" + current_cell_line; //should be parameter from URL
+                    var urlCHIP = 'http://1kgenome.exascale.info/chipseq?' + requestCHIP;
+                    req_count += 1;
+                    $.getJSON(urlCHIP + "?callback=?", null, 
+                        function(data) {
+                            resp_count += 1;
+                            for (var track_index_CHIP = 0; track_index_CHIP < data.length; ++track_index_CHIP) {
+                                chr_id = data[track_index_CHIP][0];
+                                start_pos = data[track_index_CHIP][1];
+                                end_pos = data[track_index_CHIP][2];
+                                TF_name = data[track_index_CHIP][3];
+                                affect_level = data[track_index_CHIP][4];
+                                snpArray = data[track_index_CHIP][6];
+                                for (var track_internal_index = 0; track_internal_index < snpArray.length; ++track_internal_index) {
+                                    var tr=document.createElement('tr');
+                                    // Chromosome
+                                    var td=document.createElement('td');
+                                    td.appendChild(document.createTextNode(String(chr_id)));
+                                    tr.appendChild(td)
+                                    //position
+                                    var td=document.createElement('td');
+                                    td.appendChild(document.createTextNode(String(snpArray[track_internal_index][0])));
+                                    tr.appendChild(td)
+                                    //snp
+                                    td=document.createElement('td');
+                                    td.appendChild(document.createTextNode("rs" + String(snpArray[track_internal_index][1])));
+                                    tr.appendChild(td)
+                                    //TF
+                                    td=document.createElement('td');
+                                    td.appendChild(document.createTextNode(String(TF_name)));
+                                    tr.appendChild(td);
+                                    //Level
+                                    td=document.createElement('td');
+                                    td.appendChild(document.createTextNode(String(affect_level)));
+                                    tr.appendChild(td)
+                                    tbdy.appendChild(tr);
+                                }
+                            }
+                        }
+                    );
+                }
+
+            }
+
+            tbl.appendChild(tbdy);
+            body.appendChild(tbl);
+
+            waitFunction();   
+        }
+
+        /*@deprecated*/
         function cubicBuildTable(data) {
             deb_var = data;
             if (data.length==0) {
@@ -157,9 +277,7 @@
             tbl.appendChild(tbdy);
             body.appendChild(tbl);
 
-            waitFunction();
-
-            
+            waitFunction(); 
         }
 
         function waitFunction(){
@@ -300,69 +418,5 @@
 
     </script>
 
-    <!--table id="table1" cellpadding="0" cellspacing="0">
-    <caption>WORLD INTERNET USAGE AND POPULATION STATISTICS</caption>
-    <tr>
-        <th>World Regions</th>
-        <th>Population ( 2007 Est.)</th>
-        <th>Population % of World</th>
-        <th>% Population ( Penetration )</th>
-        <th>Usage % of World</th>
-    </tr>
-    <tr>
-        <td>Africa</td>
-        <td>933,448,292</td>
-        <td>14.2 %</td>
-        <td>3.5 %</td>
-        <td>3.0 %</td>
-    </tr>
-    <tr>
-        <td>Asia</td>
-        <td>3,712,527,624</td>
-        <td>56.5 %</td>
-        <td>10.5 %</td>
-        <td>35.6 %</td>
-    </tr>
-    <tr>
-        <td>Europe</td>
-        <td>809,624,686</td>
-        <td>12.3 %</td>
-        <td>38.6 %</td>
-        <td>28.6 %</td>
-    </tr>
-    <tr>
-        <td>Middle East</td>
-        <td>193,452,727</td>
-        <td>2.9 %</td>
-        <td>10.0 %</td>
-        <td>1.8 %</td>
-    </tr>
-    <tr>
-        <td>North America</td>
-        <td>334,538,018</td>
-        <td>5.1 %</td>
-        <td>69.4 %</td>
-        <td>21.2 %</td>
-    </tr>
-    <tr>
-        <td>Latin America / Caribbean</td>
-        <td>556,606,627</td>
-        <td>8.5 %</td>
-        <td>16.0 %</td>
-        <td>8.1 %</td>
-    </tr>
-    <tr>
-        <td>Oceania / Australia</td>
-        <td>34,468,443</td>
-        <td>0.5 %</td>
-        <td>53.5 %</td>
-        <td>1.7 %</td>
-    </tr>
-  </table-->
-    <script language="javascript" type="text/javascript">
-    //<![CDATA[ 
-    
-    //]]>
-    </script>
   </body>
 </html>

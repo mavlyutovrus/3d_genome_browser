@@ -61,7 +61,7 @@
             <p>Welcome to 3D Genome Browser page</p>
             <p><input id = "incoords" type="text" title="The format of data 'x,y,z'." size="40">
                 <p>
-                    <button type="button" onclick="var incoords = document.getElementById('incoords').value; if (validate(incoords)) {ChangeCameraPosition(incoords); $('#tabs').tabs('option', 'active', 1); } else {window.alert('Wrong format of input data. It should be [x,y,z] where any symbol(s) except for numeric could be separators');}">Action</button>
+                    <button type="button" onclick="var incoords = document.getElementById('incoords').value; if (validate(incoords)) {$('#tabs').tabs('option', 'active', 1); } else {window.alert('Wrong format of input data. It should be [x,y,z] where any symbol(s) except for numeric could be separators');}">Action</button>
                 </p>
             </p>
           </div>
@@ -108,6 +108,7 @@
 
 		<!-- main part -->
         <script>
+            var ChangeCameraPositionBoolean = true;
             var globalArrayForWindow;
 
             var MAX_WAIT_INTERVAL = 10000;
@@ -115,6 +116,8 @@
             var resp_count = 0;
             var req_count = 0;
             var tableStrContent = '';
+
+            var isOneCubeOctree = true;
 
             var rgn;//made it global for table
 
@@ -135,7 +138,8 @@
             var lastBlockIndicesStr;
             var radiusSphere = 40, segmentsWidth = 32, segmentsHeight = 16; //sphere zone parameters
             var maxRadiusSphere = 140, minRadiusSphere = 20;
-            var regexpPattern = /[^\d]*([\d]+)[^\d]+([\d]+)[^\d]+([\d]+)[^\d]*/; //format smth(0+) [num] smth(1+) [num] smth(1+) [num] smth(0+)
+            var regexpPattern = /^([\d]+)[^\d]+([\d]+)[^\d]+([\d]+)[^\d]*/i; //[num] smth(1+) [num] smth(1+) [num] smth(0+)
+            var regexpPatternChrms = /chr[^\d]*([\d]+[ab]*)[^\dab]+([\d]+)[^\d]+([\d]+)[^\d]*/; //format smth(0+) [num] smth(1+) [num] smth(1+) [num] smth(0+)
             var regexpPatternURL = /([\dXY]{1,2})[_]*([abAB]*)[^\d]+([\d]+)[^\d]+([\d]+)/ ;
             var divElement;
             var test_mesh;
@@ -190,14 +194,66 @@
             var NUMBER_OF_MODES = 3;
 
             function validate(incoords) {
-                return (incoords.match(regexpPattern) != null);
+
+                if (incoords.match(regexpPattern) != null) {
+                    ChangeCameraPosition(incoords, 0);
+                    console.log("option 0");
+                    return true;
+                } else if (incoords.match(regexpPatternChrms) != null) {
+                    ChangeCameraPosition(incoords, 1);
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
-            function ChangeCameraPosition(incoords) {
-                
-                var str = incoords.replace(regexpPattern, "$1:$2:$3");
-                var arr = str.split(':');
-                controls.getObject().position = new THREE.Vector3(parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2]));
+            function ChangeCameraPosition(incoords, option) {
+                var foo =   function() {
+                                if (ChangeCameraPositionBoolean)
+                                    setTimeout(foo, 50);
+                            };
+
+                if (option == 0) {
+                    var str = incoords.replace(regexpPattern, "$1:$2:$3");
+                    var arr = str.split(':');
+                    controls.getObject().position = Global2localVector3({x:parseInt(arr[0]), y:parseInt(arr[1]), z:parseInt(arr[2])});
+                } else if (option == 1) {
+                    console.log("OPTION 1");
+                    var str = incoords.replace(regexpPatternChrms, "$1:$2:$3");
+                    var arr = str.split(':');
+
+                    if (parseInt(arr[1]) > parseInt(arr[2])) return false;
+
+                    if (arr[0][arr[0].length - 1] == "b" ) {
+                        arr[0] = arr[0].replace("b", "a"); //default value - b doesn't work now
+                    }
+
+                    var position = Math.floor((parseInt(arr[2]) + parseInt(arr[1]))/2);
+                    console.log("+++" + incoords);
+                    var request = incoords.replace(regexpPatternChrms, "chrid=$1&bp=" + String(position));
+
+                    var url = 'http://1kgenome.exascale.info/chr_pos?' + request;
+
+                    $.getJSON(url + "?callback=?", null, 
+                        function(data) {
+                            deb_var = data;
+                            if (data[0] == -1) {
+                                return;
+                            }
+                            controls.getObject().position = Global2localVector3({x:parseInt(data[1]), y:parseInt(data[2]), z:parseInt(data[3])});
+                            controls.getObject().rotation.set(0,0,0);
+                            controls.getObject().children[0].rotation.set(0,0,0)
+                            ChangeCameraPositionBoolean = false;
+                        }
+                    );
+
+
+                    foo();
+                    // http://1kgenome.exascale.info/chr_pos?chrid=10a&bp=2000000
+
+
+                    
+                }
             }
 
             function changeModeIndicator() {
@@ -280,7 +336,7 @@
                                                         document.webkitExitPointerLock;
                             document.exitPointerLock();
                             tableStrContent = '';
-                            buildCubeDataStructureSNPs(searchOctree())
+                            buildCubeDataStructureSNPs(searchOctree());
 
                             waitFunction();
 
@@ -378,11 +434,11 @@
                         var element = document.body;
                         if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ){
                             if (event.detail != null && event.detail < 0 || event.wheelDeltaY != null && event.wheelDeltaY > 0) {
-                                basesInSelection = Math.min(3000, basesInSelection + 100);
-                                radiusSphere = Math.min(maxRadiusSphere, radiusSphere + 10);
+                                if (mode_id == 0) basesInSelection = Math.min(3000, basesInSelection + 100);
+                                if (mode_id == 1) radiusSphere = Math.min(maxRadiusSphere, radiusSphere + 10);
                             } else {
-                                basesInSelection = Math.max(100, basesInSelection - 100);
-                                radiusSphere = Math.max(minRadiusSphere, radiusSphere -10);
+                                if (mode_id == 0) basesInSelection = Math.max(100, basesInSelection - 100);
+                                if (mode_id == 1)radiusSphere = Math.max(minRadiusSphere, radiusSphere -10);
                             }    
                         }
 						
@@ -435,11 +491,13 @@
 
                 $.getJSON(urlCHIP + "?callback=?", null, 
                     function(data) {
-                        drawChipSeqData(data, _intersection);
+                        // drawChipSeqData(data, _intersection);
+                        chipseqDataPostionDeterminitionAndDraw(data, _intersection);
                     }
                 );
             }
 
+            //@deprecated - use very inaccurate method of approximation.
             function drawChipSeqData(data, _intersection) {
                 var name = _intersection.object.name;
                 var vertices = _intersection.object.geometry.vertices;
@@ -468,7 +526,6 @@
                     for (var pointIndex = aStart; pointIndex <= aEnd; ++pointIndex) {
                         chipVertices.push(vertices[pointIndex])
                     }
-                    deb_var=  chipVertices;
                     var spline = new THREE.SplineCurve3(chipVertices);
                     
                     var segments = chipVertices.length * 2;
@@ -483,6 +540,200 @@
                     scene.add(tubeMesh);
                     chipObjects.push(tubeMesh);
                 }
+            }
+
+            function chipseqDataPostionDeterminitionAndDraw(data, _intersection) {
+                console.log("RUN");
+                // var vertices = vertices of the intersection.object.geometry.vertices
+                var vertices = _intersection.object.geometry.vertices;
+                // var data = data after 
+
+                var _vert1 = uploaded_splines[_intersection.object.name][1];//nodes
+
+                var vertices_start_position = 0; //out
+                var last_seen_interval_end = 1; //out
+                var left_distance_begin, left_distance_end; //in but without any values
+                var start_node, end_node;
+                var NODE_THRESHOLD = 625;
+                var first_vert = -1;
+                var tr = true;
+                var second_vert = -1;
+
+                var vert_length = _vert1.length;
+                for (var ss = 0; ss <data.length; ss++) {
+                    first_vert = -1;
+                    second_vert = -1;
+                    var distance_between_nodes = -1;
+                    start_node = -1;
+                    end_node = -1;
+                    if (data[ss][2] >= _vert1[vert_length-1][1]) {
+                        second_vert = vertices.length-1;
+                    }
+                    //iterator for beginnings
+                    for (var kk = last_seen_interval_end; kk <vert_length; kk++) {
+                        if (data[ss][1]<_vert1[kk][1]) {// -------start--------v--
+                            last_seen_interval_end = kk;
+                            distance_between_nodes = Math.sqrt(Math.pow(_vert1[kk-1][2] - _vert1[kk][2], 2) + 
+                                                    Math.pow(_vert1[kk-1][3] - _vert1[kk][3], 2) +
+                                                    Math.pow(_vert1[kk-1][4] - _vert1[kk][4], 2));
+
+                            left_distance_begin = (data[ss][1] - _vert1[kk-1][1])/(_vert1[kk][1] - _vert1[kk-1][1])*Math.floor(distance_between_nodes); //-----v=======begin------
+                            // console.log("("+data[ss][1]+" - "+_vert1[kk-1][1]+")/("+_vert1[kk][1]+" - "+_vert1[kk-1][1]+")*Math.floor("+distance_between_nodes+")");
+                            start_node = kk-1;
+                            break;
+                        }
+                    }
+                    if (start_node == -1) {
+                        console.log("Start_node has not been defined " + ss);
+                        continue;
+                    }
+
+                    // console.log("A" + left_distance_begin);
+
+                    if (second_vert == -1) {
+                        //iterator for ends
+                        for (var kk = last_seen_interval_end; kk <vert_length; kk++) {
+                            if (data[ss][2]<_vert1[kk][1]) { // -------end--------v--
+                                if (kk != last_seen_interval_end) {
+                                    distance_between_nodes = Math.sqrt(Math.pow(_vert1[kk-1][2] - _vert1[kk][2], 2) + 
+                                                            Math.pow(_vert1[kk-1][3] - _vert1[kk][3], 2) +
+                                                            Math.pow(_vert1[kk-1][4] - _vert1[kk][4], 2));  
+                                }
+                                end_node = kk-1;
+                                left_distance_end = (data[ss][2] - _vert1[kk-1][1])/(_vert1[kk][1] - _vert1[kk-1][1])*Math.floor(distance_between_nodes); //-----v=======begin------
+                                break;
+                            }
+                        }   
+                        if (end_node == -1) {
+                            console.log("End_node has not been defined " + ss);
+                            continue;
+                        }
+                    } 
+                    
+                    if (end_node == -1 || start_node == -1) {
+                        console.log("Nodes have not been defined " + ss);
+                        continue;
+                    }
+                    //I can iterate over vertices of object right here with saved state.
+                    //iteration to find the closest vertex near node
+                    // var is_first_node_found = false;
+                    var minDistance = -1;
+                    var distance = -1;
+                    var first_node_vert = -1;
+                    var first_vert = -1;
+                    var start_node_vector = Global2local({x:_vert1[start_node][2], y:_vert1[start_node][3],z:_vert1[start_node][4]});
+                    //find the closest node point
+                    for (var kk = vertices_start_position; kk < vertices.length; kk++) {
+                        distance = Math.pow(vertices[kk].x - start_node_vector.x, 2) + 
+                            Math.pow(vertices[kk].y - start_node_vector.y, 2) +
+                            Math.pow(vertices[kk].z - start_node_vector.z, 2);
+                        if (distance < NODE_THRESHOLD) {
+                            if (minDistance == -1 || (distance < minDistance)) {
+                                minDistance = distance;
+                                first_node_vert = kk;
+                            } else if (minDistance != -1 && distance>2*minDistance) {
+                                // is_first_node_found = true;
+                                break;
+                            }
+                        } else if (minDistance != -1){
+                            // is_first_node_found = true;
+                            break;
+                        }
+                    }
+
+                    if (first_node_vert == -1) {
+                        console.log("first_node_vert has not been defined " + ss);
+                        continue;
+                    }
+
+                    // console.log(first_node_vert);
+
+                    // console.log(left_distance_begin);
+                    var sq_left_distance_begin = Math.pow(left_distance_begin,2);
+                    for (var kk = first_node_vert; kk < vertices.length; kk++) {
+                        distance = Math.pow(vertices[kk].x - vertices[first_node_vert].x, 2) + 
+                            Math.pow(vertices[kk].y - vertices[first_node_vert].y, 2) +
+                            Math.pow(vertices[kk].z - vertices[first_node_vert].z, 2);
+
+                            if (distance > sq_left_distance_begin) {
+                                first_vert = kk-1;
+                                break;
+                            } else {
+                                // console.log(distance +  " >? " + sq_left_distance_begin);
+                            }
+                    }
+
+                    if (first_vert == -1) {
+                        console.log("first_vert has not been defined " + ss);
+                        continue;
+                    }
+
+                    if (second_vert == -1) {
+                        minDistance = -1;
+                        var second_node_vert= -1;
+                        var end_node_vector = Global2local({x:_vert1[end_node][2], y:_vert1[end_node][3], z:_vert1[end_node][4]});
+                        for (var kk = first_vert; kk < vertices.length; kk++) {
+                            distance = Math.pow(vertices[kk].x - end_node_vector.x, 2) + 
+                                Math.pow(vertices[kk].y - end_node_vector.y, 2) +
+                                Math.pow(vertices[kk].z - end_node_vector.z, 2);
+                            if (distance < NODE_THRESHOLD) {
+                                if (minDistance == -1 || (distance < minDistance)) {
+                                    minDistance = distance;
+                                    second_node_vert = kk;
+                                } else if (minDistance != -1 && distance>2*minDistance) {
+                                    // is_first_node_found = true;
+                                    break;
+                                }
+                            } else if (minDistance != -1){
+                                // is_first_node_found = true;
+                                break;
+                            }
+                        }   
+                        if (second_node_vert == -1) {
+                            console.log("second_node_vert has not been defined " + ss);
+                            continue;
+                        }
+                    
+                        var sq_left_distance_end = Math.pow(left_distance_end,2);
+                        for (var kk = second_node_vert; kk < vertices.length; kk++) {
+                            distance = Math.pow(vertices[kk].x - vertices[second_node_vert].x, 2) + 
+                                Math.pow(vertices[kk].y - vertices[second_node_vert].y, 2) +
+                                Math.pow(vertices[kk].z - vertices[second_node_vert].z, 2);
+
+                                if (distance > sq_left_distance_end) {
+                                    second_vert = kk-1;
+                                    break;
+                                }
+                        }
+                        if (second_vert == -1) {
+                            console.log("second_vert has not been defined " + ss);
+                            continue;
+                        }
+                    }
+
+                    //draw part
+                    {
+                        var tube_color = getColorForPercentage(data[ss][4]);
+                        var material = new THREE.MeshLambertMaterial( { color: tube_color, shading: THREE.SmoothShading } );
+                        var chipVertices = [];
+                        // var temp_vhipVert = vertices.slice(first_vert, second_vert);
+                        for (var pointIndex = first_vert; pointIndex <= second_vert; ++pointIndex) {
+                            chipVertices.push(new THREE.Vector3(vertices[pointIndex].x, vertices[pointIndex].y, vertices[pointIndex].z));
+                        }
+                        var spline = new THREE.SplineCurve3(chipVertices);
+                        var segments = chipVertices.length * 1;
+                        var radiusSegments = 5;
+                        var tube = new THREE.TubeGeometry( spline, segments, 10, radiusSegments, false, false);
+                        tube.dynamic = true;
+                        var tubeMesh = new THREE.Mesh(tube, material);
+                        // tubeMesh.userData = [blockIndicesStr, blockIndices];//?
+                        tubeMesh.name = data[ss][0] + "-" + String(data[ss][1]) + "-"  + String(data[ss][2]);
+                        uploaded_splines_chip[tubeMesh.name] = [data[ss][0], data[ss][1], data[ss][2], data[ss][3], data[ss][4]];                                
+                        scene.add(tubeMesh);
+                        chipObjects.push(tubeMesh);
+                    }
+                }
+
             }
 
             function getColorForPercentage(chipLvl) {
@@ -545,7 +796,6 @@
                               "_blank", "dependent, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");
                     return;    
                 }
-                
             }
 
 
@@ -664,10 +914,10 @@
                     verts = meshesSearch[_mesh].object.geometry.vertices;
                     aLen = verts.length;
                     chr = (name.replace(regexpPatternURL, "$1"));
-                    helix = (name.replace(regexpPatternURL, "$2"));
-                    startRange = parseInt(name.replace(regexpPatternURL, "$3"));
-                    endRange = parseInt(name.replace(regexpPatternURL, "$4"));
-                    unit = (endRange - startRange)/(aLen-1);
+                    // helix = (name.replace(regexpPatternURL, "$2"));
+                    // startRange = parseInt(name.replace(regexpPatternURL, "$3"));
+                    // endRange = parseInt(name.replace(regexpPatternURL, "$4"));
+                    // unit = (endRange - startRange)/(aLen-1);
 
                     aStart = -1;
                     aEnd = -1;
@@ -694,6 +944,9 @@
 
                                 //define the beginning of the line
                                 if (counter == POSSIBLE_HOLE_IN_VERTICES) {
+                                    
+                                    /*
+                                    old approximation - @deprecated
                                     if (aStart == 0) {
                                         aStart = startRange; //reassign variable from index to value (position)
                                     } else {
@@ -709,8 +962,20 @@
                                         aEnd = Math.floor(startRange + unit * (aEndClone + 1));
                                         // console.log(aEnd);
                                     }
+                                    */
 
-                                    tempObject.push({start: aStart, end: aEnd});
+                                    /*BEGIN*/
+                                    var trackPoints = uploaded_splines[name][1];
+                                    var objStart = getPointPositionInChr(trackPoints, 0, verts[aStart]);
+                                    var objEnd = getPointPositionInChr(trackPoints, objStart.firstPoint, verts[aEnd]);
+                                    /*END*/
+
+                                    if (objStart.position == objEnd.position) {
+                                        tempObject.push({start: objStart.position-50, end: objEnd.position+50});//show the minimum block
+                                    } else {
+                                        tempObject.push({start: objStart.position, end: objEnd.position});    
+                                    }
+                                    
                                     aStart = -1;
                                     aEnd = -1;
                                 }
@@ -723,8 +988,66 @@
                 return resultSet;
             }
 
+            function getPointPositionInChr(trackPoints, startPointIndex, local_verts_point) {
+                var verts_point = Local2global(local_verts_point);
+                var closestPoint = -1;
+                var minDistance = -1;
+                var secClosestPoint = -1;
+                var secMinDistance = -1;
+                var distBetweenNodes = -1;
+                for (var pointIndex = startPointIndex; pointIndex < trackPoints.length; ++pointIndex) {
+                    var x = trackPoints[pointIndex][2];
+                    var y = trackPoints[pointIndex][3];
+                    var z = trackPoints[pointIndex][4];
+
+                    var distance = Math.pow(verts_point.x - x, 2) + 
+                                    Math.pow(verts_point.y - y, 2) +
+                                    Math.pow(verts_point.z - z, 2);
+                    
+                    if (minDistance == -1 || distance < minDistance) {
+                        if (pointIndex - closestPoint == 1) {
+                            secMinDistance = minDistance;
+                            secClosestPoint = closestPoint;    
+                        } else {
+                            secMinDistance = -1;
+                            secClosestPoint = -1;
+                        }
+
+                        minDistance = distance;
+                        closestPoint = pointIndex;
+                    }
+                }
+
+                if (secClosestPoint == -1) {
+                    secClosestPoint = closestPoint-1;
+                    secMinDistance = Math.pow(verts_point.x - trackPoints[secClosestPoint][2], 2) + 
+                                    Math.pow(verts_point.y - trackPoints[secClosestPoint][3], 2) +
+                                    Math.pow(verts_point.z - trackPoints[secClosestPoint][4], 2); 
+                }
+
+                distBetweenNodes = Math.pow(trackPoints[closestPoint][2] - trackPoints[secClosestPoint][2], 2) + 
+                                    Math.pow(trackPoints[closestPoint][3] - trackPoints[secClosestPoint][3], 2) +
+                                    Math.pow(trackPoints[closestPoint][4] - trackPoints[secClosestPoint][4], 2);
+
+                if (secMinDistance>=distBetweenNodes) { // v---x------x
+                    closestPoint = closestPoint+1;
+                    secClosestPoint = secClosestPoint+1;
+                    secMinDistance = minDistance;
+                    minDistance = Math.pow(verts_point.x - trackPoints[secClosestPoint][2], 2) + 
+                                    Math.pow(verts_point.y - trackPoints[secClosestPoint][3], 2) +
+                                    Math.pow(verts_point.z - trackPoints[secClosestPoint][4], 2); 
+                }
+
+                // x----v-----------x
+                //console.log(trackPoints[closestPoint][1] + "|||" + trackPoints[secClosestPoint][1]);
+                // console.log(closestPoint + "|||" + secClosestPoint);
+                return {position: Math.floor((Math.sqrt(secMinDistance)*trackPoints[closestPoint][1] + Math.sqrt(minDistance)*trackPoints[secClosestPoint][1])/(Math.sqrt(secMinDistance)+Math.sqrt(minDistance))), firstPoint: secClosestPoint};
+            }
+
             function searchOctree() {
-                intersectionImpl = GetIntersection().point;
+                var tempInt = GetIntersection();
+                if (tempInt == null) return;
+                intersectionImpl = tempInt.point;
                 var rayCaster = new THREE.Raycaster( new THREE.Vector3().copy( intersectionImpl ), new THREE.Vector3(0,0,radiusSphere).normalize() );
                 // var radiusSearch = radiusSphere;
                 var meshesSearch = octree.search( rayCaster.ray.origin, radiusSphere, true, rayCaster.ray.direction ); 
@@ -786,7 +1109,11 @@
             	return {x :  (coordinates.x - zeroCoordinate.x) * scaleFactor, 
             		    y :  (coordinates.y - zeroCoordinate.y) * scaleFactor, 
             		    z :  (coordinates.z - zeroCoordinate.z) * scaleFactor };
-            }       
+            }    
+
+            function Global2localVector3(coordinates) {
+                return new THREE.Vector3((coordinates.x - zeroCoordinate.x) * scaleFactor, (coordinates.y - zeroCoordinate.y) * scaleFactor, (coordinates.z - zeroCoordinate.z) * scaleFactor);
+            }
             
             function GenerateColor() {
             	mix = [0.8, 0.8, 0.8];
@@ -898,7 +1225,7 @@
 					
 					tubeMesh.name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
 					uploaded_splines[tubeMesh.name] = [chrid, track_points];								
-					octree.add(tubeMesh, {useFaces: false, useVertices: true});
+					octree.add(tubeMesh, {useFaces: false, useVertices: false, useSeqVertices: true});
                     scene.add(tubeMesh);
 					objects.push(tubeMesh);
                     console.log('Hi')
@@ -978,7 +1305,34 @@
             	var modelPosition = Local2global(controls.getObject().position);
             	var blockIndices = GetBlockIndices(modelPosition);
             	var blockIndicesStr = Coords2Str(blockIndices);
+
+                //delete textures in the others cube only if 
+                if (lastBlockIndicesStr != blockIndicesStr) {
+                    //immediate cleaning the octree - recreate everytime you left the cube
+                    if (isOneCubeOctree) {
+                        octree = new THREE.Octree( {
+                          undeferred: false,
+                          depthMax: Infinity,
+                          objectsThreshold: 8,
+                          overlapPct: 0.15
+                           // ,
+                           // scene: scene
+                        } );
+                        if (blockIndicesStr in uploaded_area) {
+
+                            var objArray = $.grep(objects, function(v,i){return v.userData = blockIndicesStr});
+                            for (var _o in objArray) {
+                                octree.add(objArray[_o], {useFaces: false, useVertices: false, useSeqVertices: true});
+                            }
+                        }
+                    }
+                    DeleteTexturesFromCubes2(blockIndicesStr, blockIndices);
+                    lastBlockIndicesStr = blockIndicesStr;
+                }
+
             	if (blockIndicesStr in uploaded_area) {
+
+                    // console.log("Alex Alex Alex");
                     // if (uploaded_area[blockIndicesStr]) // if it is SOMEHOW is still true
                         // return;
             		// recreate textures in the particular cube (Tube Mesh to Line)
@@ -988,14 +1342,7 @@
                     var blockCornerCoordinates = GetBlockCornerCoordinates(blockIndices);
                     DrawBox(blockCornerCoordinates, blockSize);
                     UploadPoints(blockCornerCoordinates, blockIndicesStr, blockIndices);
-
-                }
-                
-                //delete textures in the others cube only if 
-                if (lastBlockIndicesStr != blockIndicesStr) {
-                    DeleteTexturesFromCubes2(blockIndicesStr, blockIndices);
-                    lastBlockIndicesStr = blockIndicesStr;
-                }   
+                } 
             }
 
             //Delete Mesh out of the alowed space region
@@ -1004,6 +1351,7 @@
                 var tempUserData, tempUserDataCoord;
                 var distanceToDelete = 1;
                 //for (var _obj in objects) {
+                console.log("Delete started");
                 for (var _obj = 0; _obj < objects.length; ++_obj) {
                         tempUserData = objects[_obj].userData[0];
                         tempUserDataCoord = objects[_obj].userData[1];
@@ -1014,11 +1362,13 @@
                             scene.remove(objects[_obj]);
 
                             delete uploaded_splines[objects[_obj].name];
-                            octree.remove(objects[_obj]);
+                            if (!isOneCubeOctree) octree.remove(objects[_obj]);
                             
                             objectsIndcesToDelete.push(_obj);
                         }
                 }
+                // octree.rebuild();
+                console.log("Delete finished");
                 if (objects.length>0 && objectsIndcesToDelete.length>0) {
                     objects = $.grep(objects, function(v,i){return $.inArray(i,objectsIndcesToDelete)==-1});
                 }   
@@ -1048,6 +1398,8 @@
 				}
 				return intersects[0];
             }
+
+
             
             function GetSelectedTrackPoints(intersectPoint, trackName) {
             	var intersectInModelCoordinates = Local2global(intersectPoint);

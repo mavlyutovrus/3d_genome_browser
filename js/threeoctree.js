@@ -182,6 +182,8 @@
 				useFaces,
 				vertices,
 				useVertices,
+				trackPoints,
+				useSeqVertices,
 				objectData;
 			
 			// ensure object is not object data
@@ -213,10 +215,23 @@
 					
 					useFaces = options.useFaces;
 					useVertices = options.useVertices;
-					
+					useSeqVertices = options.useSeqVertices;
+					//trackPoints = options.trackPoints;
 				}
 				
-				if ( useVertices === true ) {
+
+				if ( useSeqVertices === true ) {
+					
+					geometry = object.geometry;
+					vertices = geometry.vertices;
+					
+					for ( i = 0, l = vertices.length; i < l; i++ ) {
+						if (i % 4 == 2) {
+							this.addObjectData( object, vertices[ i ] );
+						}
+					}
+					
+				} else if ( useVertices === true ) {
 					
 					geometry = object.geometry;
 					vertices = geometry.vertices;

@@ -148,7 +148,12 @@
                                     tr.appendChild(td)
                                     //snp
                                     td=document.createElement('td');
-                                    td.appendChild(document.createTextNode("rs" + String(snpArray[track_internal_index][1])));
+                                    var tempSpnId = String(snpArray[track_internal_index][1]);
+                                    var newlink = document.createElement('a');
+                                    newlink.setAttribute('target', '_blank');
+                                    newlink.setAttribute('href', 'http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?rs='+tempSpnId);
+                                    newlink.appendChild(document.createTextNode("rs"+tempSpnId));
+                                    td.appendChild(newlink);
                                     tr.appendChild(td)
                                     //TF
                                     td=document.createElement('td');
@@ -257,8 +262,13 @@
                                 tr.appendChild(td)
                                 //snp
                                 td=document.createElement('td');
-                                td.appendChild(document.createTextNode("rs" + String(snpArray[track_internal_index][1])));
-                                tr.appendChild(td)
+                                var tempSpnId = String(snpArray[track_internal_index][1]);
+                                var newlink = document.createElement('a');
+                                newlink.setAttribute('target', '_blank');
+                                newlink.setAttribute('href', 'http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?rs='+tempSpnId);
+                                newlink.appendChild(document.createTextNode("rs"+tempSpnId));
+                                td.appendChild(newlink);
+                                tr.appendChild(td);
                                 //TF
                                 td=document.createElement('td');
                                 td.appendChild(document.createTextNode(String(TF_name)));
@@ -372,8 +382,13 @@
                     tr.appendChild(td)
                     //snp
                     td=document.createElement('td');
-                    td.appendChild(document.createTextNode("rs" + String(snpArray[track_internal_index][1])));
-                    tr.appendChild(td)
+                    var tempSpnId = String(snpArray[track_internal_index][1]);
+                    var newlink = document.createElement('a');
+                    newlink.setAttribute('target', '_blank');
+                    newlink.setAttribute('href', 'http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?rs='+tempSpnId);
+                    newlink.appendChild(document.createTextNode("rs"+tempSpnId));
+                    td.appendChild(newlink);
+                    tr.appendChild(td);
                     //TF
                     td=document.createElement('td');
                     td.appendChild(document.createTextNode(String(TF_name)));

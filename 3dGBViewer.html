@@ -85,7 +85,7 @@
         </script>
 
         <div id="dialog-message" title="Wrong format of coordinates" >
-            <p>Wrong format of input data. Please enter coordinates in format 'X,Y,Z' to specify your next location in Genome space. Also you can move to the place of particular part of specified chromosome. Format: 'chr#,#,#'. Separator can be any symbol except for numeric one. </p>
+            <p>Wrong format of input data. Please enter coordinates in format 'X,Y,Z' to specify your next location in Genome space. Also you can move to the place of particular part of specified chromosome. Format: 'chr#,#,#'. Separator can be any symbol except for numeric one. In case of using 3d model of particular chromosomes you can use only this chromosome.</p>
         </div>
         
         <!-- google analytics -->
@@ -434,7 +434,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -447,7 +448,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -460,7 +462,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -473,7 +476,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -486,7 +490,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -499,7 +504,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -512,7 +518,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -525,7 +532,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -538,7 +546,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -551,7 +560,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -564,7 +574,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -577,7 +588,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -590,7 +602,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -603,7 +616,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -616,7 +630,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -629,7 +644,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -642,7 +658,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -655,7 +672,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -668,7 +686,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -681,7 +700,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -694,7 +714,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -707,7 +728,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -720,7 +742,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=leukemia&chr=" + particularChromosome + "&";
+                    healthness = "m=leukemia";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -733,7 +756,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -746,7 +770,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -759,7 +784,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -772,7 +798,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -785,7 +812,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -798,7 +826,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -811,7 +840,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -824,7 +854,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -837,7 +868,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -850,7 +882,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -863,7 +896,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -876,7 +910,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -889,7 +924,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -902,7 +938,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -915,7 +952,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -928,7 +966,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -941,7 +980,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -954,7 +994,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -967,7 +1008,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -980,7 +1022,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -993,7 +1036,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                    healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                     scaleFactor = 1300; blockSize = 3;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                     break;
@@ -1006,7 +1050,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                 serviceForStructure = "3d";
                 particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                 console.log("particularChromosome" + particularChromosome)
                 scaleFactor = 1300; blockSize = 3;
                 NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
@@ -1020,7 +1065,8 @@
                 zeroCoordinate={x: 3, y: 3, z: 3};
                 serviceForStructure = "3d";
                 particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                disease3Dexpression= "m=normal&chr=" + particularChromosome + "&";
+                healthness = "m=normal";
+                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
                 scaleFactor = 1300; blockSize = 3;
                 NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
                 break;
@@ -1121,6 +1167,7 @@
                     console.log("option 0");
                     return true;
                 } else if (incoords.match(regexpPatternChrms) != null) {
+                    if (incoords.replace(regexpPatternChrms, "$1") != particularChromosome) return false;
                     ChangeCameraPosition(incoords, 1);
                     return true;
                 } else {
@@ -1144,16 +1191,14 @@
                     var arr = str.split(':');
 
                     if (parseInt(arr[1]) > parseInt(arr[2])) return false;
-
                     if (arr[0][arr[0].length - 1] == "b" ) {
                         arr[0] = arr[0].replace("b", "a"); //default value - b doesn't work now
                     }
 
                     var position = Math.floor((parseInt(arr[2]) + parseInt(arr[1]))/2);
-                    console.log("+++" + incoords);
                     var request = incoords.replace(regexpPatternChrms, "chrid=$1&bp=" + String(position));
 
-                    var url = 'http://1kgenome.exascale.info/chr_pos?' + request;
+                    var url = 'http://1kgenome.exascale.info/chr_pos?' + request + ( (serviceForStructure == '3d') ?"&"+healthness:"");
 
                     $.getJSON(url + "?callback=?", null, 
                         function(data) {
@@ -3307,7 +3352,8 @@
                             var genotypeArray = [];
 			            	for (var point_index = 0; point_index < positions.length; ++point_index) {
 			            		var base_index = positions[point_index][0];
-                                genotypeArray[point_index] = getFakeGenotypeForSNP();//positions[point_index][1];
+
+                                genotypeArray[point_index] = /*getFakeGenotypeForSNP();*/positions[point_index][2]+positions[point_index][3];
 			            		var snp_id = /*"rs" + */String(positions[point_index][1]);
 			            		snips += " <a target=\"_blank\" style=\"color: rgb(255,255,0)\" href=\"http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?rs="+snp_id+"\">rs"+snp_id+"</a>;";
 			            	}

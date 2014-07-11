@@ -403,6 +403,7 @@
             var resp_count = 0;
             var req_count = 0;
             var tableStrContent = '';
+            var healthness;
 
             var isOneCubeOctree = true;
 
@@ -425,19 +426,28 @@
             var scaleFactor; 
         	var blockSize;
             var NODE_THRESHOLD = 625;
+            var radiusOfTube = 10;
+
+            var radiusSphere = 40, segmentsWidth = 32, segmentsHeight = 16; //sphere zone parameters
+            var maxRadiusSphere = 140, minRadiusSphere = 20;
+
             switch (urlParams["3dmodel"]){
                 case "BCL-1" : 
                 { 
                 name_of_model = "B-Cell, Leukemia, Chromosome 1";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 1.5196, y: 4.625, z: 1.75};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
-                    healthness = "m=normal";
-                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    healthness = "m=leukemia";
+                    disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
+                    scaleFactor = 15000; blockSize = 0.8;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-2" : 
@@ -445,27 +455,37 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 2";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                // zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.607, y: 3.066, z: 2.406};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    // scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
-                case "BCL-3" : 
+                case "BCL-3" :
                 { 
                  name_of_model = "B-Cell, Leukemia, Chromosome 3";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.396, y: 3.129, z: 4.991};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-4" : 
@@ -473,13 +493,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 4";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 4.637, y: 1.413, z: 2.748};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-5" : 
@@ -487,13 +511,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 5";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 6.1960, y: 4.679, z: 4.901};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-6" : 
@@ -501,13 +529,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 6";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.6, y: 1, z: 2.3};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1;
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-7" : 
@@ -515,13 +547,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 7";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.5224339672252576, y: 2.8265053937650886, z: 2.6624181521072248};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-8" : 
@@ -529,13 +565,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 8";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.384638770206183, y: 2.7213556491985345, z: 3.2190198759600035};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                   scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-9" : 
@@ -543,13 +583,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 9";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 1.1286286205784912, y: 2.34872326069342, z: 2.7515753634198};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-10" : 
@@ -557,13 +601,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 10";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.7002137110319437, y: 2.803395113630164, z: 2.8327274044350967};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-11" : 
@@ -571,13 +619,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 11";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.9175686487197745, y: 3.0422142962947305, z: 2.0713270276646902};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-12" : 
@@ -585,13 +637,17 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 12";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 4.174361780360315, y: 3.011481034745547, z: 4.752406682114412};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCL-13" : 
@@ -599,13 +655,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 13";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.915946578330066, y: 2.10311133236101, z: 2.2040866952662914};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-14" : 
@@ -613,13 +674,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 14";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.816070125510321, y: 2.6803492066361, z: 2.2112362739538534};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-15" : 
@@ -627,13 +693,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 15";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.287786912326149, y: 2.289238772912303, z: 2.672768601749768};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-16" : 
@@ -641,13 +712,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 16";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.3565839610562507, y: 3.1745956368632826, z: 3.6769545232477876};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-17" : 
@@ -655,13 +731,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 17";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.6369316396175915, y: 2.7422466265810446, z: 2.2013006074737618};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-18" : 
@@ -669,13 +750,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 18";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.7963916541086737, y: 3.2310423850305496, z: 2.717080901779388};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-19" : 
@@ -683,13 +769,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 19";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.422579864207846, y: 3.00588379696229, z: 2.779965908530172};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-20" : 
@@ -697,13 +788,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 20";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.714724725538362, y: 2.9557876871210444, z: 2.893564357748228};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-21" : 
@@ -711,13 +807,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 21";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.976763264996193, y: 2.975517476333303, z: 2.6491180063221886};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-22" : 
@@ -725,13 +826,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 22";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.12026287716053, y: 3.3174266856077033, z: 3.224190734706632};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCL-23" : 
@@ -739,13 +845,18 @@
                  name_of_model = "B-Cell, Leukemia, Chromosome 23";
                 current_cell_line = 'B-cell';
                 isChipSeqAvailable = false;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.2093499344016747, y: 6.19408957037137, z: 3.0928600396076003};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=leukemia";
-                disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                disease3Dexpression = healthness + "&chr=X"  + "&";
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCH-1" : 
@@ -753,13 +864,18 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 1";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.028643447604918, y: 2.890738383622912, z: 4.109576482443055};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
+
                     break;
                 }
                 case "BCH-2" : 
@@ -767,13 +883,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 2";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.199904037434262, y: 3.5599361421035023, z: 2.016223358671252};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-3" : 
@@ -781,13 +901,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 3";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.6552218202817075, y: 2.8453974944543536, z: 2.4446027459009483};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-4" : 
@@ -795,13 +919,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 4";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.071287723765832, y: 3.0877035224328813, z: 2.78887829509825};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-5" : 
@@ -809,13 +937,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 5";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.6493915149963545, y: 3.2130827648406872, z: 2.5536481253807897};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-6" : 
@@ -823,13 +955,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 6";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.4840182088706366, y: 1.679119369905898, z: 2.8160299181144923};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-7" : 
@@ -837,13 +973,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 7";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.2807329066853628, y: 2.672600303671124, z: 3.7860452041377872};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-8" : 
@@ -851,13 +991,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 8";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.6459739239516518, y: 2.6391411828461817, z: 3.975179853417516};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-9" : 
@@ -865,13 +1009,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 9";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.773577392942734, y: 2.5921210446418863, z: 2.2028152115862745};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-10" : 
@@ -879,13 +1027,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 10";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.6702232188740513, y: 2.531886396842844, z: 2.8187572029371903};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-11" : 
@@ -893,13 +1045,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 11";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.1019471317951934, y: 3.856279271263897, z: 1.6510631427705267};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-12" : 
@@ -907,13 +1063,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 12";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 4.11109074425881, y: 2.7114129501017032, z: 2.2341538540683525};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-13" : 
@@ -921,13 +1081,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 13";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.3886978400144803, y: 3.013187538800507, z: 2.2243349109628587};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-14" : 
@@ -935,13 +1099,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 14";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 1.55303995186045, y: 2.197019566042211, z: 2.906060979462621};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-15" : 
@@ -949,13 +1117,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 15";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 4.1430899937886165, y: 2.206063652812622, z: 3.2603409310289};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-16" : 
@@ -963,13 +1135,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 16";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 4.039037458257831, y: 2.5580294526351235, z: 1.929846300832198};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-17" : 
@@ -977,13 +1153,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 17";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 4.133035698044761, y: 2.462407039945692, z: 4.195447668839935};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-18" : 
@@ -991,13 +1171,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 18";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 2.4204389544257787, y: 2.7924236722558198, z: 2.1668763080083284};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-19" : 
@@ -1005,13 +1189,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 19";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 1.8115930828234836, y: 2.904626714948919, z: 2.9414152397511137};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-20" : 
@@ -1019,13 +1207,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 20";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.49361077188669, y: 4.207871717048262, z: 2.4505625440882604};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-21" : 
@@ -1033,13 +1225,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 21";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.574121184451935, y: 2.6698422763157805, z: 2.7381431250213564};
                     serviceForStructure = "3d";
                     particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                     healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                    scaleFactor = 1300; blockSize = 3;
+                    scaleFactor = 15000; blockSize = 1; // before 1300 | 3
                     NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                     break;
                 }
                 case "BCH-22" : 
@@ -1047,14 +1243,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 22";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.45545567678287, y: 3.310117407814258, z: 2.9226027443824822};
                 serviceForStructure = "3d";
                 particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                 healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                console.log("particularChromosome" + particularChromosome)
-                scaleFactor = 1300; blockSize = 3;
-                NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                scaleFactor = 15000; blockSize = 1; // before 1300 | 3
+                    NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                 break;
                 }
                 case "BCH-23" : 
@@ -1062,13 +1261,17 @@
                  name_of_model = "B-Cell GM06990, Healthy, Chromosome 23";
                 current_cell_line = 'GM06990';
                 isChipSeqAvailable = true;
-                zeroCoordinate={x: 3, y: 3, z: 3};
+                zeroCoordinate={x: 3.166116488821329, y: 3.753381136085846, z: 2.6700131713938355};
                 serviceForStructure = "3d";
                 particularChromosome = parseInt(urlParams["3dmodel"].split("-")[1]);
                 healthness = "m=normal";
                 disease3Dexpression = healthness + "&chr=" + particularChromosome + "&";
-                scaleFactor = 1300; blockSize = 3;
-                NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                scaleFactor = 15000; blockSize = 1; // before 1300 | 3
+                    NODE_THRESHOLD = NODE_THRESHOLD*scaleFactor/10;
+                    radiusOfTube = 25;
+                    minRadiusSphere = 70;
+                    maxRadiusSphere = 180;
+                    radiusSphere = 100;
                 break;
                 }
                 default:
@@ -1103,8 +1306,6 @@
             var is_coloring_of_chipseq = false;
             var deb_var;
             var lastBlockIndicesStr;
-            var radiusSphere = 40, segmentsWidth = 32, segmentsHeight = 16; //sphere zone parameters
-            var maxRadiusSphere = 140, minRadiusSphere = 20;
             var regexpPattern = /^([\d\-]+)[^\d\-]+([\-\d]+)[^\d\-]+([\d\-]+)[^\d\-]*/i; //[num] smth(1+) [num] smth(1+) [num] smth(0+)
             var regexpPatternChrms = /chr[^\d]*([\d]+[ab]*)[^\dab]+([\d]+)[^\d]+([\d]+)[^\d]*/; //format smth(0+) [num] smth(1+) [num] smth(1+) [num] smth(0+)
             var regexpPatternURL = /([\dXY]{1,2})[_]*([abAB]*)[^\d]+([\d]+)[^\d]+([\d]+)/ ;
@@ -2097,7 +2298,7 @@
                         var spline = new THREE.SplineCurve3(chipVertices);
                         var segments = chipVertices.length * 1;
                         var radiusSegments = 10;
-                        var tube = new THREE.TubeGeometry( spline, segments, 8, radiusSegments, false, false);
+                        var tube = new THREE.TubeGeometry( spline, segments, radiusOfTube-2, radiusSegments, false, false);
                         tube.dynamic = true;
                         var tubeMesh = new THREE.Mesh(tube, material);
                         tubeMesh.userData = userDataChip;//?
@@ -2228,6 +2429,7 @@
                     }            	
             }
             
+            //probably trash
             function InitSelectionMesh() {
 				var spline = new THREE.SplineCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(100, 100, 100),]);
 				var material = new THREE.LineBasicMaterial({color: 0xff0000});
@@ -2266,7 +2468,7 @@
             function getPositionRangeFromCubeIntersection(meshesSearch) {
                 var resultSet = [];
                 var verts;
-                deb_var = [];
+                
                 var mentionedMeshes = [];
                 var name, aLen;
                 var chr, helix;
@@ -2325,7 +2527,6 @@
                         }
                     }
 
-                    deb_var = possibleSolutions;
                     if (minDistance == -1) { //everything in the selection area - as there should be at least something in the minDistance after the end of the loop
                         var trackPoints = uploaded_splines[name][1];
                         var objStart = getPointPositionInChr(trackPoints, 0, verts[0]);
@@ -2645,6 +2846,7 @@
                 var NEGL_DISTANCE = 400; //based on the tubes width (10*2) * (10*2)
                 var distBetweenNodes = -1;
                 for (var _v = startPointIndex+1; _v < verts.length; _v++) {
+                    if (verts[_v] === 'undefined') continue;
                         distBetweenNodes = Math.pow(verts[startPointIndex].x - verts[_v].x, 2) + 
                                             Math.pow(verts[startPointIndex].y - verts[_v].y, 2) +
                                             Math.pow(verts[startPointIndex].z - verts[_v].z, 2);
@@ -2817,6 +3019,10 @@
             		    z :  (coordinates.z - zeroCoordinate.z) * scaleFactor };
             }    
 
+            function Local2globalVector3(coordinates) {
+                return new THREE.Vector3(zeroCoordinate.x + coordinates.x / scaleFactor, zeroCoordinate.y + coordinates.y / scaleFactor, zeroCoordinate.z + coordinates.z / scaleFactor);
+            }
+
             function Global2localVector3(coordinates) {
                 return new THREE.Vector3((coordinates.x - zeroCoordinate.x) * scaleFactor, (coordinates.y - zeroCoordinate.y) * scaleFactor, (coordinates.z - zeroCoordinate.z) * scaleFactor);
             }
@@ -2915,44 +3121,58 @@
 							wireframe: false,
 							transparent: false
 					  });
-					*/								
+					*/			
+                    var approx_track_point = track_points;
+                    if ( serviceForStructure == '3d' ) {
+                        approx_track_point = createApproximatedTrackPoints(track_points);
+                    }
+
 					var spline_points = [];
-					var points_count = track_points.length;
+					var points_count = approx_track_point.length;
                     var lastChinkPosition
 					for (var point_index = 0; point_index < points_count; ++point_index) {
-						var chunk = track_points[point_index];
+						var chunk = approx_track_point[point_index];
                         
 						var localCorodinates = Global2local( {x: chunk[2], y: chunk[3], z : chunk[4] });						
 						spline_points.push(new THREE.Vector3(localCorodinates.x, localCorodinates.y, localCorodinates.z));
 					}
-                    
+                    var spline = new THREE.SplineCurve3(spline_points);
+                    var segments = points_count * 2;
+                    var radiusSegments =  6;
+                    var tube = new THREE.TubeGeometry(spline, segments, radiusOfTube,    radiusSegments, false, false);
+
                     if (typeof meter == 'undefined') {
                         if (serviceForStructure == '3d'){
-                            meter = parseInt(track_points[points_count-1][1])/points_count;
-                            basesInSelection = meter;
-                            minMeter = meter / 10 ; maxMeter = meter * 2; stepScroll = meter / 10;
+                            console.log(track_points.length + " before " + parseInt(track_points[track_points.length-1][1] - track_points[0][1])/track_points.length)
+                            console.log(approx_track_point.length + "now " + parseInt(approx_track_point[approx_track_point.length-1][1] - approx_track_point[0][1])/approx_track_point.length)
+                            meter = parseInt(approx_track_point[approx_track_point.length-1][1] - approx_track_point[0][1])/approx_track_point.length;
+                            
+                            if (healthness === 'm=leukemia') {
+
+                                basesInSelection = meter;
+                                minMeter = meter / 5 ; maxMeter = meter * 5; stepScroll = meter / 5;    
+                            } else {
+                                basesInSelection = meter/2;
+                                minMeter = meter / 10 ; maxMeter = meter * 2; stepScroll = meter / 10;    
+                            }
+                            
                         } else {
                             meter = basesInSelection;
                             minMeter = 100 ; maxMeter = 3000; stepScroll = 100;
                         }
                     } 
                     
-					var spline = new THREE.SplineCurve3(spline_points);
-					var segments = points_count * 2;
-					var radiusSegments = 6;
-					var tube = new THREE.TubeGeometry(spline, segments, 10,    radiusSegments, false, false);
 					tube.dynamic = true;
 					var tubeMesh = new THREE.Mesh(tube, material);	
-//                    console.log(blockIndicesStr +" +++ " + blockIndices.x);
                     tubeMesh.userData = [blockIndicesStr, blockIndices];
 					
 					tubeMesh.name = chrid + "-" + String(track_points[0][1]) + "-"  + String(track_points[track_points.length - 1][1]);
-                    
+
                     if (isCustomerData && typeof customerData != 'undefined') {
-                    var arr = AdaptUploadedSpinesForCustomerData(track_points[0][1], track_points[track_points.length - 1][1], chridOnlyNum);
-                        uploaded_splines[tubeMesh.name] = [chrid, track_points, arr[0], arr[1], chridOnlyNum];
+                    var arr = AdaptUploadedSpinesForCustomerData(approx_track_point[0][1], approx_track_point[approx_track_point.length - 1][1], chridOnlyNum);
+                        uploaded_splines[tubeMesh.name] = [chrid, approx_track_point, arr[0], arr[1], chridOnlyNum];//in usual case - as before
                     } else {
-                        uploaded_splines[tubeMesh.name] = [chrid, track_points];
+                        uploaded_splines[tubeMesh.name] = [chrid, approx_track_point];//in usual case - as before
                     }
                     
 					if (serviceForStructure == '3d') 
@@ -2962,6 +3182,120 @@
 					objects.push(tubeMesh);
                     console.log('Hi')
 				}
+            }
+            function createApproximatedTrackPoints(track_points) {
+                
+                function Interpolate2(point, otherPoint, bpIndexNeed) {
+                    var bpIndex = point[1];
+                    var bpIndexOther = otherPoint[1];
+                    var coeff = (bpIndexNeed - bpIndex) / (bpIndexOther - bpIndex);
+                    var xCoord = point[2] + (otherPoint[2] - point[2]) * coeff;
+                    var yCoord = point[3] + (otherPoint[3] - point[3]) * coeff;
+                    var zCoord = point[4] + (otherPoint[4] - point[4]) * coeff;
+                    return {x: xCoord, y: yCoord, z: zCoord};
+                }
+
+                function Interpolate3(previousPoint, point, otherPoint, bpIndexNeed) {
+                    var bpIndexPrevious = previousPoint[1];
+                    var bpIndexOther = otherPoint[1];
+                    var coeff = (bpIndexNeed - bpIndexPrevious) / (bpIndexOther - bpIndexPrevious);
+                    var xCoord = (1-coeff) * (1-coeff) * previousPoint[2] + 2*(1-coeff) * coeff * point[2] + otherPoint[2] * coeff * coeff;
+                    var yCoord = (1-coeff) * (1-coeff) * previousPoint[3] + 2*(1-coeff) * coeff * point[3] + otherPoint[3] * coeff * coeff;
+                    var zCoord = (1-coeff) * (1-coeff) * previousPoint[4] + 2*(1-coeff) * coeff * point[4] + otherPoint[4] * coeff * coeff;
+                    return {x: xCoord, y: yCoord, z: zCoord};
+                }
+
+                var result = [];
+                var NUMBER_LIMIT = 10000;
+                var points_count = track_points.length;
+                var rate;
+                result[0] = track_points[0];
+                var tempObj, previousLastTempObj;
+                for (var indx = 0; indx <  points_count-1; indx++) {
+                    rate = parseInt((track_points[indx+1][1] - track_points[indx][1])/NUMBER_LIMIT);
+                    console.log(track_points[indx][0] + "  -  rate = " + rate);
+                    if (rate < 2) {
+                        result.push(track_points[indx+1]);
+                        continue;
+                    }
+
+                    for (var i = 1; i <= rate; i++) {
+                        bpIndexNeed = Math.floor(track_points[indx][1] + i/rate* (track_points[indx+1][1] - track_points[indx][1]));
+                        
+                        /*
+                        //3points based Interpolation. Not good for neighbor cubes
+                        if (points_count == 2) {
+                            tempObj = Interpolate2(track_points[indx], track_points[indx+1], bpIndexNeed);
+                        } else if (indx == 0) {
+                            tempObj = Interpolate3(track_points[indx], track_points[indx+1], track_points[indx+2], bpIndexNeed);
+                            lastTempObj = [track_points[indx+1][0], bpIndexNeed, tempObj.x, tempObj.y, tempObj.z]
+                        } else if ( indx < points_count - 2 ) {
+                            tempObj = Interpolate3(lastTempObj, track_points[indx+1], track_points[indx+2], bpIndexNeed);
+                            if (i == rate) {
+                                previousLastTempObj = lastTempObj;
+                                lastTempObj = [track_points[indx+1][0], bpIndexNeed, tempObj.x, tempObj.y, tempObj.z]
+                            }
+                        } else if (indx == points_count - 2) {
+                            tempObj = Interpolate3(((previousLastTempObj)?previousLastTempObj:track_points[indx-1]), track_points[indx], track_points[indx+1], bpIndexNeed);
+                            // if (i == rate) {
+                            //     deb_var = [previousLastTempObj, lastTempObj];
+                            //     previousLastTempObj = lastTempObj;
+                            //     lastTempObj = [track_points[indx][0], bpIndexNeed, tempObj.x, tempObj.y, tempObj.z]
+                            // }
+                        }
+                        */
+
+                        //linear interpolation
+                        tempObj = Interpolate2(track_points[indx], track_points[indx+1], bpIndexNeed);
+                        result.push([track_points[indx][0], bpIndexNeed, tempObj.x, tempObj.y, tempObj.z]);
+                    }
+
+                    // result.push(track_points[indx+1]);
+                }
+                
+                return result;
+            }
+
+            function recursiveInterpolation(result, firstPoint, lastPoint) {
+                result.push
+            }
+
+            function createApproximatedTrackPoints1(track_points, spline) {
+                var result = [];
+                var track_points_len = track_points.length;
+                var points_count = spline.length;
+                var globalVar;
+                var start_point = 0;
+                var distance, distance_between_nodes;
+                var normal_counter = 0;
+                
+                for (var indx = 0; indx <  points_count; indx = findNextNotGroupedPoint(spline, indx)) {
+                    globalVar = Local2globalVector3(spline[indx]);
+                    if (indx == 0) {
+                        result[normal_counter] = track_points[0];
+                    }
+
+                    for (var indx2 = start_point; indx2 < track_points_len-1/*because of decrease*/; indx2++) {
+                        distance = Math.pow(track_points[indx2][2] - globalVar.x,2) + 
+                                Math.pow(track_points[indx2][3] - globalVar.y,2) + 
+                                Math.pow(track_points[indx2][4] - globalVar.z,2);
+
+                        distance_between_nodes = Math.pow(track_points[indx2][2] - track_points[indx2+1][2],2) + 
+                                Math.pow(track_points[indx2][3] - track_points[indx2+1][3],2) + 
+                                Math.pow(track_points[indx2][4] - track_points[indx2+1][4],2);
+
+                        if ( distance_between_nodes >= distance ) {
+                            result[normal_counter] = [track_points[indx2][0], Math.floor(track_points[indx2][1] + (track_points[indx2+1][1] - track_points[indx2][1]) * distance / distance_between_nodes), globalVar.x, globalVar.y, globalVar.z];
+                            break;
+                        } else {
+                            start_point++;
+                            continue;
+                        }
+                    }
+                    normal_counter++;
+                }
+                
+                return result;
             }
 
             function AdaptUploadedSpinesForCustomerData(beginPos, endPos, chridOnlyNum) {
@@ -3007,7 +3341,8 @@
             }
 
             function UploadPoints(blockCornerCoordinates, blockIndicesStr, blockIndices) {
-            	overlap = blockSize * 0.2;
+                overlap = blockSize * 0.2;
+                
             	var request = "xstart=" + String(blockCornerCoordinates.x - overlap) 
             				  + "&xend=" + String(blockCornerCoordinates.x + blockSize + overlap)
             				  + "&zstart=" + String(blockCornerCoordinates.z - overlap)      
@@ -3187,6 +3522,10 @@
             	var closestPoint = -1;
             	var minDistance = -1;
             	for (var pointIndex = 0; pointIndex < trackPoints.length; ++pointIndex) {
+                    if (typeof trackPoints[pointIndex] == 'undefined'){
+                        console.log("ff+ " + pointIndex);
+                        continue;
+                    }
             		var x = trackPoints[pointIndex][2];
             		var y = trackPoints[pointIndex][3];
             		var z = trackPoints[pointIndex][4];
@@ -3236,7 +3575,7 @@
                     var segments = serviceForStructure=='3d' ? Math.floor(basesInSelection/6500) : basesInSelection/50; 
                     var radiusSegments = 6;
                     
-                    var tube = new THREE.TubeGeometry(spline, segments, 20, radiusSegments, false, false);
+                    var tube = new THREE.TubeGeometry(spline, segments, radiusOfTube+10, radiusSegments, false, false);
                     tube.dynamic = true;
                     scene.remove(selectionMesh);
 

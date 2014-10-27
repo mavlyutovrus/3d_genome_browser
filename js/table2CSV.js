@@ -61,6 +61,7 @@ jQuery.fn.table2CSV = function(options) {
         return '"' + output + '"';
     }
     function popup(data) {
+        console.log("Hello popup")
         var generator = window.open('', 'csv', 'height=400,width=600');
         generator.document.write('<html><head><title>CSV</title>');
         generator.document.write('</head><body >');

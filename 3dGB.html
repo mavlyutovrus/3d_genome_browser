@@ -9,10 +9,11 @@
         <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
             <script>
                 $(function() {
-                $( "#tabs" ).tabs({
-                    
+                  $( "#tabs" ).tabs({});
+                  $("#href_tabs-4").click(function() {window.location = "scripting.html"});
                 });
-              });
+                
+                
             </script>
     </head>
     
@@ -33,6 +34,7 @@
                 <li><a id="href_tabs-0" href="#tabs-0">Welcome Page/UI</a></li>
                 <li><a id="href_tabs-2" href="#tabs-2">Contact us</a></li>
                 <li><a id="href_tabs-3" href="#tabs-3">About</a></li>
+                <li><a id="href_tabs-4" href="#tabs-4">Script'ing</a></li>
             </ul>
             <div id="tabs-0">
                 <label>3D Genome Structure that you want to explore: </label>
@@ -40,29 +42,6 @@
               <select name="3dmodel" style="width : 200" >
                   <option value="">Select one...</option>
                   <option value="K562-All">K562 Cell Type, All Chromosome, Simulations</option>
-                  <option value="BCL-1">B-Cell, Leukemia, Chromosome 1</option>
-                  <option value="BCL-2">B-Cell, Leukemia, Chromosome 2</option>
-                  <option value="BCL-3">B-Cell, Leukemia, Chromosome 3</option>
-                  <option value="BCL-4">B-Cell, Leukemia, Chromosome 4</option>
-                  <option value="BCL-5">B-Cell, Leukemia, Chromosome 5</option>
-                  <option value="BCL-6">B-Cell, Leukemia, Chromosome 6</option>
-                  <option value="BCL-7">B-Cell, Leukemia, Chromosome 7</option>
-                  <option value="BCL-8">B-Cell, Leukemia, Chromosome 8</option>
-                  <option value="BCL-9">B-Cell, Leukemia, Chromosome 9</option>
-                  <option value="BCL-10">B-Cell, Leukemia, Chromosome 10</option>
-                  <option value="BCL-11">B-Cell, Leukemia, Chromosome 11</option>
-                  <option value="BCL-12">B-Cell, Leukemia, Chromosome 12</option>
-                  <option value="BCL-13">B-Cell, Leukemia, Chromosome 13</option>
-                  <option value="BCL-14">B-Cell, Leukemia, Chromosome 14</option>
-                  <option value="BCL-15">B-Cell, Leukemia, Chromosome 15</option>
-                  <option value="BCL-16">B-Cell, Leukemia, Chromosome 16</option>
-                  <option value="BCL-17">B-Cell, Leukemia, Chromosome 17</option>
-                  <option value="BCL-18">B-Cell, Leukemia, Chromosome 18</option>
-                  <option value="BCL-19">B-Cell, Leukemia, Chromosome 19</option>
-                  <option value="BCL-20">B-Cell, Leukemia, Chromosome 20</option>
-                  <option value="BCL-21">B-Cell, Leukemia, Chromosome 21</option>
-                  <option value="BCL-22">B-Cell, Leukemia, Chromosome 22</option>
-                  <option value="BCL-23">B-Cell, Leukemia, Chromosome 23</option>
                   <option value="BCH-1">B-Cell GM06990, Healthy, Chromosome 1</option>
                   <option value="BCH-2">B-Cell GM06990, Healthy, Chromosome 2</option>
                   <option value="BCH-3">B-Cell GM06990, Healthy, Chromosome 3</option>
@@ -86,6 +65,29 @@
                   <option value="BCH-21">B-Cell GM06990, Healthy, Chromosome 21</option>
                   <option value="BCH-22">B-Cell GM06990, Healthy, Chromosome 22</option>
                   <option value="BCH-23">B-Cell GM06990, Healthy, Chromosome 23</option>
+                  <option value="BCL-1">B-Cell, Leukemia, Chromosome 1</option>
+                  <option value="BCL-2">B-Cell, Leukemia, Chromosome 2</option>
+                  <option value="BCL-3">B-Cell, Leukemia, Chromosome 3</option>
+                  <option value="BCL-4">B-Cell, Leukemia, Chromosome 4</option>
+                  <option value="BCL-5">B-Cell, Leukemia, Chromosome 5</option>
+                  <option value="BCL-6">B-Cell, Leukemia, Chromosome 6</option>
+                  <option value="BCL-7">B-Cell, Leukemia, Chromosome 7</option>
+                  <option value="BCL-8">B-Cell, Leukemia, Chromosome 8</option>
+                  <option value="BCL-9">B-Cell, Leukemia, Chromosome 9</option>
+                  <option value="BCL-10">B-Cell, Leukemia, Chromosome 10</option>
+                  <option value="BCL-11">B-Cell, Leukemia, Chromosome 11</option>
+                  <option value="BCL-12">B-Cell, Leukemia, Chromosome 12</option>
+                  <option value="BCL-13">B-Cell, Leukemia, Chromosome 13</option>
+                  <option value="BCL-14">B-Cell, Leukemia, Chromosome 14</option>
+                  <option value="BCL-15">B-Cell, Leukemia, Chromosome 15</option>
+                  <option value="BCL-16">B-Cell, Leukemia, Chromosome 16</option>
+                  <option value="BCL-17">B-Cell, Leukemia, Chromosome 17</option>
+                  <option value="BCL-18">B-Cell, Leukemia, Chromosome 18</option>
+                  <option value="BCL-19">B-Cell, Leukemia, Chromosome 19</option>
+                  <option value="BCL-20">B-Cell, Leukemia, Chromosome 20</option>
+                  <option value="BCL-21">B-Cell, Leukemia, Chromosome 21</option>
+                  <option value="BCL-22">B-Cell, Leukemia, Chromosome 22</option>
+                  <option value="BCL-23">B-Cell, Leukemia, Chromosome 23</option>
               </select>
               <input type="submit">
             </form>
@@ -146,20 +148,43 @@
                 </p>
                 <hr>
                 <h2 id="functionality">Browser Functionality</h2>
-                <p>The general idea of the 3D Genome Browser is to show the genome sequence in 3 dimensions, provide an opportunity to explore genome both in standard (linear) way and using advantages of space location of chromosomes, genes, their interactions.<br>Currently in the system there are <b>47</b> 3d structures available: 23 chromosomes of B-Cell with Leukemia, 23 chromosomes of Healthy B-Cell (GM06990 cell type) and simualations with complete genome for K562 Cell Type. They can be chosen on the first tab of 3D Genome Browser. For deep understanding of how 3d Genome Browser works and what kind of data it represents - choose Simulation data - <i>K562 Cell Type, All Chromosome, Simulations</i> or any chromosome of <i>Healthy GM06990 B-Cell</i>.<br> 
+                <p>The general idea of the 3D Genome Browser is to show the genome sequence in 3 dimensions, provide an opportunity to explore genome both in standard (linear) way and using advantages of space location of chromosomes, genes, their interactions.<br>Currently in the system there are <b>47</b> 3d structures available: 23 chromosomes of Leukemia B-Cell, 23 chromosomes of Healthy B-Cell (GM06990 cell type) and simualations with complete genome for K562 Cell Type. They can be chosen on the first tab of 3D Genome Browser. For deep understanding of how 3d Genome Browser works and what kind of data it represents - choose Simulation data - <i>K562 Cell Type, All Chromosome, Simulations</i> or any chromosome of <i>Healthy GM06990 B-Cell</i>.<br> 
                   Another important feature of this system is the way of information representetion. In most cases, user can retrieve information while moving through the space in the bottom panel of the screen, or using special commands to get pop up window for detailed information.
                     <br>
                     This system provides wide variety of tools for exploring genome.<br>
-                    In comparison with standard Genome Browsers we deal with 3D coordinates, models and associated with them biological entities. That's why it is important to provide an opportunity to change the current position in space with standard way in format  "chr [number of chromosome] [start position] [end position]", where any non numeric symbol can be separator (for instance, "chr 5: 1234567 - 1234765"); and in 3 dimensional way - format "X Y Z", where X,Y,Z are coordinates of particular point in database (very specific, for instance, "147:2345:924") and any non numeric symbol can be separator as well.<br>
+                    In comparison with standard Genome Browsers we deal with 3D coordinates, models and associated with them biological entities. That is why it is important to provide an opportunity to change the current position in space with standard way in format  "chr [number of chromosome] [start position] [end position]", where any non numeric symbol can be separator (for instance, "chr 5: 1234567 - 1234765"); and in 3 dimensional way - format "X Y Z", where X,Y,Z are coordinates of particular point in database (this way is very specific and usually usefull for people, who want to make a connection between initial <i>Hi-C</i> data and visual representation; for instance, "147:2345:924"), any non numeric symbol can be separator as well. As 3D Genome Browser works with such biological data as genes, user can move the camera to look at the specific location of gene and its surroundings. Knowledge of the location of gene is not required.<br>
+                    <table border = "1px" id='table_linear'>
+                        <tr>
+                            <th></th>
+                            <th>B-Cell, Leukemia</th>
+                            <th>B-Cell, Healthy</th>
+                            <th>K562, Simulations</th>
+                        </tr>
+                        <tr>
+                            <th>Positions in chromosome</th>
+                            <td colspan="2"><i>chr12 12345-23456</i><br>OR<br><i>12345-23456</i><br>(this example is for <b>12</b> chromosome model)</td>
+                            <td><i>chr12 12345-23456</i></td>
+                        </tr>
+                        <tr>
+                            <th>Gene</th>
+                            <td colspan="3"><i><a class = "external-link" href="http://www.ncbi.nlm.nih.gov/gene/7157" target="_blank">TP53</a></i><br>OR <i>any other name of gene</i> (case sensitive)</td>
+                        </tr>
+                        <tr>
+                            <th>Model coordinates</th>
+                            <td colspan="3"><i>5.23:4.534:1.89</i><br>Which corresponds to X, Y, Z coordinates in database</td>
+                        </tr>
+                    </table>
+                <h6><i>Example of using search field of 3D Genome Browser</i></h6>
                     <br>
-                    Fundamentally there are 3 different modes that allow user interact with system in different ways and/or retrieve special information from database.</p>
+                
+                    <p>Fundamentally there are 3 different modes that allow user interact with system in different ways and/or retrieve special information from database.</p>
                 <h3 id="func-linear">Linear mode</h3>
                 <p>
                 Basically, linear mode in 3D space is the putting old canons of representation in a new light. It easily can be compared with such genome browser as <a class = "external-link" href="http://genome.ucsc.edu/" target="_blank">UCSC Genome Browser</a> and track system, which it uses. User can examine and analyze only one sequence of genome at a time but instead of plane tables 3D Genome Browser uses partition of the screen on 2 parts: 3D models and panels with information that is appeared immediately by pointing to the specific part of the genome. To investigate specific part of genome <i>left click of mouse</i> will call popup window with almost the same information but with opportunity to click on any link and continue investigation on the <a class = "external-link" href="http://www.ncbi.nlm.nih.gov/" target="_blank">National Center for Biotechnology Information web site </a>.
                     <br>
                     Also, system provides an opportunity to change the size of observable area of genome sequence and, therefore, of retrieving data from the server by scrolling the mouse (up to several thousands of nucleotides). 
                     <br>
-                    Besides, group of scientist raised an issue whether it is possible to map ChIP-sequencing data (Transcription Factors) and Single Nucleotide Polymorphisms (SNPs). This problem has been solved by aligning the position of SNP in chromosome and particular Transcription Factor. Thus, in this mode the system provides this feature for linear part of chromosome. The user can use it by selecting particular <i>linear</i> part of chromosome and then pressing the key "G". There will be shown popup windom that contains basic information about chromosome, SNP position, SNP identificator (click on it to find more information on The National Center for Biotechnology Information website), transcription factor and its affection level. For scientists' comfort, dynamic filtering system has been integrated. As well <b>filtered</b> data can be easily exported in CSV format by clicking "Export to CSV".
+                    Besides, group of scientist raised an issue whether it is possible to map ChIP-sequencing data (Transcription Factors) and Single Nucleotide Polymorphisms (SNPs). This problem has been solved by aligning the position of SNP in chromosome and particular Transcription Factor. Thus, in this mode the system provides this feature for linear part of chromosome. The user can use it by selecting particular <i>linear</i> part of chromosome and then pressing the key "G". There will be shown popup windom that contains basic information about chromosome, SNP position, SNP identificator (click on it to find more information on The National Center for Biotechnology Information website), transcription factor and its affection level. For scientists' comfort, dynamic filtering system has been integrated. As well <b>filtered</b> data can be easily exported to CSV format by clicking "Export to CSV".
                     <br>
                 </p>
                 <h3 id="func-cubic">Cubic mode</h3>
@@ -167,15 +192,17 @@
                 Currently, almost all Genome Browsers use linear approach for showing the biggest part of data. That is observable area is only integral and complete part of one genome's chromosome. But investigation of interactions between two not connected areas of genome is still open-ended problem.    
                 Cubic mode of 3D Genome Browser provides to user an opportunity to use almost all advantages of 3 dimensions of space. Basic shape for retrieveing of data is resizable cube. Once pointer is on the genome strand, the cube will be automatically built around this point. At the same time scrolling action is available for user to change size of observable area. Data that is available for all parts of strands that are located inside the cube will be shown on the popup window after <i>left click of mouse</i>. It contains information about all parts of all chromosomes that fit in the cube: chromosome with positions and complete list of SNPs (links to NCBI website for deep investigation).
                 <br>
-                Same as previous mode (<i>Linear Mode</i>) system provides an opportunity to map ChIP-Sequencing data to SNPs that are fit in the range of the particular Transcription Factor. The difference is that in the cubic mode can investigate all strands that are in the cubic area.<br>
+                Same as previous mode (<i>Linear Mode</i>) system provides an opportunity to map ChIP-Sequencing data to SNPs that are fit in the range of the particular Transcription Factor. The difference is that in the cubic mode user can investigate all strands that are in the cubic area.<br>
                 <b>Important:</b> All actions for this mode are available for any strand from the space cube, where user is currently located (see <a href="#memory-management">Memory Management</a> chapter).
             </p>
                 <h3 id="func-chipseq">ChIP-Seq mode</h3>
             <p>
-                From biological terminology, ChIP-sequencing is basically the method to analyze protein (or Transcription Factor) interactions with DNA. By using this mode user gets an opportunity to visualize all transcription factors that have been found for particular Cell Type and investigate it in details using <a class = "external-link" href="https://genome.ucsc.edu/" target="_blank">UCSC genome browser</a>. To start visualization step user should point to particular strand and left click of mouse. There will be appeared colored parts of genome (from green to red). The color identifies the level of affection from the weakest (green) to the strongest (red) level. In numbers that means: affection level 0 - green, affection level 1000 - red.<br>To call popup window with the general information and link to UCSC Genome Browser user can point to the colored part of genome and left click of mouse.
+                From biological terminology, ChIP-sequencing is basically the method to analyze protein (or Transcription Factor) interactions with DNA. By using this mode user gets an opportunity to visualize all transcription factors that have been found for particular Cell Type and investigate it in details using <a class = "external-link" href="https://genome.ucsc.edu/" target="_blank">UCSC genome browser</a>. Visualization step starts automatical when user switch mode to <i>ChIP-Seq mode</i>. There will be appeared colored parts of genome (from green to red), which are the measured representation of protein-DNA interaction. The color identifies the level of affection from the weakest (green) to the strongest (red) level. In numbers that means: effect level 0 - green, effect level 1000 - red.<br>To call popup window with the general information and link to UCSC Genome Browser user can point to the colored part of genome and left click of mouse. While moving to another cube, ChIP-Seq data will not be coloured untill user clicks <b>F</b> key. To refresh the memory and to delete <b>whole</b> stored information (ChIP-Seq data, visualization entities) user should click <b>R</b> key. In this case all colored segments of genome will be disappeard.  
                 <br><b>Important:</b> In case of switching to another mode, all colored segments of genome will be disappeared (see <a href="#memory-management">Memory Management</a> chapter).
             </p>
-
+                <br>
+                <h3 id="func-gene">Genes</h3>
+                <p><i>The 3D Genome Browser</i> provides an opportunity to work with genes as well. With help of this system user can move camera to the location of particular gene and colour gene in logarithmic scale: <b>log(GENE_EXPRESSION_LEVEL)</b> (normalized according to the <i>maximum</i> gene expression level over the whole genome; green-red colors are used for coloring). Also system is able to list all genes which are available in current cube (fully or partly). Here user can choose particular gene, find some information and ask system to colour it.</p>
                 <h3 id="func-ownSNPData">Using customer's SNP data</h3>
             <p>
                 Originally, in Linear and Cubic modes scientist can retrieve SNP data that initially has been collected from enormous libraries of <a class = "external-link" href="http://www.1000genomes.org/" target="_blank">1000 Genomes Project</a>. It is usefull for research, but it can't help to typical customer to investigate his own mutations even if he has required information from Genome Center. 3D Genome Browser provides an opportunity to securely upload the data to the genome browser and to start comparison SNPs with those that came from the 1000 Genome Project. All calculations (which are connected with customer's snp data) are implemented locally on the user's machine and, thus, data cannot be sent to server and/or distributed in SNP resources.<br>
@@ -245,11 +272,18 @@
                   </tr>
 
                   <tr>
-                    <td>ChIP-Seq</td>
+                    <td rowspan="3">ChIP-Seq</td>
                     <td>Left Click</td>
-                    <td><b>For not colored Strand:</b> visualization of ChIP-Seq data<br><b>For colored Strand:</b> get popup window with basic information about the Transcription Factor, its positions and affection level</td>
+                    <td>Get popup window with basic information about the Transcription Factor, its positions and effect level</td>
                   </tr>
-
+                    <tr>
+                    <td>F</td>
+                    <td>Colour all binding sites of Transcription Factors, which are available in current cube.</td>
+                    </tr>
+                    <tr>
+                    <td>R</td>
+                    <td>Release all ChIP-Seq information that has been coloured before. </td>
+                    </tr>
                   <tr>
                     <td rowspan="2">Linear and Cubic</td>
                     <td>G</td>
@@ -261,7 +295,7 @@
                   </tr>
 
                   <tr>
-                    <td rowspan="4">All modes</td>
+                    <td rowspan="5">All modes</td>
                     <td>C</td>
                     <td>Change mode in loop from Linear to Cubic, from Cubic to ChIP-Seq and from ChIP-Seq to Linear mode</td>
                   </tr>
@@ -277,6 +311,10 @@
                     <td>Mouse</td>
                     <td>Look around</td>
                   </tr>
+                <tr>
+                    <td>P</td>
+                    <td>List all genes available in current cube with some information and opportunity to colour it</td>
+                </tr>
                 </table>
             </p>
             <hr>

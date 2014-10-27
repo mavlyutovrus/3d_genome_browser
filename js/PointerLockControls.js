@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointerLockControls = function ( camera ) {
+THREE.PointerLockControls = function ( camera, _x, _y, _z ) {
 
 	var scope = this;
 
@@ -12,8 +12,14 @@ THREE.PointerLockControls = function ( camera ) {
 	pitchObject.add( camera );
 
 	var yawObject = new THREE.Object3D();
-	yawObject.position.y = 10;
-	yawObject.add( pitchObject );
+	if (_x && _y && _z) {
+		yawObject.position.x = _x;
+		yawObject.position.y = _y;
+		yawObject.position.z = _z;
+	} else {
+		yawObject.position.y = 10;
+	}
+	yawObject.add( pitchObject );	
 
 	var moveForward = false;
 	var moveBackward = false;
@@ -80,9 +86,9 @@ THREE.PointerLockControls = function ( camera ) {
 			// case 71: // g
 			// 	alert('do here anything!');
 			// 	break;
-			  default:
-			  	console.log(event.keyCode);
-			  	break
+			  // default:
+			  // 	console.log(event.keyCode);
+			  // 	break
 		}
 
 	};

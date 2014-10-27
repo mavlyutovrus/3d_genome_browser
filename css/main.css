@@ -216,11 +216,48 @@ div#detection-sign img#exclamation-sign {
     height: 42px;
 }
 
-#table_cube tr td, #table_linear tr td {
+div#keys {
+    float: right;
+    right: 20px;
+    width: 35px;
+    height: 35px;
+    position: fixed;
+}
+
+div#keys img#letter-C-icon, div#keys img#letter-G-icon, div#keys img#tab-icon, div#keys img#letter-R-icon, div#keys img#letter-F-icon, div#keys img#letter-P-icon {
+    width: 35px;
+    height: 35px;
+}
+
+div#keys img#thermometer {
+    margin-left:10%;
+    width: 28px;
+    height: 78px;
+}
+
+#table_cube tr td, #table_linear tr td,  #table_cube tr th{
   text-align: left; 
   vertical-align: top; 
   border: 1px solid #000;
   border-collapse: collapse;
   padding: 0.3em;
   caption-side: bottom;
+}
+
+/*select#moveCameraChoice , input#incoords {
+    border: 1px solid gray;
+}*/
+.guide {
+    text-decoration: underline;
+    text-align: center;
+}
+.odd {
+    color: #fff;
+    background: #666;
+}
+.even {
+    color: #666;
+}
+.hot {
+    border: 1px solid #f00;
 }

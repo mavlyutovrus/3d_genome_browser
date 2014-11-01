@@ -20,13 +20,11 @@
           overflow-x: auto;
         }
 
-
-
     </style>
   </head>
   <body>
     <h1 align="center">SCRIPTING PAGE</h1>
-    <p>Here is the page with jquery libraries and preloaded gene data. Use javascript console in your web browser for using <i>3D Genome Browser</i>'s API. Also this page is the storage of scripts that people use for achieving various results in exploring 3D genome.</p>
+    <p>Here is the page with jquery libraries and preloaded gene data. Use javascript console bellow or one in your web browser for using <i>3D Genome Browser</i>'s API. Also this page is the storage of scripts that people use for achieving various results in exploring 3D genome.</p>
 
     <table border="1" style="width:100%">
       <tr>
@@ -44,7 +42,7 @@
     </table>
     <br>
     <h3>Your code</h3>
-    <p>(Use standard javascript here. To output any results, use integrated <i>function print(value)</i>.)</p>
+    <p>(Use standard javascript here. To output any results, use integrated <i>function print(value)</i>. For global variables, use <i>vars</i> object. For example, vars.a = 1; vars.b = "Hello World"; vars.getCheers = function(name){print("Hello "+name+"!");})</p>
     <p><textarea id="code" name="code"></textarea></p>
     <button onclick="run()"> Run </button> <button onclick="save()"> Save </button>
     <br><br>
@@ -53,6 +51,8 @@
     <br>
     <p>If you want to share your script(s), please email to Alexander Butyaev <i>alexander . butyaev at mail . mcgill . ca</i></p>
     <script>
+        // Variables for user's work with scripts
+        var vars = {};
         // var myCodeMirror = CodeMirror(document.body);
         var code = document.getElementById("code");
         var display=document.getElementById("display")
@@ -66,7 +66,6 @@
                 });
                 editor.setValue("print('Curiosity is the key to creativity!');\nvar len = 1;\nfor(var i = 0; i < len; i++) {\n\tprint('Do you agree?');\n}");
             };
-        
 
         function run() {
             var result = eval(editor.getValue());
@@ -79,7 +78,7 @@
         }
 
         function save() {
-            var mydata = 'function print(value) {console.log(value);}\n' + editor.getValue() + '\n';
+            var mydata = 'var vars = {};\n\nfunction print(value) {console.log(value);}\n' + editor.getValue() + '\n';
             window.location.href = 'data:text/javascript;charset=UTF-8,'
                 + encodeURIComponent(mydata);
         }

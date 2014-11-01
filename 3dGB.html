@@ -2,19 +2,35 @@
 <html>
     <head>
         <meta charset="utf-8">
-    	<link href="css/main.css" rel="stylesheet" type="text/css"/>
+        <link href="css/jquery.bxslider.css" rel="stylesheet" />
+    	  <link href="css/main.css" rel="stylesheet" type="text/css"/>
         <link href="css/cupertino/jquery-ui-1.10.4.custom.css" rel="stylesheet">
         
         <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
         <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
+        <script src="js/jquery.bxslider.min.js"></script>
+        <!-- <link rel="stylesheet" href="js/slideme/slideme.css" type="text/css" media="all"/> -->
             <script>
                 $(function() {
                   $( "#tabs" ).tabs({});
                   $("#href_tabs-4").click(function() {window.location = "scripting.html"});
                 });
-                
-                
+
+                $(document).ready(function(){
+                  $('.bxslider').bxSlider({
+                    // mode: 'fade',
+                    auto: true,
+                    autoControls: true,
+                    speed: 10000
+                  });
+                });
             </script>
+
+
+        
+        <script>
+          
+        </script>
     </head>
     
     <body>
@@ -28,19 +44,28 @@
         </script>
         <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
         </script>
+        <script>
+          function validateSelect() {
+            if (document.getElementById('3dmodel').value == 'none') {
+              alert('Please choose a model');
+              return false;
+            }
+            return true;
+          }
+        </script>
 
         <div id="tabs">
             <ul>
                 <li><a id="href_tabs-0" href="#tabs-0">Welcome Page/UI</a></li>
                 <li><a id="href_tabs-2" href="#tabs-2">Contact us</a></li>
                 <li><a id="href_tabs-3" href="#tabs-3">About</a></li>
-                <li><a id="href_tabs-4" href="#tabs-4">Script'ing</a></li>
+                <li><a id="href_tabs-4" href="#tabs-4">Tools</a></li>
             </ul>
             <div id="tabs-0">
                 <label>3D Genome Structure that you want to explore: </label>
-            <form action="3dGBViewer.html">
-              <select name="3dmodel" style="width : 200" >
-                  <option value="">Select one...</option>
+            <form action="3dGBViewer.html"  onsubmit = "return validateSelect()">
+              <select id='3dmodel' name="3dmodel" style="width : 200" >
+                  <option value="none">Select one...</option>
                   <option value="K562-All">K562 Cell Type, All Chromosome, Simulations</option>
                   <option value="BCH-1">B-Cell GM06990, Healthy, Chromosome 1</option>
                   <option value="BCH-2">B-Cell GM06990, Healthy, Chromosome 2</option>
@@ -89,8 +114,16 @@
                   <option value="BCL-22">B-Cell, Leukemia, Chromosome 22</option>
                   <option value="BCL-23">B-Cell, Leukemia, Chromosome 23</option>
               </select>
-              <input type="submit">
+              <input type="submit" value = "Submit">
             </form>
+            <br>
+            <ul class="bxslider" style="text-align: center;">
+              <li><img class = "gallery-image" src="image/gallery/1_1_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/2_2_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/3_3_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/4_4_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/5_5_v2.png" /></li>
+            </ul>
             </div>
             <div id="tabs-2">
                 <p><em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>:
@@ -115,8 +148,6 @@
                     })();
                 </script-->
             <!--/div-->
-
-
           </div>
         </div>
             <div id="tabs-3">
@@ -176,15 +207,14 @@
                     </table>
                 <h6><i>Example of using search field of 3D Genome Browser</i></h6>
                     <br>
-                
-                    <p>Fundamentally there are 3 different modes that allow user interact with system in different ways and/or retrieve special information from database.</p>
+                    Fundamentally there are 3 different modes that allow user interact with system in different ways and/or retrieve special information from database.</p>
                 <h3 id="func-linear">Linear mode</h3>
                 <p>
                 Basically, linear mode in 3D space is the putting old canons of representation in a new light. It easily can be compared with such genome browser as <a class = "external-link" href="http://genome.ucsc.edu/" target="_blank">UCSC Genome Browser</a> and track system, which it uses. User can examine and analyze only one sequence of genome at a time but instead of plane tables 3D Genome Browser uses partition of the screen on 2 parts: 3D models and panels with information that is appeared immediately by pointing to the specific part of the genome. To investigate specific part of genome <i>left click of mouse</i> will call popup window with almost the same information but with opportunity to click on any link and continue investigation on the <a class = "external-link" href="http://www.ncbi.nlm.nih.gov/" target="_blank">National Center for Biotechnology Information web site </a>.
                     <br>
                     Also, system provides an opportunity to change the size of observable area of genome sequence and, therefore, of retrieving data from the server by scrolling the mouse (up to several thousands of nucleotides). 
                     <br>
-                    Besides, group of scientist raised an issue whether it is possible to map ChIP-sequencing data (Transcription Factors) and Single Nucleotide Polymorphisms (SNPs). This problem has been solved by aligning the position of SNP in chromosome and particular Transcription Factor. Thus, in this mode the system provides this feature for linear part of chromosome. The user can use it by selecting particular <i>linear</i> part of chromosome and then pressing the key "G". There will be shown popup windom that contains basic information about chromosome, SNP position, SNP identificator (click on it to find more information on The National Center for Biotechnology Information website), transcription factor and its affection level. For scientists' comfort, dynamic filtering system has been integrated. As well <b>filtered</b> data can be easily exported to CSV format by clicking "Export to CSV".
+                    Besides, group of scientist raised an issue whether it is possible to map ChIP-sequencing data (Transcription Factors) and Single Nucleotide Polymorphisms (SNPs). This problem has been solved by aligning the position of SNP in chromosome and particular Transcription Factor. Thus, in this mode the system provides this feature for linear part of chromosome. The user can use it by selecting particular <i>linear</i> part of chromosome and then pressing the key <b>X</b>. There will be shown popup windom that contains basic information about chromosome, SNP position, SNP identificator (click on it to find more information on The National Center for Biotechnology Information website), transcription factor and its effect level. For scientists' comfort, dynamic filtering system has been integrated. As well <b>filtered</b> data can be easily exported in CSV format by clicking "Export to CSV".
                     <br>
                 </p>
                 <h3 id="func-cubic">Cubic mode</h3>
@@ -192,12 +222,12 @@
                 Currently, almost all Genome Browsers use linear approach for showing the biggest part of data. That is observable area is only integral and complete part of one genome's chromosome. But investigation of interactions between two not connected areas of genome is still open-ended problem.    
                 Cubic mode of 3D Genome Browser provides to user an opportunity to use almost all advantages of 3 dimensions of space. Basic shape for retrieveing of data is resizable cube. Once pointer is on the genome strand, the cube will be automatically built around this point. At the same time scrolling action is available for user to change size of observable area. Data that is available for all parts of strands that are located inside the cube will be shown on the popup window after <i>left click of mouse</i>. It contains information about all parts of all chromosomes that fit in the cube: chromosome with positions and complete list of SNPs (links to NCBI website for deep investigation).
                 <br>
-                Same as previous mode (<i>Linear Mode</i>) system provides an opportunity to map ChIP-Sequencing data to SNPs that are fit in the range of the particular Transcription Factor. The difference is that in the cubic mode user can investigate all strands that are in the cubic area.<br>
+                Same as previous mode (<i>Linear Mode</i>) system provides an opportunity to map ChIP-Sequencing data to SNPs that are fit in the range of the particular Transcription Factor. The difference is that in the cubic mode can investigate all strands that are in the cubic area.<br>
                 <b>Important:</b> All actions for this mode are available for any strand from the space cube, where user is currently located (see <a href="#memory-management">Memory Management</a> chapter).
             </p>
                 <h3 id="func-chipseq">ChIP-Seq mode</h3>
             <p>
-                From biological terminology, ChIP-sequencing is basically the method to analyze protein (or Transcription Factor) interactions with DNA. By using this mode user gets an opportunity to visualize all transcription factors that have been found for particular Cell Type and investigate it in details using <a class = "external-link" href="https://genome.ucsc.edu/" target="_blank">UCSC genome browser</a>. Visualization step starts automatical when user switch mode to <i>ChIP-Seq mode</i>. There will be appeared colored parts of genome (from green to red), which are the measured representation of protein-DNA interaction. The color identifies the level of affection from the weakest (green) to the strongest (red) level. In numbers that means: effect level 0 - green, effect level 1000 - red.<br>To call popup window with the general information and link to UCSC Genome Browser user can point to the colored part of genome and left click of mouse. While moving to another cube, ChIP-Seq data will not be coloured untill user clicks <b>F</b> key. To refresh the memory and to delete <b>whole</b> stored information (ChIP-Seq data, visualization entities) user should click <b>R</b> key. In this case all colored segments of genome will be disappeard.  
+                From biological terminology, ChIP-sequencing is basically the method to analyze protein (or Transcription Factor) interactions with DNA. By using this mode user gets an opportunity to visualize all transcription factors that have been found for particular Cell Type and investigate it in details using <a class = "external-link" href="https://genome.ucsc.edu/" target="_blank">UCSC genome browser</a>. Visualization step starts automatical when user switch mode to <i>ChIP-Seq mode</i>. There will be appeared colored parts of genome (from green to red), which are the measured representation of protein-DNA interaction. The color identifies the level of affection from the weakest (green) to the strongest (red) level. In numbers that means: effect level 0 - green, effect level 1000 - red.<br>To call popup window with the general information and link to UCSC Genome Browser user can point to the colored part of genome and left click of mouse. While moving to another cube, ChIP-Seq data will not be coloured untill user clicks <b>T</b> key. To refresh the memory and to delete stored ChIP-Seq information for current cube (ChIP-Seq data, visualization entities) user should click <b>T</b> key. In this case all colored segments in current cube will be disappeard. To delete all ChIP-Seq information (ChIP-Seq data, visualization entities) user should click <b>Shift-T</b> key. All colored segments of genome will be disappeard.
                 <br><b>Important:</b> In case of switching to another mode, all colored segments of genome will be disappeared (see <a href="#memory-management">Memory Management</a> chapter).
             </p>
                 <br>
@@ -272,21 +302,25 @@
                   </tr>
 
                   <tr>
-                    <td rowspan="3">ChIP-Seq</td>
+                    <td rowspan = "3">ChIP-Seq</td>
                     <td>Left Click</td>
-                    <td>Get popup window with basic information about the Transcription Factor, its positions and effect level</td>
+                    <td><b>For colored part of strand:</b> get popup window with basic information about the Transcription Factor, its positions and level of effect</td>
                   </tr>
-                    <tr>
-                    <td>F</td>
-                    <td>Colour all binding sites of Transcription Factors, which are available in current cube.</td>
-                    </tr>
-                    <tr>
-                    <td>R</td>
-                    <td>Release all ChIP-Seq information that has been coloured before. </td>
-                    </tr>
+                  <tr>
+                    <td>T</td>
+                    <td><b>Colour</b> all strands in <b>current cube</b> according to the ChIP-Seq experiment data: Transcription Factor and effect level (<b>only for cube other from one where mode has been activated</b>).<br>
+                    <b>Delete</b> stored ChIP-Seq information for current cube (ChIP-Seq data, visualization entities).
+                    </td>
+
+                  </tr>
+                  <tr>
+                    <td>Shift-T</td>
+                    <td>Refresh field of view: to erase all coloured parts of strands from the memory. (It will immediately improve performance of user's local machine.)</td>
+                  </tr>
+
                   <tr>
                     <td rowspan="2">Linear and Cubic</td>
-                    <td>G</td>
+                    <td>X</td>
                     <td>Get popup window with mapped ChIP-Seq data and SNPs</td>
                   </tr>
                   <tr>
@@ -295,8 +329,8 @@
                   </tr>
 
                   <tr>
-                    <td rowspan="5">All modes</td>
-                    <td>C</td>
+                    <td rowspan="7">All modes</td>
+                    <td>M</td>
                     <td>Change mode in loop from Linear to Cubic, from Cubic to ChIP-Seq and from ChIP-Seq to Linear mode</td>
                   </tr>
                   <tr>
@@ -311,10 +345,18 @@
                     <td>Mouse</td>
                     <td>Look around</td>
                   </tr>
-                <tr>
-                    <td>P</td>
+                  <tr>
+                    <td>I</td>
                     <td>List all genes available in current cube with some information and opportunity to colour it</td>
-                </tr>
+                  </tr>
+                  <tr>
+                    <td>L</td>
+                    <td>Define the points to measure a distance between them.<br>Show the distance between two already existing points.</td>
+                  </tr>
+                  <tr>
+                    <td>Shift-L</td>
+                    <td>Erase information about the distance between two existing points (including points themselves). User must use this to measure distance between other two points.</td>
+                  </tr>
                 </table>
             </p>
             <hr>

@@ -14,6 +14,7 @@
         <!-- <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script> -->
         <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
         <!--script src="js/dat.gui.min.js"></script-->
+        <script src="js/spin.min.js"></script>
 
         <!-- lite version of three.js distrib   -->
         <!--script src="js/min.three.js"></script-->
@@ -35,6 +36,11 @@
                 $( "#tabs" ).tabs({
                     "create": function (event, ui) {
                         document.getElementById("blocker").style.top = String($("ul.ui-tabs-nav").height()+27) + "px";
+                        console.log($(document).height())
+                        // if ($(document).height() >= MIN_FIXED_HEIGHT_SCREEN && $(document).height() < MIDDLE_FIXED_HEIGHT_SCREEN) {
+                        //     keys_block.style.width = "80px";
+                        // } else if ($(document).height() >= MIDDLE_FIXED_HEIGHT_SCREEN) {keys_block.style.width = "35px";}
+                        // keys_block_management();
                     },
                     "activate": function(event, ui) {
                         if (ui.newTab.index() == 1) document.body.style.overflow = "hidden";
@@ -68,7 +74,7 @@
                 $( "#submitCustomData, #cleanButton" )
                   .button()
                   .click(function( event ) {
-                    event.preventDefault;
+                    event.preventDefault();
                   });
               });
             
@@ -103,7 +109,7 @@
             <li><a id="href_tabs-1" href="#tabs-1">Genome Browser</a></li>
             <li><a id="href_tabs-3" href="#tabs-3">Contact us</a></li>
             <li><a id="href_tabs-4" href="#tabs-4">About</a></li>
-            <li><a id="href_tabs-5" href="#tabs-5">Script'ing</a></li>
+            <li><a id="href_tabs-5" href="#tabs-5">Tools</a></li>
           </ul>
           <div id="tabs-0">
               <div>
@@ -139,14 +145,58 @@
                 </div>
               </div>
           </div>
-          <div id="tabs-1">
-                <div id="keys" style="display:none">
+          <!-- <div id="tabs-1">
+                <li id="keys1" style="display:none">
                     <img id="tab-icon" src="image/tab-icon.png" alt="Information">
-                    <img id="letter-C-icon" src="image/letter-uppercase-C-icon.png" alt="Change mode">
-                    <img id="letter-G-icon" src="image/letter-uppercase-G-icon.png" alt="SNP ChIP-Seq mapping">
+                    <img id="letter-M-icon" src="image/letter-uppercase-C-icon.png" alt="Change mode">
+                    <img id="letter-X-icon" src="image/letter-uppercase-G-icon.png" alt="SNP ChIP-Seq mapping">
                     <img id="letter-F-icon" src="image/letter-uppercase-F-icon.png" alt="ChIP-Seq colouring">
-                    <img id="letter-R-icon" src="image/letter-uppercase-R-icon.png" alt="Remove ChIP-Seq colouring">
-                    <img id="letter-P-icon" src="image/letter-uppercase-P-icon.png" alt="List genes in cube">
+                    <img id="letter-T-icon" src="image/letter-uppercase-R-icon.png" alt="Remove ChIP-Seq colouring">
+                    <img id="letter-I-icon" src="image/letter-uppercase-P-icon.png" alt="List genes in cube">
+                    <img id="thermometer" src="image/thermometer.png" alt="Measure of colour">
+                    
+                </li> 
+                <div id="detection-sign" >
+                    <img id="exclamation-sign" src="image/exclamation.png" alt="SNP!">
+                </div>
+                <div id="blocker">
+                    <div id="instructions">
+                        <span style="font-size:40px">Click to Explore</span><br><br>
+                        Supported browsers: Firefox, Google Chrome.
+                    </div>
+                </div>
+                <div id = "footPanel">
+                    <p id = "textmode"></p>
+                    <div id = "infoKeyContainer">
+                        <div id="keys" style="display:none">
+                            <img id="tab-icon" src="image/tab-icon.png" alt="Information">
+                            <img id="letter-M-icon" src="image/letter-uppercase-C-icon.png" alt="Change mode">
+                            <img id="letter-X-icon" src="image/letter-uppercase-G-icon.png" alt="SNP ChIP-Seq mapping">
+                            <img id="letter-F-icon" src="image/letter-uppercase-F-icon.png" alt="ChIP-Seq colouring">
+                            <img id="letter-T-icon" src="image/letter-uppercase-R-icon.png" alt="Remove ChIP-Seq colouring">
+                            <img id="letter-I-icon" src="image/letter-uppercase-P-icon.png" alt="List genes in cube">
+                            <img id="thermometer" src="image/thermometer.png" alt="Measure of colour">
+                            <img id="plain_cube" style = "width: 50px;height: 50px;" src="image/plain_cube_v2.1.png" alt="scale">
+                        </div>
+                    </div>
+                    <div id = "infoblock"></div>
+                </div>
+          </div> -->
+
+          <div id="tabs-1">
+                <div id="distancePoints" style="display:block">
+                    <img id="first-point-distance" src="image/distance_firstPoint.png" alt="firstPoint" style="display: none;">
+                    <img id="second-point-distance" src="image/distance_secondPoint.png" alt="secondPoint" style="display: none;">
+                </div>
+                <div id="keys" style="display:none">
+                    <div id="img_text_container"></div>
+                    <img id="left_click" class = "keys_images" src="image/left_click.png" alt="Left click">
+                    <img id="tab-icon" class = "keys_images" src="image/tab-icon.png" alt="Information">
+                    <img id="letter-M-icon" class = "keys_images" src="image/letter-uppercase-M-icon.png" alt="Change mode">
+                    <img id="letter-L-icon" class = "keys_images" src="image/letter-uppercase-L-icon.png" alt="Distance Between two points">
+                    <img id="letter-X-icon" class = "keys_images" src="image/letter-uppercase-X-icon.png" alt="SNP ChIP-Seq mapping">
+                    <img id="letter-T-icon" class = "keys_images" src="image/letter-uppercase-T-icon.png" alt="Colour/Remove ChIP-Seq colouring">
+                    <img id="letter-I-icon" class = "keys_images" src="image/letter-uppercase-I-icon.png" alt="List genes in cube">
                     <img id="thermometer" src="image/thermometer.png" alt="Measure of colour">
                 </div>
                 <div id="detection-sign" >
@@ -158,6 +208,12 @@
                         Supported browsers: Firefox, Google Chrome.
                     </div>
                 </div>
+                <div id = "footPanel">
+                    <p id = "textmode"></p>
+                    <div id = "infoblock">
+                    </div>
+                </div>
+                
           </div>
           <div id="tabs-3">
             <p><em>3DBD Genome browser</em>, contact: <a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>:
@@ -250,7 +306,7 @@
                     <br>
                     Also, system provides an opportunity to change the size of observable area of genome sequence and, therefore, of retrieving data from the server by scrolling the mouse (up to several thousands of nucleotides). 
                     <br>
-                    Besides, group of scientist raised an issue whether it is possible to map ChIP-sequencing data (Transcription Factors) and Single Nucleotide Polymorphisms (SNPs). This problem has been solved by aligning the position of SNP in chromosome and particular Transcription Factor. Thus, in this mode the system provides this feature for linear part of chromosome. The user can use it by selecting particular <i>linear</i> part of chromosome and then pressing the key "G". There will be shown popup windom that contains basic information about chromosome, SNP position, SNP identificator (click on it to find more information on The National Center for Biotechnology Information website), transcription factor and its effect level. For scientists' comfort, dynamic filtering system has been integrated. As well <b>filtered</b> data can be easily exported in CSV format by clicking "Export to CSV".
+                    Besides, group of scientist raised an issue whether it is possible to map ChIP-sequencing data (Transcription Factors) and Single Nucleotide Polymorphisms (SNPs). This problem has been solved by aligning the position of SNP in chromosome and particular Transcription Factor. Thus, in this mode the system provides this feature for linear part of chromosome. The user can use it by selecting particular <i>linear</i> part of chromosome and then pressing the key <b>X</b>. There will be shown popup windom that contains basic information about chromosome, SNP position, SNP identificator (click on it to find more information on The National Center for Biotechnology Information website), transcription factor and its effect level. For scientists' comfort, dynamic filtering system has been integrated. As well <b>filtered</b> data can be easily exported in CSV format by clicking "Export to CSV".
                     <br>
                 </p>
                 <h3 id="func-cubic">Cubic mode</h3>
@@ -263,7 +319,7 @@
             </p>
                 <h3 id="func-chipseq">ChIP-Seq mode</h3>
             <p>
-                From biological terminology, ChIP-sequencing is basically the method to analyze protein (or Transcription Factor) interactions with DNA. By using this mode user gets an opportunity to visualize all transcription factors that have been found for particular Cell Type and investigate it in details using <a class = "external-link" href="https://genome.ucsc.edu/" target="_blank">UCSC genome browser</a>. Visualization step starts automatical when user switch mode to <i>ChIP-Seq mode</i>. There will be appeared colored parts of genome (from green to red), which are the measured representation of protein-DNA interaction. The color identifies the level of affection from the weakest (green) to the strongest (red) level. In numbers that means: effect level 0 - green, effect level 1000 - red.<br>To call popup window with the general information and link to UCSC Genome Browser user can point to the colored part of genome and left click of mouse. While moving to another cube, ChIP-Seq data will not be coloured untill user clicks <b>F</b> key. To refresh the memory and to delete <b>whole</b> stored information (ChIP-Seq data, visualization entities) user should click <b>R</b> key. In this case all colored segments of genome will be disappeard.  
+                From biological terminology, ChIP-sequencing is basically the method to analyze protein (or Transcription Factor) interactions with DNA. By using this mode user gets an opportunity to visualize all transcription factors that have been found for particular Cell Type and investigate it in details using <a class = "external-link" href="https://genome.ucsc.edu/" target="_blank">UCSC genome browser</a>. Visualization step starts automatical when user switch mode to <i>ChIP-Seq mode</i>. There will be appeared colored parts of genome (from green to red), which are the measured representation of protein-DNA interaction. The color identifies the level of affection from the weakest (green) to the strongest (red) level. In numbers that means: effect level 0 - green, effect level 1000 - red.<br>To call popup window with the general information and link to UCSC Genome Browser user can point to the colored part of genome and left click of mouse. While moving to another cube, ChIP-Seq data will not be coloured untill user clicks <b>T</b> key. To refresh the memory and to delete stored ChIP-Seq information for current cube (ChIP-Seq data, visualization entities) user should click <b>T</b> key. In this case all colored segments in current cube will be disappeard. To delete all ChIP-Seq information (ChIP-Seq data, visualization entities) user should click <b>Shift-T</b> key. All colored segments of genome will be disappeard.
                 <br><b>Important:</b> In case of switching to another mode, all colored segments of genome will be disappeared (see <a href="#memory-management">Memory Management</a> chapter).
             </p>
                 <br>
@@ -343,17 +399,20 @@
                     <td><b>For colored part of strand:</b> get popup window with basic information about the Transcription Factor, its positions and level of effect</td>
                   </tr>
                   <tr>
-                    <td>F</td>
-                    <td>Colour all strands in current cube according to the ChIP-Seq experiment data: Transcription Factor and effect level (<b>only for cube other from one where mode has been activated</b>).</td>
+                    <td>T</td>
+                    <td><b>Colour</b> all strands in <b>current cube</b> according to the ChIP-Seq experiment data: Transcription Factor and effect level (<b>only for cube other from one where mode has been activated</b>).<br>
+                    <b>Delete</b> stored ChIP-Seq information for current cube (ChIP-Seq data, visualization entities).
+                    </td>
+
                   </tr>
                   <tr>
-                    <td>R</td>
+                    <td>Shift-T</td>
                     <td>Refresh field of view: to erase all coloured parts of strands from the memory. (It will immediately improve performance of user's local machine.)</td>
                   </tr>
 
                   <tr>
                     <td rowspan="2">Linear and Cubic</td>
-                    <td>G</td>
+                    <td>X</td>
                     <td>Get popup window with mapped ChIP-Seq data and SNPs</td>
                   </tr>
                   <tr>
@@ -362,8 +421,8 @@
                   </tr>
 
                   <tr>
-                    <td rowspan="5">All modes</td>
-                    <td>C</td>
+                    <td rowspan="7">All modes</td>
+                    <td>M</td>
                     <td>Change mode in loop from Linear to Cubic, from Cubic to ChIP-Seq and from ChIP-Seq to Linear mode</td>
                   </tr>
                   <tr>
@@ -379,9 +438,17 @@
                     <td>Look around</td>
                   </tr>
                   <tr>
-                    <td>P</td>
+                    <td>I</td>
                     <td>List all genes available in current cube with some information and opportunity to colour it</td>
-                </tr>
+                  </tr>
+                  <tr>
+                    <td>L</td>
+                    <td>Define the points to measure a distance between them.<br>Show the distance between two already existing points.</td>
+                  </tr>
+                  <tr>
+                    <td>Shift-L</td>
+                    <td>Erase information about the distance between two existing points (including points themselves). User must use this to measure distance between other two points.</td>
+                  </tr>
                 </table>
             </p>
             <hr>
@@ -397,6 +464,7 @@
             var isInProgress = true;
             var file;
             var progress_bar_div;
+            var spinner;
 
 
             function readFile() {
@@ -411,7 +479,7 @@
                 reader.onload = function(event) {
                     contents = event.target.result;
                     isInProgress = false;
-                    if (DEBUG) console.log("Done ");
+                    console.log("Done ");
                 };
                 
                 reader.onerror = function(event) {
@@ -427,13 +495,14 @@
                 }
                 reader.readAsText(file);
                 progressBarFunction();
-                if (DEBUG) console.log("Let's write something")
+                console.log("Let's write something")
                 $('button#cleanButton').button("enable");
                 isCustomerData = true;
+                return false
             }
 
             function progressBarFunction() {
-                if (DEBUG) console.log(isInProgress + "  " + (typeof contents != 'undefined') + "  "  + file.size + "|now = " + ((typeof contents != 'undefined')?contents.length:""));
+                console.log(isInProgress + "  " + (typeof contents != 'undefined') + "  "  + file.size + "|now = " + ((typeof contents != 'undefined')?contents.length:""));
                 if ((typeof contents === 'undefined')  || ( previousLength == 0 || previousLength != contents.length)) {
                     if ((typeof contents === 'undefined')) previousLength = 0;
                     else previousLength = contents.length;
@@ -458,6 +527,28 @@
         </script>
 		<!-- main part -->
         <script>
+            var opts = {
+              lines: 9, // The number of lines to draw
+              length: 20, // The length of each line
+              width: 9, // The line thickness
+              radius: 16, // The radius of the inner circle
+              corners: 1, // Corner roundness (0..1)
+              rotate: 0, // The rotation offset
+              direction: 1, // 1: clockwise, -1: counterclockwise
+              color: '#000', // #rgb or #rrggbb or array of colors
+              speed: 1, // Rounds per second
+              trail: 62, // Afterglow percentage
+              shadow: false, // Whether to render a shadow
+              hwaccel: false, // Whether to use hardware acceleration
+              className: 'spinner', // The CSS class to assign to the spinner
+              zIndex: 2e9, // The z-index (defaults to 2000000000)
+              top: '50%', // Top position relative to parent
+              left: '50%' // Left position relative to parent
+            };
+            // var target = document.getElementById('foo');
+            // var spinner = new Spinner(opts).spin(target);
+
+
             var ChangeCameraPositionBoolean = true;
             var globalArrayForWindow;
 
@@ -749,7 +840,10 @@
             var is_modal_opened = false;
             var mod_message_div;
             var MAX_CHIP_LVL = 1000;
-            var FIXED_HEIGHT_SCREEN = 495;
+            var MIDDLE_FIXED_HEIGHT_SCREEN = 625;
+            var MIN_FIXED_HEIGHT_SCREEN = 550;
+            var MIN_FIXED_HEIGHT_SCREEN_WO_THERMOMETER = 467;
+            var STANDARD_FIXED_HEIGHT_UI_TABS_NAV = 42.48;
             var percentColors = [
                 { pct: 0.0, color: { r: 0x00, g: 0xff, b: 0 } },
                 { pct: 0.5, color: { r: 0x88, g: 0x88, b: 0 } },
@@ -764,6 +858,7 @@
             var regexpPatternURL = /([\dXY]{1,2})[_]*([abAB]*)[^\d]+([\d]+)[^\d]+([\d]+)/ ;
             var divElement;
             var test_mesh;
+            var distance_FirstPoint = null, distance_SecondPoint = null, distance_line = null;
         	var DEBUG = false;
 			// zero point in local coordinates translates into zeroCoordinate in the model coordinates        
         	
@@ -773,7 +868,8 @@
             var camera, scene, renderer, controls;
             var projector = new THREE.Projector();
             
-            var infoBlock, staticBlock, keys_block;
+            var infoBlock, staticBlock, keys_block, footerPanel, imgTextContainer, distancePoints_block;
+            var isNonDisplayThermometer = false;
             
             var selectionMesh;
             
@@ -805,6 +901,8 @@
             var regionData = {};
 
             var checkboxes = [];
+
+
 			
 			// dark screen, when the game starts
             var blocker = document.getElementById( 'blocker' );
@@ -1095,34 +1193,33 @@
                 switch(mode_id) {
                     case 0: //linear mode
                         if (lastMode == 2) cleanCHIPSEQdata();
-                        document.getElementById("letter-G-icon").style.display = "block";
-                        document.getElementById("letter-F-icon").style.display = "none";
+                        document.getElementById("letter-X-icon").style.display = "block";
                         document.getElementById("thermometer").style.display = "none";
-                        document.getElementById("letter-R-icon").style.display = "none";
+                        document.getElementById("letter-T-icon").style.display = "none";
                         mode_name = 'Linear mode';
                         $('p#textmode').text(mode_name+' (TAB for info)');
                         lastMode = 0;
                         break;
                     case 1: //cubic mode
                         if (lastMode == 2) cleanCHIPSEQdata();
-                        document.getElementById("letter-G-icon").style.display = "block";
-                        document.getElementById("letter-F-icon").style.display = "none";
+                        document.getElementById("letter-X-icon").style.display = "block";
                         document.getElementById("thermometer").style.display = "none";
-                        document.getElementById("letter-R-icon").style.display = "none";
+                        document.getElementById("letter-T-icon").style.display = "none";
                         mode_name = 'Cubic mode';
                         $('p#textmode').text(mode_name+' (TAB for info)');
                         lastMode = 1;
                         break;
                     case 2: //CHiP-SEQ mode
                         scene.remove(selectionMesh);
-                        document.getElementById("letter-G-icon").style.display = "none";
-                        document.getElementById("letter-F-icon").style.display = "block";
-                        document.getElementById("thermometer").style.display = "block";
-                        document.getElementById("letter-R-icon").style.display = "block";
+                        document.getElementById("letter-X-icon").style.display = "none";
+                        if (!isNonDisplayThermometer)document.getElementById("thermometer").style.display = "block";
+                        document.getElementById("letter-T-icon").style.display = "block";
                         if (!isChipSeqAvailable) showErrorAlertModalWindow("ChIP-Sequencing Data is not available for this 3d model.", function() {mode_id ++;if (mode_id >= NUMBER_OF_MODES) mode_id = 0;changeModeIndicator();});
                         mode_name = 'CHiP-Seq mode';
-                        if (lastMode != 2)
+                        if (lastMode != 2) {
+                            popupInProgressSymbol();
                             drawChipSeqDataForCurrentCube();
+                        }
                         $('p#textmode').text(mode_name+' (TAB for info)');
                         lastMode = 2;
                         break;
@@ -1132,14 +1229,25 @@
                 }
             }
             
-            function cleanCHIPSEQdata() {
-                for (var indx in chipObjects) {
-                    scene.remove(chipObjects[indx]);
+            function cleanCHIPSEQdata(blockIndicesStr) {
+                if (blockIndicesStr) {
+                    for (var indx = chipObjects.length-1; indx >= 0; indx--) {
+                        if (chipObjects[indx].userData[0] == blockIndicesStr) {
+                            scene.remove(chipObjects[indx]);
+                            delete uploaded_splines_chip[chipObjects[indx].name];
+                            chipObjects.splice(indx,1);
+                        }
+                    }
+                    delete chipSecCubes[blockIndicesStr];
+                } else {
+                    for (var indx in chipObjects) {
+                        scene.remove(chipObjects[indx]);
+                    }
+                    chipObjects = [];
+                    uploaded_splines_chip = {};
+                    // arrayOfCHIPCoveredTubes = [];
+                    chipSecCubes = {};
                 }
-                chipObjects = [];
-                uploaded_splines_chip = {};
-                // arrayOfCHIPCoveredTubes = [];
-                chipSecCubes = {};
             }
             
             function init_controls() {
@@ -1160,6 +1268,7 @@
                         $('p#textmode').text('');
                         document.getElementById('detection-sign').style.display = "none";
                         keys_block.style.display = "none";
+                        distancePoints_block.style.display = "none";
                     }
             	}
                 var pointerlockerror = function ( event ) {
@@ -1179,7 +1288,6 @@
                 
                 window.addEventListener("click",function(event) {
                     if(controls.enabled == true) {
-                        
                         if (mode_id == 0) { // only linear mode
                             var _intersection = GetIntersection();
                             if (_intersection == null) {
@@ -1382,6 +1490,7 @@
                 });
 
                 instructions.addEventListener( 'click', function ( event ) {
+                    console.log("!!!" + $(document).height())
                     instructions.style.display = 'none';
                     // Ask the browser to lock the pointer
                     element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
@@ -1399,15 +1508,21 @@
                         element.requestFullscreen();
                         element.requestPointerLock();
                         document.getElementById('detection-sign').style.display = "none";
-                        if ($(document).height() > FIXED_HEIGHT_SCREEN){
-                            keys_block.style.display = "block";
-                        }
+                        // if ($(document).height() > MIN_FIXED_HEIGHT_SCREEN){
+                        //     keys_block.style.display = "block";
+                            
+                        // }
+                        keys_block_management();
+                        distancePoints_block.style.display = "block";
                             
                     } else {
                         element.requestPointerLock();
                         document.getElementById('detection-sign').style.display = "none";
-                        if ($(document).height() > FIXED_HEIGHT_SCREEN)
-                            keys_block.style.display = "block";
+                        // if ($(document).height() > MIN_FIXED_HEIGHT_SCREEN){
+                        //     keys_block.style.display = "block";
+                        // }
+                        keys_block_management();
+                        distancePoints_block.style.display = "block";
                     }
                 }, false );    
                 
@@ -1415,103 +1530,181 @@
                     var GKeyDownHandler = function (event) {
                         var element = document.body;
                         if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element )
-                            switch ( event.keyCode ) {
-                                case 80: //p
-                                    {   
-                                        suggestionGeneInCube = {};
-                                        var modelPosition = Local2global(controls.getObject().position);
-                                        var blockIndices = GetBlockIndices(modelPosition);
-                                        var blockIndicesStr = Coords2Str(blockIndices);
-                                        var tempNameArr = [];
-                                        var _chr, _rangeBegin, _rangeEnd, genes;
-                                        for (var _obj in objects) {
-                                            if (objects[_obj].userData[0] == blockIndicesStr) {
-                                                tempNameArr = objects[_obj].name.split('-');
-                                                if (DEBUG) console.log(objects[_obj].name);
-                                                _chr = tempNameArr[0].replace(/([\dXYxy]+).*/, "$1");
-                                                if (!suggestionGeneInCube[_chr]) suggestionGeneInCube[_chr] = {};
-                                                _rangeBegin = parseInt(tempNameArr[1]);
-                                                _rangeEnd = parseInt(tempNameArr[2]);
-                                                genes = genedata[_chr];
-                                                for (var _index in genes) {
-                                                    if (_rangeBegin<genes[_index][1] && _rangeEnd>genes[_index][2]) {
-                                                        suggestionGeneInCube[_chr][_index] = true;
-                                                    } else if ((_rangeBegin<genes[_index][1] && _rangeEnd>genes[_index][1]) ||
-                                                        (_rangeBegin<genes[_index][2] && _rangeEnd>genes[_index][2]) ||
-                                                        (_rangeBegin>genes[_index][1] && _rangeEnd<genes[_index][2])) { //gene is larger than strand
-                                                        suggestionGeneInCube[_chr][_index] = false;
-                                                    }
-                                                }
-                                                if (Object.size(suggestionGeneInCube[_chr]) == 0) delete suggestionGeneInCube[_chr];
+                            if (controls.isKeyEnabled) {
+                                switch ( event.keyCode ) {
+
+                                    case 76: // L - length/distance between two points
+                                    {
+                                        var getDistance = function() {
+                                            var distance = getDistanceBetweenTwoPoints(distance_FirstPoint[0], distance_SecondPoint[0], 4)
+                                            drawMessiModalWindow("Label1 : ("+distance_FirstPoint[0].x.toFixed(4)+", " + distance_FirstPoint[0].y.toFixed(4) +", "+distance_FirstPoint[0].z.toFixed(4)+");<br>Label2 : ("+distance_SecondPoint[0].x.toFixed(4)+", " + distance_SecondPoint[0].y.toFixed(4) +", "+distance_SecondPoint[0].z.toFixed(4)+");<br>Distance between labeled points = " + distance + "<br>Use Shift-L to measure distance between two points again.", "Distance between model points",null,null,null,true);
+                                        }
+                                        var _intersn = GetIntersection();
+                                        if (event.shiftKey) {
+                                            if (distance_FirstPoint) {
+                                                console.log(distance_FirstPoint);
+                                                scene.remove(distance_FirstPoint[2]);
+                                                distance_FirstPoint = null;
+                                                document.getElementById("first-point-distance").style.display = "none";
                                             }
+                                            if (distance_SecondPoint) {
+                                                scene.remove(distance_SecondPoint[2]);
+                                                distance_SecondPoint = null
+                                                document.getElementById("second-point-distance").style.display = "none";
+                                            }
+                                            if (distance_line) {
+                                                scene.remove(distance_line);
+                                                distanceline = null;
+                                            }
+                                            if (_intersn == null) break;
+                                        } else if (_intersn == null) {
+                                            if (distance_FirstPoint && distance_SecondPoint) {
+                                                getDistance();
+                                                break;
+                                            } else {
+                                                showErrorAlertModalWindow("Point the strand firstly!");
+                                                return;
+                                            }
+                                        } else {}
+
+                                        if (_intersn.object.name == "")
+                                            return;
+
+                                        if (!distance_FirstPoint) {
+                                            var localPoint = _intersn.point;
+                                            var sphere = drawPointSphere(localPoint);
+                                            distance_FirstPoint = [Local2globalVector3(_intersn.point), localPoint, sphere];
+                                            document.getElementById("first-point-distance").style.display = "block";
+                                        } else if (!distance_SecondPoint) {
+                                            var localPoint = _intersn.point;
+                                            var sphere = drawPointSphere(localPoint);
+                                            distance_SecondPoint = [Local2globalVector3(_intersn.point), localPoint, sphere];
+                                            
+                                            var material = new THREE.LineBasicMaterial({
+                                                color: 0x000000
+                                            });
+                                            var geometry = new THREE.Geometry();
+                                            geometry.vertices.push(distance_FirstPoint[1]);
+                                            geometry.vertices.push(distance_SecondPoint[1]);
+
+                                            distance_line = new THREE.Line(geometry, material);
+                                            scene.add(distance_line);
+
+                                            document.getElementById("second-point-distance").style.display = "block";
+                                            getDistance();
+                                        } else {
+                                            getDistance();
                                         }
-                                        showSuggestionGeneInCubeWindow();
+
                                         break;
+
                                     }
-                                case 82: //r - in chipseq mode - arise everything, clean the memory.
-                                    {
-                                        if (mode_id == 2) {
-                                            cleanCHIPSEQdata()
-                                        }
-                                        break;
-                                    }
-                                case 70: //f - in chipseq mode - show the chipseq data in current cube (not the same cube where mode has been activated)
-                                    {
-                                        if (mode_id == 2) {
+                                    // case 80: //p
+                                    case 73: //i
+                                        {   
+                                            suggestionGeneInCube = {};
                                             var modelPosition = Local2global(controls.getObject().position);
                                             var blockIndices = GetBlockIndices(modelPosition);
                                             var blockIndicesStr = Coords2Str(blockIndices);
-                                            if (chipSecCubes[blockIndicesStr]) {
-                                                showErrorAlertModalWindow("ChIP-Seq data for current cube has been already shown.");
-                                            } else {
-                                                drawChipSeqDataForCurrentCube();
-                                                chipSecCubes[blockIndicesStr] = true;
+                                            var tempNameArr = [];
+                                            var _chr, _rangeBegin, _rangeEnd, genes;
+                                            for (var _obj in objects) {
+                                                if (objects[_obj].userData[0] == blockIndicesStr) {
+                                                    tempNameArr = objects[_obj].name.split('-');
+                                                    if (DEBUG) console.log(objects[_obj].name);
+                                                    _chr = tempNameArr[0].replace(/([\dXYxy]+).*/, "$1");
+                                                    if (!suggestionGeneInCube[_chr]) suggestionGeneInCube[_chr] = {};
+                                                    _rangeBegin = parseInt(tempNameArr[1]);
+                                                    _rangeEnd = parseInt(tempNameArr[2]);
+                                                    genes = genedata[_chr];
+                                                    for (var _index in genes) {
+                                                        if (_rangeBegin<genes[_index][1] && _rangeEnd>genes[_index][2]) {
+                                                            suggestionGeneInCube[_chr][_index] = true;
+                                                        } else if ((_rangeBegin<genes[_index][1] && _rangeEnd>genes[_index][1]) ||
+                                                            (_rangeBegin<genes[_index][2] && _rangeEnd>genes[_index][2]) ||
+                                                            (_rangeBegin>genes[_index][1] && _rangeEnd<genes[_index][2])) { //gene is larger than strand
+                                                            suggestionGeneInCube[_chr][_index] = false;
+                                                        }
+                                                    }
+                                                    if (Object.size(suggestionGeneInCube[_chr]) == 0) delete suggestionGeneInCube[_chr];
+                                                }
                                             }
+                                            showSuggestionGeneInCubeWindow();
+                                            break;
                                         }
-                                        break;
-                                    }
-                                case 71: //g - get mapping ChIP-Seq data and SNPs
-                                    {
-                                        if (mode_id == 0) {
-                                            var _intersection = GetIntersection();
-                                            if (_intersection == null) {
-                                                showErrorAlertModalWindow("Point the area firstly!");
-                                                return;
-                                            }
+                                    // case 70: //f - in chipseq mode - show the chipseq data in current cube (not the same cube where mode has been activated)
+                                    case 84: //t  - in chipseq mode - show/delete the chipseq data in current cube (not the same cube where mode has been activated)
+                                        {
 
-                                            document.exitPointerLock = document.exitPointerLock ||
-                                                                    document.mozExitPointerLock ||
-                                                                    document.webkitExitPointerLock;
-                                            document.exitPointerLock();
-                                            keys_block.style.display = "none";
-                                            if ( /Firefox/i.test( navigator.userAgent ) ) exitFromFullScreen();
-                                            init_new_window_SNP_CHIP_SEQ(rgn, true);
-                                        } else if (mode_id == 1) {
-                                            var _intersection = GetIntersection();
-                                            if (_intersection == null) {
-                                                showErrorAlertModalWindow("Point the area firstly!");
-                                                return;
-                                            }
+                                            if (mode_id == 2) {
 
-                                            document.exitPointerLock = document.exitPointerLock ||
-                                                                    document.mozExitPointerLock ||
-                                                                    document.webkitExitPointerLock;
-                                            document.exitPointerLock();
-                                            keys_block.style.display = "none";
-                                            if ( /Firefox/i.test( navigator.userAgent ) ) exitFromFullScreen();
-                                            init_new_window_SNP_CHIP_SEQ(_intersection.point, false);
+                                                if (event.shiftKey) // before it was case 82://r - in chipseq mode - arise everything, clean the memory. 
+                                                {
+                                                    cleanCHIPSEQdata();
+                                                    break;
+                                                }
+                                                var modelPosition = Local2global(controls.getObject().position);
+                                                var blockIndices = GetBlockIndices(modelPosition);
+                                                var blockIndicesStr = Coords2Str(blockIndices);
+                                                if (chipSecCubes[blockIndicesStr]) {
+                                                    cleanCHIPSEQdata(blockIndicesStr);
+                                                    // showErrorAlertModalWindow("ChIP-Seq data for current cube has been already shown.");
+                                                } else {
+                                                    popupInProgressSymbol();
+                                                    drawChipSeqDataForCurrentCube();
+                                                    chipSecCubes[blockIndicesStr] = true;
+                                                }
+                                            }
+                                            break;
                                         }
-                                        break;
-                                    }
-                                case 67: //c - change mode
-                                    mode_id ++;
-                                    if (mode_id >= NUMBER_OF_MODES) mode_id = 0;
-                                    changeModeIndicator();
-                                    break;  
-                                case 9: //tab - information about current mode
-                                    drawMessiModalWindow(textMessages[mode_name], mode_name, null, null, false, true);//central
-                                    return false;
+                                    // case 71: //g - get mapping ChIP-Seq data and SNPs
+                                    case 88: //x - get mapping ChIP-Seq data and SNPs
+                                        {
+                                            if (mode_id == 0) {
+                                                var _intersection = GetIntersection();
+                                                if (_intersection == null) {
+                                                    showErrorAlertModalWindow("Point the area firstly!");
+                                                    return;
+                                                }
+
+                                                document.exitPointerLock = document.exitPointerLock ||
+                                                                        document.mozExitPointerLock ||
+                                                                        document.webkitExitPointerLock;
+                                                document.exitPointerLock();
+                                                keys_block.style.display = "none";
+                                                distancePoints_block.style.display = "none";
+                                                if ( /Firefox/i.test( navigator.userAgent ) ) exitFromFullScreen();
+                                                init_new_window_SNP_CHIP_SEQ(rgn, true);
+                                            } else if (mode_id == 1) {
+                                                var _intersection = GetIntersection();
+                                                if (_intersection == null) {
+                                                    showErrorAlertModalWindow("Point the area firstly!");
+                                                    return;
+                                                }
+
+                                                document.exitPointerLock = document.exitPointerLock ||
+                                                                        document.mozExitPointerLock ||
+                                                                        document.webkitExitPointerLock;
+                                                document.exitPointerLock();
+                                                keys_block.style.display = "none";
+                                                distancePoints_block.style.display = "none";
+                                                if ( /Firefox/i.test( navigator.userAgent ) ) exitFromFullScreen();
+                                                init_new_window_SNP_CHIP_SEQ(_intersection.point, false);
+                                            }
+                                            break;
+                                        }
+                                    // case 67: //c - change mode
+                                    case 77: //c - change mode
+                                        mode_id ++;
+                                        if (mode_id >= NUMBER_OF_MODES) mode_id = 0;
+                                        changeModeIndicator();
+                                        break;  
+                                    case 9: //tab - information about current mode
+                                        drawMessiModalWindow(textMessages[mode_name], mode_name, null, null, false, true);//central
+                                        return false;
+                                }
                             }
+                            
                     }
 
                     //scrolling event
@@ -1724,6 +1917,7 @@
                     }
                 }
                 if (mapResponse.length == 0) {
+                    hideInProgressSymbol();
                     showErrorAlertModalWindow("There is no ChIP-Seq data to be shown in current cube. Please, move into one of the neighbor cubes to observe any data.");
                     return;
                 }
@@ -1745,6 +1939,7 @@
                             chipseqDataPostionDeterminitionAndDrawCore(mapResponse[_resp][0].userData, mapResponse[_resp][0].geometry.vertices, uploaded_splines[mapResponse[_resp][0].name][1], mapResponse[_resp][1].responseJSON);
                         }
                     }
+                    hideInProgressSymbol();
                 }
             }
 
@@ -2658,8 +2853,16 @@
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
                     renderer.setSize( window.innerWidth, window.innerHeight );
+
+                    // if ($(document).height() >= MIN_FIXED_HEIGHT_SCREEN && $(document).height() < MIDDLE_FIXED_HEIGHT_SCREEN) {
+                    //     keys_block.style.width = "80px";
+                    // } else if ($(document).height() >= MIDDLE_FIXED_HEIGHT_SCREEN) {
+                    //     keys_block.style.width = "35px";
+                    // }
+                    keys_block_management(true);
+
                     document.getElementById("blocker").style.top = String($("ul.ui-tabs-nav").height()+27) + "px";
-                    mod_message_div.style.bottom = String(infoBlock.clientHeight) + "px";
+                    // mod_message_div.style.bottom = String(infoBlock.clientHeight) + "px";
                     if (typeof $("div#detection-sign").style != 'undefined')
                         $("div#detection-sign").style.bottom = String(infoBlock.clientHeight) + "px";
             }
@@ -3020,6 +3223,7 @@
 			    $.getJSON(url + "?callback=?", null, 
 			    	function(model_points) {
 			    		DrawPoints(model_points, blockIndicesStr, blockIndices);
+                        hideInProgressSymbol();
 			    		//UploadSNP(model_points);
 			    	}
 			    ).fail(function() { showErrorAlertModalWindow('Service is not available at this moment. We are doing all the best to fix it now. Please, try again later.'); draw_tube_response_counter++;});
@@ -3090,12 +3294,18 @@
             		// recreate textures in the particular cube (Tube Mesh to Line)
                     // RecreateTexturesInCube(blockIndicesStr);
             	} else {
+                    popupInProgressSymbol(); //@TODO CLOSE POPUP SYMBOL
                     uploaded_area[blockIndicesStr] = true;
                     var blockCornerCoordinates = GetBlockCornerCoordinates(blockIndices);
                     DrawBox(blockCornerCoordinates, blockSize);
                     draw_tube_response_counter = 0, draw_tube_request_counter = 0;
                     UploadPoints(blockCornerCoordinates, blockIndicesStr, blockIndices);
                 }
+
+                // if (draw_tube_request_counter == draw_tube_response_counter!=0) {
+                //     hideInProgressSymbol();
+                //     draw_tube_request_counter = draw_tube_response_counter=0;
+                // }
 
                 if (isDifferentCube) {
                     checkIncompleteColoredGene();
@@ -3559,7 +3769,8 @@
 			function UploadRegionData(region) {
             	var request = "start=" + String(Math.floor(region[1])) 
             				  + "&end=" + String(Math.floor(region[2]))
-            				  + "&chrid=" + String(region[0]);
+            				  + "&chrid=" + String(region[0].replace(/^([\dxy]+).*/i, '$1').replace('23', 'X'));
+                              console.log("reqiest = " + request)
 			    var url = "http://1kgenome.exascale.info/range?" + request;		
 			    $.getJSON(url + "?callback=?", null, 
 			    	function(regionInfo) {
@@ -3569,6 +3780,7 @@
 			    		var key_a = PositionToString([chrid, region[1], region[2]]);
 			    		chrid = chrid.replace("_a", "_b");
 			    		var key_b = PositionToString([chrid, region[1], region[2]]);
+                        deb_var = regionInfo;
 			    		formated_data = "<br/>@Bases: <a target='_blank' style=\"color: rgb(0,255,0)\" href='http://1kgenome.exascale.info/range?" + request + "'>" + regionInfo.substring(0, 50) + "...</a>";
 			    		regionData[key_a][1] = formated_data;
 			    		regionData[key_b][1] = formated_data;
@@ -3822,7 +4034,63 @@
                                             document.webkitExitPointerLock;
                 document.exitPointerLock();
                 keys_block.style.display = "none";
+                distancePoints_block.style.display = "none";
                 if ( /Firefox/i.test( navigator.userAgent ) ) exitFromFullScreen();
+            }
+
+            function popupInProgressSymbol (){
+                controls.changeIsKeyEnabled();
+                spinner = new Spinner(opts).spin(divElement);
+            }
+
+            function hideInProgressSymbol (){
+                spinner.stop();
+                controls.changeIsKeyEnabled();
+            }
+
+            function getDistanceBetweenTwoPoints(_firstPoint, _secondPoint, accuracy) { //accuracy = number digits after point
+                return (Math.sqrt(Math.pow(_firstPoint.x - _secondPoint.x, 2) + Math.pow(_firstPoint.y - _secondPoint.y, 2) + Math.pow(_firstPoint.z - _secondPoint.z, 2))).toFixed(accuracy);
+            }
+
+            function keys_block_management(isOnlyWidth) {
+                var doc_height = $(document).height();
+
+                var ui_tab_height = $("ul.ui-tabs-nav").height();
+                console.log(ui_tab_height-STANDARD_FIXED_HEIGHT_UI_TABS_NAV);
+                
+                if (doc_height < MIN_FIXED_HEIGHT_SCREEN_WO_THERMOMETER+2*(ui_tab_height-STANDARD_FIXED_HEIGHT_UI_TABS_NAV)) {
+                    if (isOnlyWidth) return;
+                    keys_block.style.display = "none";
+                    console.log("A");
+                } else if (doc_height < MIN_FIXED_HEIGHT_SCREEN+2*(ui_tab_height-STANDARD_FIXED_HEIGHT_UI_TABS_NAV)) {
+                    keys_block.style.width = "80px";
+                    isNonDisplayThermometer = true;
+                    if (isOnlyWidth) return;
+                    document.getElementById("thermometer").style.display = "none";
+                    keys_block.style.display = "block";
+                    console.log("B");
+                } else if (doc_height < MIDDLE_FIXED_HEIGHT_SCREEN+2*(ui_tab_height-STANDARD_FIXED_HEIGHT_UI_TABS_NAV)) {
+                    isNonDisplayThermometer = false;
+                    keys_block.style.width = "80px";
+                    if (isOnlyWidth) {return;}
+                    keys_block.style.display = "block";
+                    console.log("C");
+                } else {
+                    isNonDisplayThermometer = false;
+                    keys_block.style.width = "35px";
+                    if (isOnlyWidth) {return;}
+                    keys_block.style.display = "block";
+                    console.log("D");
+                }
+            }
+            function drawPointSphere(init_pos) {
+                var sphere = new THREE.Mesh(new THREE.SphereGeometry(1.5*radiusOfTube, 100, 100), new THREE.MeshNormalMaterial());
+                sphere.overdraw = true;
+                sphere.position.x = init_pos.x;
+                sphere.position.y = init_pos.y;
+                sphere.position.z = init_pos.z;
+                scene.add(sphere);
+                return sphere;
             }
 
             function drawMessiModalWindow(content, title, top, left, isDelayed, isCenter, titleClass, functionBeforeCallback) {
@@ -3834,8 +4102,10 @@
                     element.requestPointerLock = element.requestPointerLock||element.mozRequestPointerLock||element.webkitRequestPointerLock;
                     element.requestPointerLock();
                     document.getElementById('detection-sign').style.display = "none";
-                    if ($(document).height() > FIXED_HEIGHT_SCREEN)
-                        keys_block.style.display = "block";
+                    // if ($(document).height() > MIN_FIXED_HEIGHT_SCREEN)
+                    //     keys_block.style.display = "block";
+                    keys_block_management();
+                    distancePoints_block.style.display = "block";
                     is_modal_opened = false;
                 }
 
@@ -3849,7 +4119,6 @@
                 else
                     _messi = new Messi(content, {title: title, center: isCenter, viewport: {top: top, left: left}, titleClass: titleClass, buttons: [{id: 0, label: 'Ok', val: 'O'}], 
                     callback: callbackFunc});
-
             }
 
         </script>
@@ -3858,18 +4127,40 @@
         	
             keys_block = document.getElementById('keys');
             keys_block.style.display = "none";
-            infoBlock = document.createElement('div');
-			infoBlock.id = "infoblock";
-			// document.body.appendChild(infoBlock); 
-            divElement.appendChild(infoBlock);
-            mod_message_div = document.createElement('p');
-            mod_message_div.id = "textmode";
-            mod_message_div.style.bottom = String(infoBlock.clientHeight) + "px";
+
+            distancePoints_block = document.getElementById('distancePoints');
+            distancePoints_block.style.display = "none";
+   //          infoBlock = document.createElement('div');
+			// infoBlock.id = "infoblock";
+            infoBlock = document.getElementById("infoblock")
+            
+            
+            imgTextContainer = document.getElementById("img_text_container");
+            var result_scale = ((scaleFactor/blockSize).toFixed(0));
+            if (result_scale==0) result_scale = "1:"+((blockSize/scaleFactor).toFixed(0));
+            else result_scale +=  ":1"
+            imgTextContainer.innerHTML = result_scale;
+
+            // mod_message_div = document.createElement('p');
+            // mod_message_div.id = "textmode";
+            // mod_message_div = document.getElementById("textmode");
+            // mod_message_div.style.bottom = String(infoBlock.clientHeight) + "px";
+
+
+            // footerPanel = document.createElement('div');
+            // footerPanel.id = "footPanel";
+            footerPanel = document.getElementById("footPanel");
+            // footerPanel.appendChild(infoKeyContainer);
+            // footerPanel.appendChild(mod_message_div);
+            // footerPanel.appendChild(infoBlock);
+
+            // divElement.appendChild(footerPanel)
+            // divElement.appendChild(infoBlock);
             document.getElementById("detection-sign").style.bottom = String(infoBlock.clientHeight) + "px";
             document.getElementById('detection-sign').style.display = "none";
 //            mod_message_div.style = "display:none";
-            mod_message_div.appendChild(document.createTextNode(""));
-            divElement.appendChild(mod_message_div);
+            // mod_message_div.appendChild(document.createTextNode(""));
+            // divElement.appendChild(mod_message_div);
             
             // var gui = new dat.GUI();
 

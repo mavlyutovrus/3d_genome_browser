@@ -11,6 +11,15 @@ body {
         font-family: arial;
 }
 
+
+/*div#tabs {
+    min-width: 735px;
+}
+
+div#tabs-1 {
+    min-width: 0px;
+}*/
+
 #blocker {
 
         position: fixed;
@@ -80,17 +89,32 @@ body {
         cursor: pointer;
 }
 
+#footPanel {
+    position: fixed;  
+    font: serif;
+    border-style: none;
+    border-color: black;
+    text-wrap: lowercase;
+    bottom:0%;
+    width:auto;
+    left: 28px;
+    right: 28px;
+    height: 12vh;
+    min-height: 70px;
+}
+
+
 #infoblock {
-	position: fixed;  
-	font: serif;
-	color: white;
-	border-style: none;
-	border-color: black;
-	text-wrap: lowercase;
-	padding : 5px;
-	background-color: gray;
-	opacity:0.9;
-	filter:alpha(opacity=90); /* For IE8 and earlier */	
+    position: fixed;  
+    font: serif;
+    color: white;
+    border-style: none;
+    border-color: black;
+    text-wrap: lowercase;
+    padding : 5px;
+    background-color: gray;
+    opacity:0.9;
+    filter:alpha(opacity=90); /* For IE8 and earlier */ 
     bottom:0%;
     width:auto;
     left: 28px;
@@ -103,47 +127,48 @@ body {
     font-size: 0.6em;
 }
 
+
+#textmode{
+    top:-30px;
+    float:left;
+    background-color: yellow;
+    position: relative;
+    font: serif;
+    color: black;
+    border-style: none;
+    border-color: black;
+    margin: 0px;
+    width:auto;
+    height:15px;
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 0.7em;
+}
+
 #staticblock {
-	position: absolute;  
-	font: serif;
-	color: white;
-	border-style: none;
-	border-color: black;
-	padding : 10px;
+    position: absolute;  
+    font: serif;
+    color: white;
+    border-style: none;
+    border-color: black;
+    padding : 10px;
     bottom:0;
     width:94.7%;
     height:1em;
 }
 
 a.genome-link:visited {
-	color: white;
+    color: white;
 }
 a.genome-link{
-	color: white;
+    color: white;
 }
 
-#textmode{
-    position: fixed;  
-    font: serif;
-    color: black;
-    border-style: none;
-    border-color: black;
-    text-wrap: lowercase;
-    padding : 5px;
-    filter:alpha(opacity=90); /* For IE8 and earlier */ 
-/*    bottom:12vh;*/
-    width:95.3%;
-    height:15px;
-    font-family: Verdana,Arial,sans-serif;
-    font-size: 0.7em;
-    margin-bottom: 1px;
-    margin-left: 5px;
-}
 
 #newtable table {
   width: 100%;
   border: 1px solid #000;
 }
+
 
 #newtable th,#newtable td {
   width: 25%;
@@ -217,22 +242,39 @@ div#detection-sign img#exclamation-sign {
 }
 
 div#keys {
-    float: right;
-    right: 20px;
+    float: left;
+    left: 10px;
     width: 35px;
     height: 35px;
     position: fixed;
 }
 
-div#keys img#letter-C-icon, div#keys img#letter-G-icon, div#keys img#tab-icon, div#keys img#letter-R-icon, div#keys img#letter-F-icon, div#keys img#letter-P-icon {
-    width: 35px;
-    height: 35px;
+.keys_images {
+    width: 37px;
+    height: 37px;
 }
 
 div#keys img#thermometer {
     margin-left:10%;
     width: 28px;
     height: 78px;
+}
+
+img#plain_cube {
+    width: 50px;
+    height: 50px;
+}
+
+div#img_text_container {
+    text-align: center; 
+    line-height: 60px;
+    width: 50px;
+    height: 60px;
+    background-size: 100%;
+    background-image: url('../image/plain_cube_v2.2.png');
+    background-repeat: no-repeat;
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 0.7em;
 }
 
 #table_cube tr td, #table_linear tr td,  #table_cube tr th{
@@ -260,4 +302,29 @@ div#keys img#thermometer {
 }
 .hot {
     border: 1px solid #f00;
+}
+
+div#distancePoints {
+    float: right;
+    right: 20px;
+    width: 35px;
+    height: 35px;
+    position: fixed;
+}
+
+#first-point-distance, #second-point-distance {
+    width: 35px;
+    height: 35px;
+}
+
+
+img.gallery-image {
+    max-height: 400px;
+    max-width: 100%;
+    border: solid;
+
+}
+
+.bx-wrapper img {
+    margin: 0 auto;
 }

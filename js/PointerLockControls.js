@@ -52,45 +52,45 @@ THREE.PointerLockControls = function ( camera, _x, _y, _z ) {
 
 
 	var onKeyDown = function ( event ) {
+		if (controls.isKeyEnabled){
+			switch ( event.keyCode ) {
 
-		switch ( event.keyCode ) {
+				case 38: // up
+					moveUp = true;
+					break;
+				case 87: // w
+					moveForward = true;
+					break;
 
-			case 38: // up
-				moveUp = true;
-				break;
-			case 87: // w
-				moveForward = true;
-				break;
+				case 37: // left
+				case 65: // a
+					moveLeft = true; 
+					break;
 
-			case 37: // left
-			case 65: // a
-				moveLeft = true; 
-				break;
+				case 40: // down
+					moveDown = true;
+					break;
+				case 83: // s
+					moveBackward = true;
+					break;
 
-			case 40: // down
-				moveDown = true;
-				break;
-			case 83: // s
-				moveBackward = true;
-				break;
+				case 39: // right
+				case 68: // d
+					moveRight = true;
+					break;
 
-			case 39: // right
-			case 68: // d
-				moveRight = true;
-				break;
-
-			case 32: // space
-				if ( canJump === true ) velocity.y += 10;
-				canJump = false;
-				break;
-			// case 71: // g
-			// 	alert('do here anything!');
-			// 	break;
-			  // default:
-			  // 	console.log(event.keyCode);
-			  // 	break
+				case 32: // space
+					if ( canJump === true ) velocity.y += 10;
+					canJump = false;
+					break;
+				// case 71: // g
+				// 	alert('do here anything!');
+				// 	break;
+				  default:
+				  	console.log(event.keyCode);
+				  	break
+			}
 		}
-
 	};
 
 	var onKeyUp = function ( event ) {
@@ -122,7 +122,6 @@ THREE.PointerLockControls = function ( camera, _x, _y, _z ) {
 				break;
 
 		}
-
 	};
 
 	document.addEventListener( 'mousemove', onMouseMove, false );
@@ -130,6 +129,12 @@ THREE.PointerLockControls = function ( camera, _x, _y, _z ) {
 	document.addEventListener( 'keyup', onKeyUp, false );
 
 	this.enabled = false;
+
+	this.isKeyEnabled = true;
+
+	this.changeIsKeyEnabled = function() {
+		this.isKeyEnabled = (!this.isKeyEnabled);
+	}
 
 	this.getObject = function () {
 

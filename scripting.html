@@ -1,92 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>The page for Scripting with 3D Genome Browser's API</title>
-    <script src="js/codemirror/lib/codemirror.js"></script>
-    <link rel="stylesheet" href="js/codemirror/lib/codemirror.css">
-    <link rel="stylesheet" href="js/codemirror/theme/3024-night.css">
-    <script src="js/codemirror/mode/javascript/javascript.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-    <script src="content/geneData.json"></script>
-    <style>
-        .CodeMirror {
-          border: 1px solid #eee;
-          height: auto;
-        }
-
-        .CodeMirror-scroll {
-          overflow-y: hidden;
-          overflow-x: auto;
-        }
-
-    </style>
-  </head>
-  <body>
-    <h1 align="center">SCRIPTING PAGE</h1>
-    <p>Here is the page with jquery libraries and preloaded gene data. Use javascript console bellow or one in your web browser for using <i>3D Genome Browser</i>'s API. Also this page is the storage of scripts that people use for achieving various results in exploring 3D genome.</p>
-
-    <table border="1" style="width:100%">
-      <tr>
-        <th>ID</th>
-        <th>Description</th>
-        <th>Author</th>
-        <th>Link</th>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>Combination of different stuff. (At this moment - mess). Main function is <i>getRangesForGenePromoterCubicArea(chr, geneStart, geneEnd, isNormal, radiusCube, isPositive)</i>. Use it like<br><b>getRangesForGenePromoterCubicArea('13', 48877883, 49056026, true, 0.2, true); /*37Release RB1 gene*/</b><br> to get all the stands in radius <i>0.2</i> from the promoter for <i>GM06990</i> cell line.</td>
-        <td>Alexander Butyaev</td>
-        <td><a href="scripting/mess.js" target="_blank">script</a></td>
-      </tr>
-    </table>
-    <br>
-    <h3>Your code</h3>
-    <p>(Use standard javascript here. To output any results, use integrated <i>function print(value)</i>. For global variables, use <i>vars</i> object. For example, vars.a = 1; vars.b = "Hello World"; vars.getCheers = function(name){print("Hello "+name+"!");})</p>
-    <p><textarea id="code" name="code"></textarea></p>
-    <button onclick="run()"> Run </button> <button onclick="save()"> Save </button>
-    <br><br>
-    <h3>Output</h3>
-    <textarea readonly id="display" style="height: 50px; width: 100%;"></textarea>
-    <br>
-    <p>If you want to share your script(s), please email to Alexander Butyaev <i>alexander . butyaev at mail . mcgill . ca</i></p>
-    <script>
-        // Variables for user's work with scripts
-        var vars = {};
-        // var myCodeMirror = CodeMirror(document.body);
-        var code = document.getElementById("code");
-        var display=document.getElementById("display")
-        window.onload = function() {
-                window.editor = CodeMirror.fromTextArea(code, {
-                    mode: "javascript",
-                    lineNumbers: true,
-                    matchBrackets: true,
-                    lineWrapping: true,
-                    theme : '3024-night'
-                });
-                editor.setValue("print('Curiosity is the key to creativity!');\nvar len = 1;\nfor(var i = 0; i < len; i++) {\n\tprint('Do you agree?');\n}");
-            };
-
-        function run() {
-            var result = eval(editor.getValue());
-            var el = $("#display").get(0);
-            var elemLen = el.value.length;
-            el.selectionStart = elemLen;
-            el.selectionEnd = elemLen;
-            el.focus();
-            return result;
-        }
-
-        function save() {
-            var mydata = 'var vars = {};\n\nfunction print(value) {console.log(value);}\n' + editor.getValue() + '\n';
-            window.location.href = 'data:text/javascript;charset=UTF-8,'
-                + encodeURIComponent(mydata);
-        }
-        
-        function print(value) {
-            display.innerHTML+= value + "\n";
-        }
-        
-    </script>
-  </body>
+<head>
+<title>The page for Scripting with 3D Genome Browser's API</title>
+<link rel="stylesheet" type="text/css" href="js/codemirror/lib/codemirror.min.css">
+<link rel="stylesheet" type="text/css" href="js/codemirror/theme/3024-night.min.css">
+<script type="text/javascript" src="http://cdn.jsdelivr.net/codemirror/4.5.0/codemirror.min.js" defer ></script>
+<script type="text/javascript" src="js/codemirror/mode/javascript/javascript.min.js" defer></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" defer></script>
+<script src="content/geneData_2.0.json" defer></script>
+<style>.CodeMirror {border: 1px solid #eee;height: auto;} .CodeMirror-scroll {overflow-y: hidden;overflow-x: auto;}</style>
+</head>
+<body>
+<h1 align="center">SCRIPTING PAGE</h1>
+<p>Here is the page with jquery libraries and preloaded gene data. Use javascript console bellow or one in your web browser for using <i>3D Genome Browser</i>'s API. Also this page is the storage of scripts that people use for achieving various results in exploring 3D genome.</p>
+<table border="1" style="width:100%">
+<tr>
+<th>ID</th>
+<th>Description</th>
+<th>Author</th>
+<th>Link</th>
+</tr>
+<tr>
+<td>1</td>
+<td>General functions for accessing data from 3D Genome Browser Database. It includes: 
+<li>3D structures for specific models</li>
+<li>Information about nucleotides</li>
+<li>SNPs Information</li>
+<li>ChIP-Sequencing Experiments data</li>
+<li>Orientation functions (search of closest point)</li>
+<hr>More information in the header for each function
+</td>
+<td>Alexander Butyaev</td>
+<td><a href="scripting/general_functions_to_access_3DGB_data_JSON.js" target="_blank">script</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>The main procedural function (<i>vars.getRangesForGenePromoterCubicArea(chr, geneStart, geneEnd, isNormal, radiusCube, isPositive, callBackCustomFunction)</i>) of this package asynchronously accesses to the database of 3D Genome Browser and retrieves information about 3D positions of strands for particular model (according to the chr chromosome and isNormal parameters) in specific cubic area, built around the promoter start point of specific gene.<br>OPTIONAL: Also it outputs queries to Ensembl database (homo_sapiens_variation) to find 1) phenotypes associated with specific variations; 2) intersections of the phenotypes for different neighbour intervals in 3D space within the chromosome (process is based on the comparing promoter area with others not connected intervals within cubic area with radius = radiusCube) AND genes, located in the cubic area built around start point of promoter area of particular gene.<br>Use it like<br><b>vars.getRangesForGenePromoterCubicArea('13', 48877883, 49056026, true, 0.2, true); /*37Release RB1 gene*/</b><br> to get all the stands in radius <i>0.2</i> from the promoter for <i>GM06990</i> cell line.<hr>More information in the header for each function</td>
+<td>Alexander Butyaev</td>
+<td><a href="scripting/Ensembl_snps&phenotype_for_gene_promoter_in_cubic_area.js" target="_blank">script</a></td>
+</tr>
+</table>
+<br>
+<h3>Your code</h3>
+<p>(Use standard javascript here. To output any results, use integrated <i>function print(value)</i>; to erase an output window - use <i>function clear()</i>. For global variables, use <i>vars</i> object. For example, vars.a = 1; vars.b = "Hello World"; vars.getCheers = function(name){print("Hello "+name+"!");})</p>
+<p><textarea id="code" name="code"></textarea></p>
+<button onclick="run()"> Run </button> <button onclick="save()"> Save </button>
+<br><br>
+<h3>Output</h3>
+<textarea readonly id="display" style="height: 50px; width: 100%;"></textarea>
+<br>
+<p>If you want to share your script(s), please email to Alexander Butyaev <i>alexander . butyaev at mail . mcgill . ca</i></p>
+<script>
+    var vars = {};
+    var code = document.getElementById("code");
+    var display=document.getElementById("display")
+    window.onload = function() {window.editor = CodeMirror.fromTextArea(code, {mode: "javascript",lineNumbers: true,matchBrackets: true,lineWrapping: true,theme : '3024-night'});editor.setValue("print('Curiosity is the key to creativity!');\nvar len = 1;\nfor(var i = 0; i < len; i++) {\n\tprint('Do you agree?');\n}");};
+    function run(){var result = eval(editor.getValue());var elemLen = display.value.length;display.selectionStart = elemLen;display.selectionEnd = elemLen;display.focus();return result;}
+    function save(){var mydata = 'var vars = {};\n\nfunction print(value) {console.log(value);}\n'+editor.getValue()+'\n';window.open('data:text/javascript;charset=UTF-8,'+encodeURIComponent(mydata),"_blank");}
+    function print(value){display.innerHTML+= value + "\n";}
+    function clear() {display.innerHTML="";}
+</script>
+</body>
 </html>

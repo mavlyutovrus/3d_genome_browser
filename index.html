@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+      <meta name="theme-color" content="#468996">
+      <title>3D Genome Browser</title>
+      <link href="css/jquery.bxslider.css" rel="stylesheet" type="text/css"/>
+  	  <link href="css/main_cleared.css" rel="stylesheet" type="text/css"/>
+      <!-- <link href="css/cupertino/jquery-ui-1.10.4.custom.min.css" rel="stylesheet"> -->
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+      <script type="text/javascript" src="js/jquery-ui-1.10.4.custom.min.js"></script>
+      <script type="text/javascript" src="js/jquery.bxslider.js"></script>
+      <script type="text/javascript">$(function() {$( "#tabs" ).tabs({});$("#href_tabs-4").click(function() {window.location = "scripting.html"});});$(document).ready(function(){$('.bxslider').bxSlider({mode:'fade',customWidth: '100%',customRelations: 'true',speed: 0});});</script>
+    </head>
+    <body>
+        <script>
+        window.fbAsyncInit = function(){FB.init({appId:'330748687128832',xfbml:true,version:'v2.2'});};
+        (function(d, s, id){var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) {return;}js = d.createElement(s); js.id = id;js.src = "//connect.facebook.net/en_US/sdk.js";fjs.parentNode.insertBefore(js, fjs);}(document, 'script', 'facebook-jssdk'));
+        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.async=true;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+          function validateSelect() {if(document.getElementById('3dmodel').value == 'none'){alert('Please choose a model');return false;}return true;}
+          function changeOptionFoo(indx) {if (indx == 0) {$("div#info_div")[0].style.display = "none";} else if (indx == 1) {$("div#info_div")[0].style.display = "inline";$("div#info_div p#info_source")[0].innerHTML = "<a class = 'external-link' href='http://www.sciencemag.org/content/326/5950/289' target='_blank'>Lieberman-Aiden, E., van Berkum, N.L., Williams, L., Imakaev, M., Ragoczy, T., <i>et al.</i>(2009) Comprehensive mapping of long-range interactions reveals folding principles of the human genome. <i>Science</i>, 326(5950), 289–93.</a>";$("div#info_div p#info_restrictions")[0].style.display = "none";} else if (indx>1) {$("div#info_div")[0].style.display = "inline";$("div#info_div p#info_source")[0].innerHTML = "<a class = 'external-link' href='http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3985632/' target='_blank'>Trieu,T. and Cheng,J.(2014), Large-scale reconstruction of 3D structures of human chromosomes from chromosomal contact data. <i>Nucleic Acids Research</i>, 42(7).</a>";if(indx>24) {$("div#info_div p#info_restrictions")[0].innerHTML = "<br>ChIP-Sequencing experiment data is not available for this model.";$("div#info_div p#info_restrictions")[0].style.display = "inline";} else {$("div#info_div p#info_restrictions")[0].style.display = "none";}}}
+        </script>
+
+        <div id="tabs">
+            <ul>
+                <li><a id="href_tabs-0" href="#tabs-0">Welcome Page/UI</a></li>
+                <li><a id="href_tabs-4" href="#tabs-4">Tools</a></li>
+                <li><a id="href_tabs-3" href="#tabs-3">About</a></li>
+                <li><a id="href_tabs-6" href="#tabs-6">News</a></li>
+                <li><a id="href_tabs-2" href="#tabs-2">Contact us</a></li>
+            </ul>
+            <div id="tabs-6">
+                <table id="news_table">
+                    <tr>
+                        <th>Change Request</th>
+                        <th>Comments</th>
+                        <th>Fixed date</th>
+                    </tr>
+                    <tr class = "finished">
+                        <td>The example txt files are too large, takes forever to load <a href='http://3dgb.cs.mcgill.ca/jsonData/' target='_blank'>http://3dgb.cs.mcgill.ca/jsonData/</a></td>
+                        <td>Original files are still there but they have been duplicated and have been cut for particular chromosomes (original and converted).</td>
+                        <td>November,1 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Compatibility with FireFox</td>
+                        <td>No more jumping in a full screen mode and back.</td>
+                        <td class ="sortnr">November,5 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Information about the "moving" keys should be on the blocker screen.</td>
+                        <td>User should see information about "W, A, S, D" keys from the beginning.</td>
+                        <td>November,5 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Improve slideshow</td>
+                        <td>The slide show images are laggy,<br>the big white space between them is needless,<br>sliding is too slow.</td>
+                        <td>November,7 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class="finished">
+                        <td>Provide information about 3D Genome Structure</td>
+                        <td>On the first page, it asks user to select a 3D Genome Structure to explore. User doesn't know what these genome structures are or where they come from. It might help to put a short description instead of their scientific label.<br>
+                          <span style="color:blue">Provide a link to original paper with initial 3D structure data.</span></td>
+                        <td>November,7 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class="finished">
+                        <td>If person presses <i>Enter</i> in the textarea of goto (gene positions).</td>
+                        <td>Enter key makes page reload. Block it.</td>
+                        <td>November,7 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class="finished">
+                        <td>Protection from an illegal state of system.</td>
+                        <td>Person should not see any exceptions/errors that can cause essential decrease of performance.<br>
+                          <span style="color:blue;">Fixed for the incorrect transfer from another page.</span></td>
+                        <td>November,7 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+
+                    <tr class="finished">
+                        <td>Improve UI of <i>Welcome PageUI</i></td>
+                        <td>Besides any input text field there should be an example entry.<br>
+                            <span style="color:blue;">Examples that might be used for immediate exploring are added in the text field.</span></td>
+                        <td>November,8 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Not informative message <i>“point to the area firstly”</i></td>
+                        <td>Almost always when user clicks in not appropriate for current function place - system shows standard error message. Needs more information.<br>
+                          <span style="color:blue"><b>To be discussed:</b> pointing the empty area (without strands) shouldn't cause error message. (Implemented)</span></td>
+                        <td>November,9 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class="finished">
+                        <td>Inline red-fonted messages upon errors</td>
+                        <td>Do inline red-fonted messages upon errors instead of pop ups … it has been a few minutes and popups are getting on user's nerves.<br>
+                          <span style="color:blue">New messenger/notifier has been implemented. User can easily choose notifications during the exploring the genome without quitting from the exploring mode.</span></td>
+                        <td>November,9 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class="finished">
+                        <td>Explanation/clarification of gene annotations</td>
+                        <td>User can't understand what the "Color in Cube" checkbox does.<br>
+                            <span style="color:blue">For the <i>Color in Cube</i> explanation sigh is added. Click for the info.</span></td>
+                        <td>November,9 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Beginning and end of the strand in current cube should have some continuations.</td>
+                        <td>All strands are drawn by portions, therefore they are cut on the both ends. It creates an impression of end or beginning of chromosome. There should be some textures on the both ends to create an impression of continuation.</td>
+                        <td>November,15 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Gene input should be case insensetive.</td>
+                        <td>It must be possible to use case insensitive input: "TP53" OR "tp53".</td>
+                        <td>November,15 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Show current model position of user for later investigation.</td>
+                        <td>User should be able to request and to get current position in model for later investigation and/or sharing.</td>
+                        <td>November,16 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>[Tools] Clarify all available functions for accessing 3D Genome Browser database.</td>
+                        <td>Script with all available functions to access 3D Genome Browser database should be available, clearly explained with exmples, and first in the list of scripts.</td>
+                        <td>November,17 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>[Tools] Create workable script with various functionality .</td>
+                        <td>User should be able to download workable script that shows different usecases, functionality, methods to interpret data and so on.</td>
+                        <td>November,17 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    <tr class = "finished">
+                        <td>Pointing to the genes.</td>
+                        <td>User should be able to find which gene is shown in bottom panel (general information about genes).</td>
+                        <td>November,17 2014<img class="solved" width="100px" height="62px" src="image/tn-solved-stamp_b.png"/></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Create audio-visual support/tutorial</td>
+                        <td>It is important to have some kind of audio-visual support.</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Make <i>About</i> section clear or split it on different paragraphs/pages.</td>
+                        <td>The <i>About</i> section mixes in the same page technical information, biological information and user manual information.</td>
+                        <td></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Limitation in 3D space.</td>
+                        <td>Prevent user from moving to a cube in 3D space that does not contain any information.</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Support touch-screen devices.</td>
+                        <td>Add touch functionality for tablets.</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Facebook support.</td>
+                        <td>At this moment, only Twitter is available for sharing current position (P button). Extend this to Facebook and Google+</td>
+                        <td></td>
+                    </tr>
+                </table>
+          </div>
+            <div id="tabs-0">
+                <label>3D Genome Structure that you want to explore: </label>
+            <form action="3dGBViewer.html"  onsubmit = "return validateSelect()">
+              <select id='3dmodel' name="3dmodel" style="width : 200" onChange="changeOptionFoo(this.selectedIndex);" >
+                  <option value="none">Select one...</option>
+                  <option value="K562-All">K562 Cell Type, All Chromosome, Simulations</option>
+                  <option value="BCH-1">B-Cell GM06990, Healthy, Chromosome 1</option>
+                  <option value="BCH-2">B-Cell GM06990, Healthy, Chromosome 2</option>
+                  <option value="BCH-3">B-Cell GM06990, Healthy, Chromosome 3</option>
+                  <option value="BCH-4">B-Cell GM06990, Healthy, Chromosome 4</option>
+                  <option value="BCH-5">B-Cell GM06990, Healthy, Chromosome 5</option>
+                  <option value="BCH-6">B-Cell GM06990, Healthy, Chromosome 6</option>
+                  <option value="BCH-7">B-Cell GM06990, Healthy, Chromosome 7</option>
+                  <option value="BCH-8">B-Cell GM06990, Healthy, Chromosome 8</option>
+                  <option value="BCH-9">B-Cell GM06990, Healthy, Chromosome 9</option>
+                  <option value="BCH-10">B-Cell GM06990, Healthy, Chromosome 10</option>
+                  <option value="BCH-11">B-Cell GM06990, Healthy, Chromosome 11</option>
+                  <option value="BCH-12">B-Cell GM06990, Healthy, Chromosome 12</option>
+                  <option value="BCH-13">B-Cell GM06990, Healthy, Chromosome 13</option>
+                  <option value="BCH-14">B-Cell GM06990, Healthy, Chromosome 14</option>
+                  <option value="BCH-15">B-Cell GM06990, Healthy, Chromosome 15</option>
+                  <option value="BCH-16">B-Cell GM06990, Healthy, Chromosome 16</option>
+                  <option value="BCH-17">B-Cell GM06990, Healthy, Chromosome 17</option>
+                  <option value="BCH-18">B-Cell GM06990, Healthy, Chromosome 18</option>
+                  <option value="BCH-19">B-Cell GM06990, Healthy, Chromosome 19</option>
+                  <option value="BCH-20">B-Cell GM06990, Healthy, Chromosome 20</option>
+                  <option value="BCH-21">B-Cell GM06990, Healthy, Chromosome 21</option>
+                  <option value="BCH-22">B-Cell GM06990, Healthy, Chromosome 22</option>
+                  <option value="BCH-23">B-Cell GM06990, Healthy, Chromosome 23</option>
+                  <option value="BCL-1">B-Cell, Leukemia, Chromosome 1</option>
+                  <option value="BCL-2">B-Cell, Leukemia, Chromosome 2</option>
+                  <option value="BCL-3">B-Cell, Leukemia, Chromosome 3</option>
+                  <option value="BCL-4">B-Cell, Leukemia, Chromosome 4</option>
+                  <option value="BCL-5">B-Cell, Leukemia, Chromosome 5</option>
+                  <option value="BCL-6">B-Cell, Leukemia, Chromosome 6</option>
+                  <option value="BCL-7">B-Cell, Leukemia, Chromosome 7</option>
+                  <option value="BCL-8">B-Cell, Leukemia, Chromosome 8</option>
+                  <option value="BCL-9">B-Cell, Leukemia, Chromosome 9</option>
+                  <option value="BCL-10">B-Cell, Leukemia, Chromosome 10</option>
+                  <option value="BCL-11">B-Cell, Leukemia, Chromosome 11</option>
+                  <option value="BCL-12">B-Cell, Leukemia, Chromosome 12</option>
+                  <option value="BCL-13">B-Cell, Leukemia, Chromosome 13</option>
+                  <option value="BCL-14">B-Cell, Leukemia, Chromosome 14</option>
+                  <option value="BCL-15">B-Cell, Leukemia, Chromosome 15</option>
+                  <option value="BCL-16">B-Cell, Leukemia, Chromosome 16</option>
+                  <option value="BCL-17">B-Cell, Leukemia, Chromosome 17</option>
+                  <option value="BCL-18">B-Cell, Leukemia, Chromosome 18</option>
+                  <option value="BCL-19">B-Cell, Leukemia, Chromosome 19</option>
+                  <option value="BCL-20">B-Cell, Leukemia, Chromosome 20</option>
+                  <option value="BCL-21">B-Cell, Leukemia, Chromosome 21</option>
+                  <option value="BCL-22">B-Cell, Leukemia, Chromosome 22</option>
+                  <option value="BCL-23">B-Cell, Leukemia, Chromosome 23</option>
+              </select>
+              <input type="submit" value = "Submit">
+            </form>
+            <div id="info_div" style="display: none">
+              <br><span style="color:green;">Model source:</span> <p id = "info_source" style="display: inline;font-family: arial, verdana, sans-serif;"></p>
+              <p id = "info_restrictions" style="display: none;color: red; font-family: arial, verdana, sans-serif;"></p>
+            </div>
+            <br>
+
+            <ul class="bxslider" style="text-align: center;">
+              <li><img class = "gallery-image" src="image/gallery/1_1_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/2_2_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/3_3_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/4_4_v2.png" /></li>
+              <li><img class = "gallery-image" src="image/gallery/5_5_v2.png" /></li>
+            </ul>
+
+            </div>
+            <div id="tabs-2">
+                <p><em>3D Genome Browser Development Group</em><br><hr>Contact: <br><br><a target='_blank' href='http://exascale.info/'>eXascale Infolab</a>:
+                <a style="color: rgb(0,0,255)" href="mailto:phil@exascale.info?subject=[3D Genome Browser]">Philippe Cudre-Mauroux</a>, <a style="color: rgb(0,0,255)" href="mailto:ruslan@exascale.info?subject=[3D Genome Browser]">Ruslan Mavlyutov</a>; <br><br><a target='_blank' href='http://csb.cs.mcgill.ca/'>CSB Group, McGill University</a>: <a style="color: rgb(0,0,255)" href="mailto:jeromew@cs.mcgill.ca?subject=[3D Genome Browser]">Jérôme Waldispühl</a>, <a style="color: rgb(0,0,255)" href="mailto:alexander.butyaev@mail.mcgill.ca?subject=[3D Genome Browser]">Alexander Butyaev</a>.</p>
+            
+            <!--Share conteiner -->
+            <div>
+                <div class="button twitter" data-type="button_count"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://3dgb.cs.mcgill.ca/" data-text="Working with 3D Genome Browser, developed by[CSB group. McGill University] and [eXascale Infolab. Friburg University]">Tweet</a></div>
+
+                <div
+                  class="fb-like"
+                  data-share="true"
+                  data-width="450"
+                  data-show-faces="true">
+                </div>
+                <div class="g-plusone" data-size="tall" data-href="http://3dgb.cs.mcgill.ca/" data-text="Working with 3D Genome Browser, developed by[CSB group. McGill University] and [eXascale Infolab. Friburg University]" data-annotation="inline" data-width="300" ></div>
+          </div>
+        </div>
+            <div id="tabs-3">
+            <h1>3D Genome Browser</h1>
+            <hr>
+            <nav class="toc">
+                    <h2>Content:</h2>
+                        <ol>
+                            <li><a href="#introduction">About the 3D Genome Browser</a></li>
+                            <li><a href="#functionality">Browser Functionality</a></li>
+                            <li><a href="#memory-management">Memory Management</a></li>
+                            <li><a href="#well-known-problems">Well-Known Problems</a></li>
+                            <li><a href="#controls">Controls</a></li>
+                        </ol>
+                </nav>
+                <hr>
+                <h2 id="introduction">About the 3D Genome Browser</h2>
+                <p>
+                    Welcome to the 3D Genome Browser. This is the website that provides detailed description of the structure of Human Genome. This web browser is fully interactive 3D viewer that allows user to move through the 3D space of genome model, interact with system with a help of commonly-used input/output devices and retrieve data of genome sequence variations, ChIP-Sequencing data etc. The data was collected from <a class = "external-link" href="http://www.1000genomes.org/" target="_blank">1000 Genomes Project</a> and <a class = "external-link" href="http://www.genome.gov/encode/" target="_blank">The ENCODE Project</a>.<br>
+                    This browser has been implemented with a help of <i>Javascript technologies</i> and, in particular, <i>Three.js</i> - javascript library that provides an opportunity to work with WebGL-3D objects in web browser.<br>
+                    It has been optimized for working with big sets of biological data and built on top of a NoSQL database for comfortable visualization, examination and data querying. In addition, the database contains several components that distinguish this system among most Genome Browsers:</p>
+                    <li>Sparse, adaptive 3D index</li>
+                    <li>Immutable data chunks</li>
+                <p>
+                    Both of these components improve the standard approach to the storing the data. From the user side - it reduces the response time and, therefore, increases user's experience of exploring 3D structure of genome and its elements. 
+                    <br>
+                    <br>
+                    The 3D Genome Browser is developed and maintained by Computational Structure Biology Group at Computer Science Department, McGill University, Canada and eXascale Infolab at the University of Fribourg, Switzerland.
+                </p>
+                <hr>
+                <h2 id="functionality">Browser Functionality</h2>
+                <p>The general idea of the 3D Genome Browser is to show the genome sequence in 3 dimensions, provide an opportunity to explore genome both in standard (linear) way and using advantages of space location of chromosomes, genes, their interactions.<br>Currently in the system there are <b>47</b> 3d structures available: 23 chromosomes of Leukemia B-Cell, 23 chromosomes of Healthy B-Cell (GM06990 cell type) and simulations with complete genome for K562 Cell Type. They can be chosen on the first tab of 3D Genome Browser. For deep understanding of how 3d Genome Browser works and what kind of data it represents - choose Simulation data - <i>K562 Cell Type, All Chromosome, Simulations</i> or any chromosome of <i>Healthy GM06990 B-Cell</i>.<br> 
+                  Another important feature of this system is the way of information representation. In most cases, user can retrieve information while moving through the space in the bottom panel of the screen, or using special commands to get pop up window for detailed information.
+                    <br>
+                    This system provides wide variety of tools for exploring genome.<br>
+                    In comparison with standard Genome Browsers we deal with 3D coordinates, models and associated with them biological entities. That is why it is important to provide an opportunity to change the current position in space with standard way in format  "chr [number of chromosome] [start position] [end position]", where any non numeric symbol can be separator (for instance, "chr 5: 1234567 - 1234765"); and in 3 dimensional way - format "X Y Z", where X,Y,Z are coordinates of particular point in database (this way is very specific and usually useful for people, who want to make a connection between initial <i>Hi-C</i> data and visual representation; for instance, "147:2345:924"), any non numeric symbol can be separator as well. As 3D Genome Browser works with such biological data as genes, user can move the camera to look at the specific location of gene and its surroundings. Knowledge of the location of gene is not required.<br>
+                    <table border = "1px" id='table_linear'>
+                        <tr>
+                            <th></th>
+                            <th>B-Cell, Leukemia</th>
+                            <th>B-Cell, Healthy</th>
+                            <th>K562, Simulations</th>
+                        </tr>
+                        <tr>
+                            <th>Positions in chromosome</th>
+                            <td colspan="2"><i>chr12 12345-23456</i><br>OR<br><i>12345-23456</i><br>(this example is for <b>12</b> chromosome model)</td>
+                            <td><i>chr12 12345-23456</i></td>
+                        </tr>
+                        <tr>
+                            <th>Gene</th>
+                            <td colspan="3"><i><a class = "external-link" href="http://www.ncbi.nlm.nih.gov/gene/7157" target="_blank">TP53</a></i><br>OR <i>any other name of gene</i> (case sensitive)</td>
+                        </tr>
+                        <tr>
+                            <th>Model coordinates</th>
+                            <td colspan="3"><i>5.23:4.534:1.89</i><br>Which corresponds to X, Y, Z coordinates in database</td>
+                        </tr>
+                    </table>
+                <h6><i>Example of using search field of 3D Genome Browser</i></h6>
+                    <br>
+                    Fundamentally there are 3 different modes that allow user interact with system in different ways and/or retrieve special information from database.</p>
+                <h3 id="func-linear">Linear mode</h3>
+                <p>
+                Basically, linear mode in 3D space is the putting old canons of representation in a new light. It easily can be compared with such genome browser as <a class = "external-link" href="http://genome.ucsc.edu/" target="_blank">UCSC Genome Browser</a> and track system, which it uses. User can examine and analyze only one sequence of genome at a time but instead of plane tables 3D Genome Browser uses partition of the screen on 2 parts: 3D models and panels with information that is appeared immediately by pointing to the specific part of the genome. To investigate specific part of genome <i>left click of mouse</i> will call popup window with almost the same information but with opportunity to click on any link and continue investigation on the <a class = "external-link" href="http://www.ncbi.nlm.nih.gov/" target="_blank">National Center for Biotechnology Information web site </a>.
+                    <br>
+                    Also, system provides an opportunity to change the size of observable area of genome sequence and, therefore, of retrieving data from the server by scrolling the mouse (up to several thousands of nucleotides). 
+                    <br>
+                    Besides, group of scientist raised an issue whether it is possible to map ChIP-Sequencing data (Transcription Factors) and Single Nucleotide Polymorphisms (SNPs). This problem has been solved by aligning the position of SNP in chromosome and particular Transcription Factor. Thus, in this mode the system provides this feature for linear part of chromosome. The user can use it by selecting particular <i>linear</i> part of chromosome and then pressing the key <b>X</b>. There will be shown popup window that contains basic information about chromosome, SNP position, SNP ID (click on it to find more information on The National Center for Biotechnology Information website), transcription factor and its effect level. For scientists' comfort, dynamic filtering system has been integrated. As well <b>filtered</b> data can be easily exported in CSV format by clicking "Export to CSV".
+                    <br>
+                </p>
+                <h3 id="func-cubic">Cubic mode</h3>
+            <p>
+                Currently, almost all Genome Browsers use linear approach for showing the biggest part of data. That is observable area is only integral and complete part of one genome's chromosome. But investigation of interactions between two not connected areas of genome is still open-ended problem.    
+                Cubic mode of 3D Genome Browser provides to user an opportunity to use almost all advantages of 3 dimensions of space. Basic shape for retrieving of data is resizable cube. Once pointer is on the genome strand, the cube will be automatically built around this point. At the same time scrolling action is available for user to change size of observable area. Data that is available for all parts of strands that are located inside the cube will be shown on the popup window after <i>left click of mouse</i>. It contains information about all parts of all chromosomes that fit in the cube: chromosome with positions and complete list of SNPs (links to NCBI website for deep investigation).
+                <br>
+                Same as previous mode (<i>Linear Mode</i>) system provides an opportunity to map ChIP-Sequencing data to SNPs that are fit in the range of the particular Transcription Factor. The difference is that in the cubic mode can investigate all strands that are in the cubic area.<br>
+                <b>Important:</b> All actions for this mode are available for any strand from the space cube, where user is currently located (see <a href="#memory-management">Memory Management</a> chapter).
+            </p>
+                <h3 id="func-chipseq">ChIP-Seq mode</h3>
+            <p>
+                From biological terminology, ChIP-Sequencing is basically the method to analyze protein (or Transcription Factor) interactions with DNA. By using this mode user gets an opportunity to visualize all transcription factors that have been found for particular Cell Type and investigate it in details using <a class = "external-link" href="https://genome.ucsc.edu/" target="_blank">UCSC genome browser</a>. Visualization step starts automatical when user switch mode to <i>ChIP-Seq mode</i>. There will be appeared colored parts of genome (from green to red), which are the measured representation of protein-DNA interaction. The color identifies the level of affection from the weakest (green) to the strongest (red) level. In numbers that means: effect level 0 - green, effect level 1000 - red.<br>To call popup window with the general information and link to UCSC Genome Browser user can point to the colored part of genome and left click of mouse. While moving to another cube, ChIP-Seq data will not be coloured untill user clicks <b>T</b> key. To refresh the memory and to delete stored ChIP-Seq information for current cube (ChIP-Seq data, visualization entities) user should click <b>T</b> key. In this case all colored segments in current cube will be disappeard. To delete all ChIP-Seq information (ChIP-Seq data, visualization entities) user should click <b>Shift-T</b> key. All colored segments of genome will be disappeard.
+                <br><b>Important:</b> In case of switching to another mode, all colored segments of genome will be disappeared (see <a href="#memory-management">Memory Management</a> chapter).
+            </p>
+                <br>
+                <h3 id="func-gene">Genes</h3>
+                <p><i>The 3D Genome Browser</i> provides an opportunity to work with genes as well. With help of this system user can move camera to the location of particular gene and colour gene in logarithmic scale: <b>log(GENE_EXPRESSION_LEVEL)</b> (normalized according to the <i>maximum</i> gene expression level over the whole genome; green-red colors are used for coloring). Also system is able to list all genes, which are available in current cube (fully or partly). Here user can choose particular gene, find some information and ask system to colour it.</p>
+                <h3 id="func-ownSNPData">Using customer's SNP data</h3>
+            <p>
+                Originally, in Linear and Cubic modes scientist can retrieve SNP data that initially has been collected from enormous libraries of <a class = "external-link" href="http://www.1000genomes.org/" target="_blank">1000 Genomes Project</a>. It is useful for research, but it can't help to typical customer to investigate his own mutations even if he has required information from Genome Center. 3D Genome Browser provides an opportunity to securely upload the data to the genome browser and to start comparison SNPs with those that came from the 1000 Genome Project. All calculations (which are connected with customer's SNP data) are implemented locally on the user's machine and, thus, data cannot be sent to server and/or distributed in SNP resources.<br>
+
+                After choosing the 3d Model of genome (its cell type), on the first tab user can find <i>Use your own data</i>. To start using this feature user should choose file with SNP Data in specific format. 3D Genome Browser accepts only JSON format with data: 
+                    <ol>
+                        <li>Number of chromosome ("1", "2" etc) - Once per occurrence;</li>
+                        <li>Position of the SNP in current chromosome</li>
+                        <li>SNP ID (for example, "rs12564807")</li>
+                        <li>Genotype (for example, "AA")</li>
+                    </ol>
+                    <br><b>Example of the data:</b> <i>{"1" : [[734462,"rs12564807","AA"], ...], "2" : [[...], [...]], ...}</i><br><br>
+                    <i>To simplify converting process, we have implemented simple converter (Java-based application).</i> It can be downloaded <a href='http://cs.mcgill.ca/~abutya/supplementary/3DCustomSNPDataConverter.jar' target='_blank'>here</a>. Detailed description of this can be found <a href='http://cs.mcgill.ca/~abutya/supplementary/converterhelp.html' target='_blank'>here</a>.
+                    <br><br>
+
+                Once the data is uploaded in system, you have an opportunity to compare your SNPs with the SNPs that came from server. To do this:
+                <ol>
+                    <li>Choose <i>Linear mode</i> (for current release it works only for linear mode)</li>
+                    <li>Try to point to different parts of genome and the same moment observe an exclamation mark to the left from the line that defines your current mode.</li>
+                    <li>Left click of mouse and you will find additional column "@Customer Data/Genotype".</li>
+                    <li>Using scrolling move to complete line with SNP's ID, genotype from system and genotype from <i>customer's SNP data</i>. It will be highlighted in either red of green color, depending on match or mismatch of two genotypes.</li>
+                </ol>
+                <br>
+                <b>Important: </b>After finishing the work with <i>customer's SNP data</i> to increase the performance of local machine - go to the first "Welcome Page/UI" tab and click "Delete User Data" button (see <a href="#memory-management">Memory Management</a> chapter).
+            </p>
+            <hr>
+            <h2 id="memory-management">Memory Management</h2>
+            <p>
+                &nbsp;In spite of the fact that this Genome Browser is the website, biggest part of the processing of the data that represents on the user's screen, is on the client machine. Also, the drawing of 3D objects is very memory consuming process. That means the development has been limited by the capabilities of typical computer. To reduce the local machine load, development group introduced the Memory Management Policy.
+                <br><br>
+                <li>The success of the <a class = "external-link" href="http://web.ornl.gov/sci/techresources/Human_Genome/index.shtml" target="_blank"><b>Human Genome Project</b></a>, first release of draft of human genome and later investigation of Hi-C methodology made possible to create 3D model of full genome. As human genome contains 23 pairs of chromosome and the length of each of them varies in range from 48 to 250 million nucleotides, it is not reasonable to represent all chromosomes at a time: it is not informative and could be ruinous for productivity of local machine. To solve this issue, space has been divided by cubes of fixed size and, thus, user by moving through the space can consequently upload the data from the server.</li>
+                <br>
+                <li>Another important feature of the policy is the consistent removing of 3D objects from the memory when current distance to the 3D object is getting be greater than one cube. It allows system to balance between memory consumption and visibility.</li>
+                <br>
+                <li>As it is mentioned above, to find out 3D objects in specified region <i>Octree</i> approach has been used. Number of nodes in such a tree for specified model in fixed-size cube and resolution can be tremendous. For this reason, user can retrieve data in cubic mode only in the cube, where user currently is located. By moving through the space, crossing the border between cubes the system fully rebuilds an octree. </li>
+                <br>
+                <li>One of the most important rule of the memory management in this system is to clean ChIP-Seq data when user changes mode from "ChIP-Seq mode". Performance of a local machine fully depends on the number of objects primarily, and, secondly, on the length of the elements.</li>
+                <br>
+                <li>In 3D Genome Browser user can use own data (see <a href="#func-ownSNPData">Using customer's SNP data</a> chapter), which creates uncontrollable spending of memory by storing (usually 20+ Mb) file there. By using this feature, user is responsible for the performance of his machine. To accelerate machine, after finishing the work with own data open the first tab and click "Delete User Data" button.</li>
+
+            </p>
+            <hr>
+            <h2 id="well-known-problems">Well Known Problems</h2>
+            <p>Currently we defined that 3D Genome Browser supports such web browsers as Google Chrome and FireFox. However, FireFox has its own implementation of Pointer Lock API, which fully depends on FullScreen API. In other words, to use fully 3D Genome Browser in FireFox, firstly make sure that you always in FullScreen mode. Otherwise, it can cause not correct behaviour from the system.
+            </p>
+            <hr>
+            <h2 id="controls">Controls</h2>
+            <p>
+              <table id = "table_linear">
+                <tr>
+                  <th>Mode</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td>Linear</td>
+                  <td>Left Click</td>
+                  <td>Get popup window with basic information about chromosome, selected positions, sequence of DNA, and SNPs</td>
+                </tr>
+
+                <tr>
+                  <td>Cubic</td>
+                  <td>Left Click</td>
+                  <td>Get popup window with basic information about selected strands, chromosomes, positions and SNPs</td>
+                </tr>
+
+                <tr>
+                  <td rowspan = "3">ChIP-Seq</td>
+                  <td>Left Click</td>
+                  <td><b>For colored part of strand:</b> get popup window with basic information about the Transcription Factor, its positions and level of effect</td>
+                </tr>
+                <tr>
+                  <td>T</td>
+                  <td><b>Colour</b> all strands in <b>current cube</b> according to the ChIP-Seq experiment data: Transcription Factor and effect level (<b>only for cube other from one where mode has been activated</b>).<br>
+                  <b>Delete</b> stored ChIP-Seq information for current cube (ChIP-Seq data, visualization entities).
+                  </td>
+
+                </tr>
+                <tr>
+                  <td>Shift-T</td>
+                  <td>Refresh field of view: to erase all coloured parts of strands from the memory. (It will immediately improve performance of user's local machine.)</td>
+                </tr>
+
+                <tr>
+                  <td rowspan="2">Linear and Cubic</td>
+                  <td>X</td>
+                  <td>Get popup window with mapped ChIP-Seq data and SNPs</td>
+                </tr>
+                <tr>
+                  <td>+/- (scroll)</td>
+                  <td>Change size of observable area.</td>
+                </tr>
+
+                <tr>
+                  <td rowspan="8">All modes</td>
+                  <td>M</td>
+                  <td>Change mode in loop from Linear to Cubic, from Cubic to ChIP-Seq and from ChIP-Seq to Linear mode</td>
+                </tr>
+                <tr>
+                  <td>Tab</td>
+                  <td>Get general information about the mode</td>
+                </tr>
+                <tr>
+                  <td>W,S,A,D</td>
+                  <td>Move in space Forward, Back, Left, Right respectively</td>
+                </tr>
+                <tr>
+                  <td>Mouse</td>
+                  <td>Look around</td>
+                </tr>
+                <tr>
+                  <td>I</td>
+                  <td>List all genes available in current cube with some information and opportunity to colour it</td>
+                </tr>
+                <tr>
+                  <td>L</td>
+                  <td>Define the points to measure a distance between them.<br>Show the distance between two already existing points.</td>
+                </tr>
+                <tr>
+                  <td>Shift-L</td>
+                  <td>Erase information about the distance between two existing points (including points themselves). User must use this to measure distance between other two points.</td>
+                </tr>
+                <tr>
+                  <td>P</td>
+                  <td>Show your current location within the model.</td>
+                </tr>
+              </table>
+            </p>
+            <hr>
+            
+        </div>
+	</body>
+</html>

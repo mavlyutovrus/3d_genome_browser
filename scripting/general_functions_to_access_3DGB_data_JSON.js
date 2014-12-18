@@ -1,6 +1,6 @@
-/*DO NOT CHANGE THIS PART! BEGIN*/
-var vars = {};
-/*DO NOT CHANGE THIS PART! END*/
+/*Uncomment this if you are using not 3dbg.cs.mcgill.ca/scripting.html tool BEGIN*/
+// var vars = {};
+/*END*/
 
 /*CUSTOMIZABLE*/
 function print(value) {

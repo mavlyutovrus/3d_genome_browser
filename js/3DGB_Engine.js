@@ -17,6 +17,7 @@ var healthness;
 var STEP;
 var NUMBER_LIMIT;
 var isOneCubeOctree=true;
+var ucsc_window;
 
 var rgn;/*made it global for table*/
 var urlParams;
@@ -458,7 +459,7 @@ function modelInit(model, _startPositionOfCamera, _zeroCoordinate){
         regexpPatternChrms=/^(chr\s*([1-9]|1[0-9]|2[0-3]|[xy])[_ab]*\s+)([\d]+)[^\d]+([\d]+)[^\d]*/i
         DEFAULT_INCOORD_ENTRY='chr17 7571719-7590868';
     }
-    $('#incoords')[0].placeholder=DEFAULT_INCOORD_ENTRY;
+    document.getElementById('incoords').placeholder=DEFAULT_INCOORD_ENTRY;
     $("i#name_of_model").text(name_of_model);
     wrong_chrms_dialog_message="Wrong format of input data. Please, do use the following format:'"+((serviceForStructure=="3d")?"[chr#,]#,#', where the first part is optional":"chr#,#,#'")+". \nSeparator can be any symbol except for numeric one." +
     ((serviceForStructure=="3d")?" In terms of current model, you can use only "+particularChromosome+" chromosomes.":"");
@@ -469,17 +470,17 @@ function changeOptionFoo(indx){
     switch(indx){
         case 0:{
             DEFAULT_INCOORD_ENTRY=((serviceForStructure=='js_test')?'chr17 ':'')+'7571719-7590868';
-            $('#incoords')[0].placeholder=DEFAULT_INCOORD_ENTRY;
+            document.getElementById('incoords').placeholder=DEFAULT_INCOORD_ENTRY;
             break;
         }
         case 1:{
             DEFAULT_INCOORD_ENTRY='TP53';
-            $('#incoords')[0].placeholder=DEFAULT_INCOORD_ENTRY;
+            document.getElementById('incoords').placeholder=DEFAULT_INCOORD_ENTRY;
             break;
         }
         case 2:{
             DEFAULT_INCOORD_ENTRY=((serviceForStructure=='js_test')?'400:150:0':'2.607:3.066:2.406');
-            $('#incoords')[0].placeholder=DEFAULT_INCOORD_ENTRY;
+            document.getElementById('incoords').placeholder=DEFAULT_INCOORD_ENTRY;
             break;
         }
     }
@@ -521,7 +522,7 @@ function validate(incoords, moveCameraChoice){
         {
             var temp=incoords.match(regexpPatternChrms);
             if (temp){
-                if (particularChromosome && temp[2] && temp[2].toUpperCase() != particularChromosome.toUpperCase()){
+                if (particularChromosome && temp[2] && String(temp[2]).toUpperCase() != String(particularChromosome).toUpperCase()){
                     $("#dialog-message").text(wrong_chrms_dialog_message).dialog("open");
                     return false;
                 }
@@ -763,6 +764,17 @@ function cleanCHIPSEQdata(blockIndicesStr){
     }
 }
 
+function sendChangeIn3DGBWindow(_chr, _start_position, _end_position) {
+    var __chr = _chr.replace(/([\dXYxy]+).*/, "$1").replace('23','X')
+    if (ucsc_window && !ucsc_window.closed) {
+        ucsc_window.postMessage('changeIn3DGBWindow_O2R' +":"+ __chr + ',' + Math.floor(_start_position) + ',' + Math.floor(_end_position),'http://3dgb.cs.mcgill.ca')
+    } else {
+        ucsc_window = window.open("genome-maps-v3.0.0/genome-maps/genome-maps.html?region="+
+            __chr+":"+Math.floor(_start_position)+"-" + Math.floor(_end_position), "WindowName", "fullscreen=1,0,status=0");
+    }
+    
+}
+
 function init_controls(){
     var element=document.body;
     var pointerlockchange=function ( event ){
@@ -792,6 +804,36 @@ function init_controls(){
         keys_block.style.display="none";
         distancePoints_block.style.display="none";
     }
+
+    var handleChangeInGenomeMapsWindow = function(e) {
+        var action = e.data.split(':')[0]
+        if(action == 'changeInGenomeMapsWindow_R2O') {
+            var location_data = e.data.split(':')[1];
+            var _chr = location_data.replace(regexpPatternChrms, '\$2');
+
+            console.log("! = " + location_data + " -> " + serviceForStructure +"(" + (serviceForStructure == '3d') + ")" + " && "
+                     + particularChromosome +" chr = "+_chr +"  ("+(particularChromosome == _chr)+")")
+            
+            console.log((serviceForStructure == 'js_test' && _chr) + " : " + (serviceForStructure == '3d' && particularChromosome == _chr))
+
+            if ((serviceForStructure == 'js_test' && _chr) || (serviceForStructure == '3d' && particularChromosome == _chr)) {
+                console.log("ChangeCameraPosition '" + location_data + "'" )
+                ChangeCameraPosition(location_data, 1);
+            }
+        }
+    }
+
+    window.addEventListener('message', handleChangeInGenomeMapsWindow, false);
+
+    var unloadFunc = function() {
+        if (ucsc_window && !ucsc_window.closed) {
+            ucsc_window.close();
+        }
+    }
+
+    window.onunload = unloadFunc;
+
+
 
     /* Hook pointer lock state change events*/
     document.addEventListener( 'pointerlockchange', pointerlockchange, false );
@@ -1022,7 +1064,30 @@ function init_controls(){
             var element=document.body;
             if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element )
                 if (controls.isKeyEnabled){
+                    console.log(event.keyCode)
                     switch ( event.keyCode ){
+                        case 32:/*space*/
+                        {   
+                            var _intersection=GetIntersection();
+                            var _rgn = rgn;
+                            if (_rgn.length == 0) {
+                                object=_intersection.object;
+                                point=_intersection.point;
+                                if (object.name == ""){
+                                    return false;
+                                }
+                                if ((typeof uploaded_splines[object.name] === 'undefined')){
+                                    if (DEBUG) console.log("Warning:undefined!!!"); 
+                                    return false;
+                                }
+                                _rgn = GetSelectedTrackPoints(point, object.name);
+                            }
+                            //ALBU: CHECK THIS?!?!?!?!?!
+                            console.log(_rgn[0] + "; " + _rgn[1] + "; " + _rgn[2])
+                            sendChangeIn3DGBWindow(_rgn[0], _rgn[1], _rgn[2])
+                            event.preventDefault();
+                            break;
+                        }
                         case 66:/*control shift B*/
                         {
                             if (event.shiftKey && event.ctrlKey){
@@ -3557,6 +3622,7 @@ messenger_block=document.getElementById('messenger');
 distancePoints_block=document.getElementById('distancePoints');
 distancePoints_block.style.display="none";
 infoBlock=document.getElementById("infoblock")
+
 imgTextContainer=document.getElementById("img_text_container");
 var result_scale=((scaleFactor/blockSize).toFixed(0));
 if (result_scale==0) result_scale="1:"+((blockSize/scaleFactor).toFixed(0));

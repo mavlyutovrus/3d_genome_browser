@@ -12,7 +12,7 @@ vars.consts = {}; 			// "folder" for constants
 vars.final_results = [];
 
 
-vars.consts.gene_name = 'RB1';	//name of gene
+vars.consts.gene_name = 'RB1';	//default name of gene
 vars.consts.RELEASE_NUM = '37'; 	//release of database in Ensembl
 vars.consts.PROMOTER_LENGTH = 1000;	//distance of promoter beginning according to the beginning of the gene
 vars.consts.SEQ_REGION_ID = 27513; //seq_region_id for chromosome 13 in 37 release of homo_sapiens_variation Ensembl DB
@@ -259,7 +259,7 @@ vars.getjson3dCurrentPointFunction = function (chr, isNormal, promoter_begin, le
 	var Y_new = leftPoint[2] + rate * (rightPoint[2] - leftPoint[2]); 
 	var Z_new = leftPoint[3] + rate * (rightPoint[3] - leftPoint[3]);
 	var currentPoint = [promoter_begin, X_new, Y_new, Z_new];
-	print("Current point: (" + X_new + ", " + Y_new + ", " + Z_new + ")");
+	// print("Current point: (" + X_new + ", " + Y_new + ", " + Z_new + ")");
 
 	var callBackCustomFunction = function (data) {
 		var meshes = data["data"];
@@ -296,6 +296,7 @@ vars.getjson3dCurrentPointFunction = function (chr, isNormal, promoter_begin, le
 *		exit through vars.getjson3dCurrentPointFunction(chr, isNormal, promoter_begin, leftPoint, rightPoint) as callBackFunction (asynchromous)
 */
 vars.getjsonChrPositionFunction = function (chr, isNormal, promoter_begin ,bp, isLeft, p) {
+	
 	$.getJSON("http://1kgenome.exascale.info/chr_pos?chrid="+chr+"&bp="+bp+"&m="+((isNormal)?"normal":"leukemia") + "?callback=?", 
 	null,
 	function(data) {
@@ -344,30 +345,89 @@ vars.getjsonChrPositionFunction = function (chr, isNormal, promoter_begin ,bp, i
 	});
 }
 
+function initChromosomeEnsemblID(chr) {
+	if (vars.consts.RELEASE_NUM == 37) {
+		switch(chr) {
+			case '11':
+				SEQ_REGION_ID = 27504;break;
+			case '21':
+				SEQ_REGION_ID = 27505;break;
+			case '7':
+				SEQ_REGION_ID = 27506;break;
+			case 'Y':
+			case 'y':
+				SEQ_REGION_ID = 27507;break;
+			case '2':
+				SEQ_REGION_ID = 27508;break;
+			case '17':
+				SEQ_REGION_ID = 27509;break;
+			case '22':
+				SEQ_REGION_ID = 27510;break;
+			case '1':
+				SEQ_REGION_ID = 27511;break;
+			case '18':
+				SEQ_REGION_ID = 27512;break;
+			case '13':
+				SEQ_REGION_ID = 27513;break;
+			case '16':
+				SEQ_REGION_ID = 27514;break;
+			case '6':
+				SEQ_REGION_ID = 27515;break;
+			case 'X':
+			case 'x':
+				SEQ_REGION_ID = 27516;break;
+			case '3':
+				SEQ_REGION_ID = 27517;break;
+			case '9':
+				SEQ_REGION_ID = 27518;break;
+			case '12':
+				SEQ_REGION_ID = 27519;break;
+			case '14':
+				SEQ_REGION_ID = 27520;break;
+			case '15':
+				SEQ_REGION_ID = 27521;break;
+			case '8':
+				SEQ_REGION_ID = 27523;break;
+			case '4':
+				SEQ_REGION_ID = 27524;break;
+			case '10':
+				SEQ_REGION_ID = 27525;break;
+			case '19':
+				SEQ_REGION_ID = 27526;break;
+			case '5':
+				SEQ_REGION_ID = 27527;break;
+		}
+	}
+}
+
 /*
-*	function getRangesForGenePromoterCubicArea (chr, geneStart, geneEnd, isNormal, radiusCube, isPositive)
-*	The main procedural function that asynchronously accesses to the database of 3D Genome Browser and retrieves information about 3D positions of strands for particular model (according to the chr chromosome and isNormal parameters) in specific cubic area, built around the promoter start point of specific gene. Prints queries to Ensembl database (homo_sapiens_variation) to find 1) phenotypes associated with specific variations; 2) intersections of the phenotypes for different neighbour intervals in 3D space within the chromosome (process is based on the comparing promoter area with others not connected intervals within cubic area with radius = radiusCube).
+*	function getRangesForGenePromoterCubicArea (chr, geneName, geneStart, geneEnd, isNormal, radiusCube, isPositive)
+*	The main procedural function that asynchronously accesses the database of 3D Genome Browser and retrieves information about 3D positions of strands for particular model (according to the chr chromosome and isNormal parameters) in specific cubic area, built around the promoter start point of specific gene. Prints queries to Ensembl database (homo_sapiens_variation) to find 1) phenotypes associated with specific variations; 2) intersections of the phenotypes for different neighbour intervals in 3D space within the chromosome (process is based on the comparing promoter area with others not connected intervals within cubic area with radius = radiusCube).
 *	@Parameters:
 *		chr - current chromosome
+*		geneName - Name of gene, used only for naming file
 *		geneStart - position of beginning of gene (numerical, lowest number among geneStart and geneEnd)
 *		geneEnd - position of end of gene (numerical, largest number among geneStart and geneEnd)
 *		isNormal - boolean parameter if healthy or leukemia cell will be used for retrieve information
 *		radiusCube - radius of the cube (1/2 of its edge), which will be used for retrieve the data
 *		isPositive - boolean parameter, "true" means positive strand, "false" - negative (used for genes)
-*	@USES: vars.consts.gene_name, vars.final_results, vars.consts.RELEASE_NUM, consts.SEQ_REGION_ID
+*	@USES: vars.final_results, vars.consts.RELEASE_NUM, consts.SEQ_REGION_ID
 *
 */
-vars.getRangesForGenePromoterCubicArea = function(chr, geneStart, geneEnd, isNormal, radiusCube, isPositive, callBackCustomFunction) {
+vars.getRangesForGenePromoterCubicArea = function(chr, geneName, geneStart, geneEnd, isNormal, radiusCube, isPositive, callBackCustomFunction) {
 	// refresh parameters after (if so) last run
 	vars.final_results = [];
 	vars.consts.radiusCube = radiusCube;
 	vars.consts.isPositive = isPositive;
+	vars.consts.gene_name = geneName;
 	vars.req_num = 1;
 	vars.res_num = 0;
 	waitInterval = 0;
 
+	initChromosomeEnsemblID(chr);
 
-	var promoter_begin = ((isPositive)?geneStart-vars.consts.PROMOTER_LENGTH:geneEnd+vars.consts.PROMOTER_LENGTH);
+
+	var promoter_begin = ((isPositive)?parseInt(geneStart)-vars.consts.PROMOTER_LENGTH:parseInt(geneEnd)+vars.consts.PROMOTER_LENGTH);
 	//init STEP "constant" that has been observed during experiments
 	vars.STEP = ((isNormal)?200000:500000); //normal vs leukemia statistical approximation
 

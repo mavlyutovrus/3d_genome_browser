@@ -1,64 +1,618 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
 <title>The page for Scripting with 3D Genome Browser's API</title>
+<link href="css/cupertino/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="js/codemirror/lib/codemirror.min.css">
 <link rel="stylesheet" type="text/css" href="js/codemirror/theme/3024-night.min.css">
-<script type="text/javascript" src="http://cdn.jsdelivr.net/codemirror/4.5.0/codemirror.min.js" defer ></script>
-<script type="text/javascript" src="js/codemirror/mode/javascript/javascript.min.js" defer></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" defer></script>
+<link href="css/scripting_main.css" rel="stylesheet">
+
+<!-- <script type="text/javascript" src="http://cdn.jsdelivr.net/codemirror/4.5.0/codemirror.min.js" defer ></script> -->
+
+<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" defer></script> -->
+<script type="text/javascript" src="js/old/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.10.4.custom.min.js"></script>
+
+<script type="text/javascript">
+	$(function() {$( "#tabs" ).tabs({ "active": 1});
+		$("#href_tabs-0").click(function() {window.location = "index.html"});
+	})
+</script>
+<script type="text/javascript" src="js/codemirror/lib/codemirror.min.js"></script>
+<script type="text/javascript" src="js/codemirror/mode/javascript/javascript.min.js"></script>
 <script src="content/geneData_2.0.json" defer></script>
-<style>.CodeMirror {border: 1px solid #eee;height: auto;} .CodeMirror-scroll {overflow-y: hidden;overflow-x: auto;}</style>
+<script type="text/javascript" src="content/helpSection.js"></script>
 </head>
 <body>
-<h1 align="center">SCRIPTING PAGE</h1>
-<p>Here is the page with jquery libraries and preloaded gene data. Use javascript console bellow or one in your web browser for using <i>3D Genome Browser</i>'s API. Also this page is the storage of scripts that people use for achieving various results in exploring 3D genome.</p>
-<table border="1" style="width:100%">
-<tr>
-<th>ID</th>
-<th>Description</th>
-<th>Author</th>
-<th>Link</th>
-</tr>
-<tr>
-<td>1</td>
-<td>General functions for accessing data from 3D Genome Browser Database. It includes: 
-<li>3D structures for specific models</li>
-<li>Information about nucleotides</li>
-<li>SNPs Information</li>
-<li>ChIP-Sequencing Experiments data</li>
-<li>Orientation functions (search of closest point)</li>
-<hr>More information in the header for each function
-</td>
-<td>Alexander Butyaev</td>
-<td><a href="scripting/general_functions_to_access_3DGB_data_JSON.js" target="_blank">script</a></td>
-</tr>
-<tr>
-<td>2</td>
-<td>The main procedural function (<i>vars.getRangesForGenePromoterCubicArea(chr, geneStart, geneEnd, isNormal, radiusCube, isPositive, callBackCustomFunction)</i>) of this package asynchronously accesses to the database of 3D Genome Browser and retrieves information about 3D positions of strands for particular model (according to the chr chromosome and isNormal parameters) in specific cubic area, built around the promoter start point of specific gene.<br>OPTIONAL: Also it outputs queries to Ensembl database (homo_sapiens_variation) to find 1) phenotypes associated with specific variations; 2) intersections of the phenotypes for different neighbour intervals in 3D space within the chromosome (process is based on the comparing promoter area with others not connected intervals within cubic area with radius = radiusCube) AND genes, located in the cubic area built around start point of promoter area of particular gene.<br>Use it like<br><b>vars.getRangesForGenePromoterCubicArea('13', 48877883, 49056026, true, 0.2, true); /*37Release RB1 gene*/</b><br> to get all the stands in radius <i>0.2</i> from the promoter for <i>GM06990</i> cell line.<hr>More information in the header for each function</td>
-<td>Alexander Butyaev</td>
-<td><a href="scripting/Ensembl_snps&phenotype_for_gene_promoter_in_cubic_area.js" target="_blank">script</a></td>
-</tr>
-</table>
-<br>
-<h3>Your code</h3>
-<p>(Use standard javascript here. To output any results, use integrated <i>function print(value)</i>; to erase an output window - use <i>function clear()</i>. For global variables, use <i>vars</i> object. For example, vars.a = 1; vars.b = "Hello World"; vars.getCheers = function(name){print("Hello "+name+"!");})</p>
-<p><textarea id="code" name="code"></textarea></p>
-<button onclick="run()"> Run </button> <button onclick="save()"> Save </button>
-<br><br>
-<h3>Output</h3>
-<textarea readonly id="display" style="height: 50px; width: 100%;"></textarea>
-<br>
-<p>If you want to share your script(s), please email to Alexander Butyaev <i>alexander . butyaev at mail . mcgill . ca</i></p>
+	<script>document.body.style.display = 'none';document.onreadystatechange = function () {if (document.readyState == "complete") document.body.style.display = '';}</script>
+
+	<div id="tabs">
+          <ul>
+            <li><a id="href_tabs-0" href="#tabs-0">Welcome Page/UI</a></li>
+            <li><a id="href_tabs-5" href="#tabs-5">Docs & Tools</a></li>
+            <li><a id="href_tabs-4" href="#tabs-4">About</a></li>
+            <li><a id="href_tabs-6" href="#tabs-6">News</a></li>
+            <li><a id="href_tabs-2" href="#tabs-2">Contact us</a></li>
+            <li><a id="href_tabs-7" href="#tabs-7" class='backButton' onclick="window.history.back()">Back</a></li>
+          </ul>
+          <div id="tabs-5">
+
+          	<h1 align="center">SCRIPT PACKEGEs, URLs and TOOLs</h1>
+
+			<p>Here is the page with jquery libraries and preloaded gene data. Use javascript console bellow or one in your web browser for using <i>3D Genome Browser</i>'s API. Below you can find interactive documentation for web-services and its URLs, which are the basis of the 3D Genome Browser. Also this page contains various scripts with documentation that people use for achieving various results in exploring 3D genome.</p>
+			<table border="1" style="width:100%">
+			<tr>
+			<th>ID</th>
+			<th>Description</th>
+			<th>Author</th>
+			<th>Link</th>
+			</tr>
+
+			<tr>
+			<td>0</td>
+			<td>General description of the web-services, its URLs. It includes following services: 
+			<ul>
+				<li>3D structures</li>
+				<li>Nucleotide sequences</li>
+				<li>SNP</li>
+				<li>Experimental ChIP-Sequencing data</li>
+				<li>Orientation functionality (closest point)</li>
+			</ul>
+			<button class="green fullWidth" onclick="showHideHiddenRow('zeroHiddenLevel')">Try it</button>
+			</td>
+			<td>Alexander Butyaev, Ruslan Mavlyutov</td>
+			<td>Go to description for examples</td>
+			</tr>
+			<tr class='hiddenRow' id='zeroHiddenLevel' style='display: none'>
+				<td colspan="4">
+					<b>Description:</b>
+					<hr>
+					<ul>
+						<li><i><b>3D structure web-service</b></i></li>
+						This web service provides an access to the 3D structure of different models. Currently, there are three models of human 3D genome structures. The structures are interpolated with a finite number of points. The volume encompassing the genome structure is segmented in 3D cubic cells. Spatial queries use the coordinates of a cube (starting and ending positions on the x, y, and z axis) as an input, and return the coordinates of the interpolation points modelling the DNA chains contained within this cell. In particular, it allows us to identify the ranges of DNA subsequences within this volume.
+						<br><br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+
+
+						<p style="display: inline;">Get 3D structure for cubic area in range X: from <input id="3DGB_URL_range_begin_X1" SIZE="9" placeholder="2"></input> to <input id="3DGB_URL_range_end_X1" SIZE="9" placeholder="3"></input>, Y: from <input id="3DGB_URL_range_begin_Y1" SIZE="9" placeholder="2"></input> to <input id="3DGB_URL_range_end_Y1" SIZE="9" placeholder="3"></input>, Z: from <input id="3DGB_URL_range_begin_Z1" SIZE="9" placeholder="2"></input> to <input id="3DGB_URL_range_end_Z1" SIZE="9" placeholder="3"></input>, using <input type='radio' id="3DGB_URL_isNormal1_t" name="3DGB_URL_isNormal1" value='true' checked>healthy</input>, <input type='radio' id="3DGB_URL_isNormal1_f" name="3DGB_URL_isNormal1" value='false'>leukemia</input> or <input type='radio' id="3DGB_URL_isNormal1__" name="3DGB_URL_isNormal1" value='_'>simulated</input> cell data, for chromosome <input id="3DGB_URL_chr1" SIZE="3" placeholder="19"></input>.</p>;
+
+						<br>
+						<button class="green" onclick="processWS3DStructure(true)">Open in new window</button><button class="green"  onclick="processWS3DStructure(false)">Get appropriate URL</button><br>
+						<p id='commandLine_3DGB_URL_1' style='display:none;'></p>
+
+						<hr>
+						<li><i><b>Nucleotide web-service</b></i></li>
+						This web-service provides an access to the Nucleotide sequences from GRCh38 asembly of the human genome from the UCSC genome browser. In the 3DGB it is used as a reference genome sequence. Nucleotide sequences can be accessed from their chromosomic location.
+						<br><br>
+						Fill the following fields to have an appropriate example of the URL.<br>
+
+						<p style="display: inline;">Get Nucleotide data for chromosome <input id="3DGB_URL_chr2" SIZE="3" placeholder="1"></input> in range(positions) from <input id="3DGB_URL_range_begin2" SIZE="9" placeholder="59146954"></input> to <input id="3DGB_URL_range_end2" SIZE="9" placeholder="59148000"></input>.</p>;
+
+						<br>
+						<button class="green" onclick="processWSNucleotides(true)">Open in new window</button><button class="green"  onclick="processWSNucleotides(false)">Get appropriate URL</button><br>
+						<p id='commandLine_3DGB_URL_2' style='display:none;'></p>
+						<hr>
+						<li><i><b>SNPs web-service</b></i></li>
+						This web-service provides an access to the storage of the Single Nucleotide Polymorphism (SNP) data from the 1000 Genomes Project. A query returns an array of arrays showing information for each individual SNP found within this interval. This information is represented as a 4-tuple including the SNP position, the SNP ID and the two alleles.
+						<br><br>
+						Fill the following fields to have an appropriate example of the URL.<br>
+
+						<p style="display: inline;">Get SNPs information data for chromosome <input id="3DGB_URL_chr3" SIZE="3" placeholder="1"></input> in range(positions) from <input id="3DGB_URL_range_begin3" SIZE="9" placeholder="59146954"></input> to <input id="3DGB_URL_range_end3" SIZE="9" placeholder="59148000"></input>.</p>;
+
+						<br>
+						<button class="green" onclick="processWSSNPs(true)">Open in new window</button><button class="green"  onclick="processWSSNPs(false)">Get appropriate URL</button><br>
+						<p id='commandLine_3DGB_URL_3' style='display:none;'></p>
+						<hr>
+						<li><i><b>Experimental ChIP-Seq web-service</b></i></li>
+						This web-service provides an access to the experimental ChIP-sequencing data from the ENCODE project stored in UCSC genome browser. This data is usefull for identifying transcription factors binding sites(TFBS). The output of such query is an array of 7-tuples that contain basic information on the Chip-Seq data. A 7-tuple stores the chromosome number, starting and ending index of the Chip-Seq peak, the transcription factor name, a normalized value (ranging from 1 to 1000) indicating the magnitude of the binding, the cell lines with similar TFBS, and a list of SNPs occurring in this binding site.
+						<br><br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+						<p style="display: inline;">Get ChIP-Sequencing data for chromosome <input id="3DGB_URL_chr4" SIZE="3" placeholder="1"></input> in range(positions) from <input id="3DGB_URL_range_begin4" SIZE="9" placeholder="59146954"></input> to <input id="3DGB_URL_range_end4" SIZE="9" placeholder="59160000"></input> for specific Cell Line <input id="3DGB_URL_Celline4" SIZE="6" placeholder="K562"></input></p>;
+
+						<br>
+						<button class="green" onclick="processWSChIP_SEQ(true)">Open in new window</button><button class="green"  onclick="processWSChIP_SEQ(false)">Get appropriate URL</button><br>
+						<p id='commandLine_3DGB_URL_4' style='display:none;'></p>
+
+						<hr>
+						<li><i><b>Determining single nucleotide 3D coordinate</b></i></li>
+						As spatial data is presented as a finite set of points in 3D space, this web-service provides the closest in terms of strand existing point in the database. This service is usefull for approximation of the data, alligning data from different resources.
+						<br><br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+						<p style="display: inline;">Find the closest point in 3DGB database to the point on <input id="3DGB_URL_chr5" SIZE="3" placeholder="1"></input> chromosome position <input id="3DGB_URL_bp5" SIZE="9" placeholder="59146954"></input>;<br>using <input type='radio' id="3DGB_URL_isNormal5_t" name="3DGB_URL_isNormal5" value='true' checked>healthy</input>, <input type='radio' id="3DGB_URL_isNormal5_f" name="3DGB_URL_isNormal5" value='false'>leukemia</input> or <input type='radio' id="3DGB_URL_isNormal5__" name="3DGB_URL_isNormal5" value='_'>simulated</input> cell data</p>;
+						<br>
+						<button class="green" onclick="processWSClosest_Point(true)">Open in new window</button><button class="green"  onclick="processWSClosest_Point(false)">Get appropriate URL</button><br>
+						<p id='commandLine_3DGB_URL_5' style='display:none;'></p>
+					</ul>
+				</td>
+			</tr>
+
+
+			<tr>
+			<td>1</td>
+			<td>General functions for accessing data from 3D Genome Browser Database. It includes: 
+			<ul>
+				<li>3D structures for specific models</li>
+				<li>Information about nucleotides</li>
+				<li>SNPs Information</li>
+				<li>ChIP-Sequencing Experiments data</li>
+				<li>Orientation functions (search of closest point)</li>
+			</ul><button class="green fullWidth" onclick="showHideHiddenRow('firstHiddenLevel')">Try it</button>
+			</td>
+			<td>Alexander Butyaev</td>
+			<td><a class="downloadButton" href="scripting/general_functions_to_access_3DGB_data_JSON.js" style="color: white;" target="_blank">Download</a></td>
+			</tr>
+			<tr class='hiddenRow' id='firstHiddenLevel' style='display: none'>
+				<td colspan="4">
+					<b>Package description:</b> 
+					<hr>
+					<ul>
+						<li><i><b>vars.get_JSON_3D_Query</b></i></li>
+						This method retrieves information about 3D structure within 3D neighbourhood (cubic area) of specific model (described by <i>isNormal</i> and <i>chr</i> parameters). Also executes callBackCustomFunction function with <i>data</i> argument.<br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+
+
+						<p style="display: inline;">Get 3D structure for cubic area in range X: from <input id="3DGB_range_begin_X1" SIZE="9" placeholder="2"></input> to <input id="3DGB_range_end_X1" SIZE="9" placeholder="3"></input>, Y: from <input id="3DGB_range_begin_Y1" SIZE="9" placeholder="2"></input> to <input id="3DGB_range_end_Y1" SIZE="9" placeholder="3"></input>, Z: from <input id="3DGB_range_begin_Z1" SIZE="9" placeholder="2"></input> to <input id="3DGB_range_end_Z1" SIZE="9" placeholder="3"></input>, using <input type='radio' id="3DGB_isNormal1_t" name="3DGB_isNormal1" value='true' checked>healthy</input>, <input type='radio' id="3DGB_isNormal1_f" name="3DGB_isNormal1" value='false'>leukemia</input> or <input type='radio' id="3DGB_isNormal1__" name="3DGB_isNormal1" value='_'>simulated</input> cell data, for chromosome <input id="3DGB_chr1" SIZE="3" placeholder="19"></input>.</p>;
+
+						<br>
+						<button class="green" onclick="processGet_JSON_3D_QueryInput(true)">Run it</button><button class="green"  onclick="processGet_JSON_3D_QueryInput(false)">Get appropriate command</button><br>
+						<p id='commandLine_3DGB_1' style='display:none;'></p>
+
+						<hr>
+						<li><i><b>vars.get_JSON_Nucleotides_List_Query</b></i></li>
+						Retrieves a list of nucleotides for specified range within particular chromosome and execute callBackCustomFunction function with <i>data</i> argument.
+						<br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+						<p style="display: inline;">Get Nucleotide data for chromosome <input id="3DGB_chr2" SIZE="3" placeholder="1"></input> in range(positions) from <input id="3DGB_range_begin2" SIZE="9" placeholder="59146954"></input> to <input id="3DGB_range_end2" SIZE="9" placeholder="59148000"></input>.</p>;
+
+						<br>
+						<button class="green" onclick="processGet_JSON_Nucleotides_List_QueryInput(true)">Run it</button><button class="green"  onclick="processGet_JSON_Nucleotides_List_QueryInput(false)">Get appropriate command</button><br>
+						<p id='commandLine_3DGB_2' style='display:none;'></p>
+						<hr>
+						<li><i><b>vars.get_JSON_SNPs_in_Range_Query</b></i></li>
+						Retrieves information about SNPs: <b>an array of arrays</b> with [SNP Position, SNP_ID(w/o 'rs'), allele_1, allele_2] for defined range within particular chromosome and execute callBackCustomFunction function with <i>data</i> argument to process it.<br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+						<p style="display: inline;">Get SNPs information data for chromosome <input id="3DGB_chr3" SIZE="3" placeholder="1"></input> in range(positions) from <input id="3DGB_range_begin3" SIZE="9" placeholder="59146954"></input> to <input id="3DGB_range_end3" SIZE="9" placeholder="59148000"></input>.</p>;
+
+						<br>
+						<button class="green" onclick="processGet_JSON_SNPs_in_Range_QueryInput(true)">Run it</button><button class="green"  onclick="processGet_JSON_SNPs_in_Range_QueryInput(false)">Get appropriate command</button><br>
+						<p id='commandLine_3DGB_3' style='display:none;'></p>
+						<hr>
+						<li><i><b>vars.get_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_Query</b></i></li>
+						Retrieves information about ChIP-Sequenciong experiment data: <b>an array of arrays</b> with [chromosome, TF's begin position, TF's end, TF ID, cellines with current TF, SNPs information (@reference to vars.get_JSON_SNPs_in_Range_Query function)] for defined range within particular chromosome for particular cell line and execute callBackCustomFunction function with <i>data</i> argument to process it. (TF means Transcription Factor)<br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+						<p style="display: inline;">Get ChIP-Sequencing data for chromosome <input id="3DGB_chr4" SIZE="3" placeholder="1"></input> in range(positions) from <input id="3DGB_range_begin4" SIZE="9" placeholder="59146954"></input> to <input id="3DGB_range_end4" SIZE="9" placeholder="59160000"></input> for specific Cell Line <input id="3DGB_Celline4" SIZE="6" placeholder="K562"></input></p>;
+
+						<br>
+						<button class="green" onclick="processGet_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_QueryInput(true)">Run it</button><button class="green"  onclick="processGet_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_QueryInput(false)">Get appropriate command</button><br>
+						<p id='commandLine_3DGB_4' style='display:none;'></p>
+
+						<hr>
+						<li><i><b>vars.get_JSON_Closest_Point_To_Current_Pos_Query</b></i></li>
+						Retrieves information about closest point to specific base (position) within particular chromosome which exists in 3D Genome Browser Database for specific model (described by <i>isNormal</i> and <i>chr</i> parameters). Also executes <i>callBackCustomFunction</i> function with <i>data</i> argument to process it.
+						<br>
+						Fill the following fields to have an appropriate example of the command.<br>
+
+						<p style="display: inline;">Find the closest point in 3DGB database to the point on <input id="3DGB_chr5" SIZE="3" placeholder="1"></input> chromosome position <input id="3DGB_bp5" SIZE="9" placeholder="59146954"></input>;<br>using <input type='radio' id="3DGB_isNormal5_t" name="3DGB_isNormal5" value='true' checked>healthy</input>, <input type='radio' id="3DGB_isNormal5_f" name="3DGB_isNormal5" value='false'>leukemia</input> or <input type='radio' id="3DGB_isNormal5__" name="3DGB_isNormal5" value='_'>simulated</input> cell data</p>;
+						<br>
+						<button class="green" onclick="processGet_JSON_Closest_Point_To_Current_Pos_QueryInput(true)">Run it</button><button class="green"  onclick="processGet_JSON_Closest_Point_To_Current_Pos_QueryInput(false)">Get appropriate command</button><br>
+						<p id='commandLine_3DGB_5' style='display:none;'></p>
+					</ul>
+				</td>
+			</tr>
+
+			<tr>
+			<td>2</td>
+			<td>
+				<b><i>Exploring of the 3D neighbourhood of a gene.</i></b><br>
+				This package allows user to investigate 3D neighbourhood centered on the beginning of specific gene in the 3D structure of chromosome. Consequently, it retrieves the list of SNPs found in promoter region of the gene and in other DNA strands that are not connected with promoter/gene strand but still located in particular 3D neighbourhood. Optionally, it is possible to get the list of genes, which are located in the same 3D neighourhood.
+
+				<!--The main procedural function (<i>vars.getRangesForGenePromoterCubicArea(chr, geneName, geneStart, geneEnd, isNormal, radiusCube, isPositive, callBackCustomFunction)</i>) of this package asynchronously accesses to the database of 3D Genome Browser and retrieves information about 3D positions of strands for particular model (according to the chr chromosome and isNormal parameters) in specific cubic area, built around the promoter start point of specific gene.<br>OPTIONAL: Also it outputs queries to Ensembl database (homo_sapiens_variation) to find 1) phenotypes associated with specific variations; 2) intersections of the phenotypes for different neighbour intervals in 3D space within the chromosome (process is based on the comparing promoter area with others not connected intervals within cubic area with radius = radiusCube) AND genes, located in the cubic area built around start point of promoter area of particular gene.<br>Use it like<br><b>vars.getRangesForGenePromoterCubicArea('13', 48877883, 49056026, true, 0.2, true); /*37Release RB1 gene*/</b><br> to get all the stands in radius <i>0.2</i> from the promoter for <i>GM06990</i> cell line.-->
+			<button class="green fullWidth" onclick="showHideHiddenRow('secondHiddenLevel')">Try it</button>
+			</td>
+			<td>Alexander Butyaev</td>
+			<td><a class="downloadButton" href="scripting/Ensembl_snps&phenotype_for_gene_promoter_in_cubic_area.js" style="color: white;" target="_blank">Download</a></td>
+			</tr>
+			<tr class="hiddenRow" id='secondHiddenLevel' style='display: none'>
+				<td colspan="4">
+					<b>Package description:</b> Set of functions and procedures to access both 3DGB database (3D structure of chromosome) and Ensembl database, to combine spatial structure of chromosome, gene and SNP information for exploring particular cubic area.
+					<hr>
+					<ul>
+					<li><i><b>vars.getRangesForGenePromoterCubicArea</b></i></li>
+					<i>This is the main function of the package.</i> It manages all assynchronious calls to the 3DGB database and outputs the result (described below) in the output area. <br>
+					Consequently, it retrieves all points of 3D structure available in the 3D neighbourhood around the beginning of the specified gene, approximate discrete points to consequent strands, assigns to every strand SNPs and/or genes. Besides it creates specific queries to Ensembl Human Variation Database to get phenotypes of particular SNP in current 3D neighbourhood.
+					<br>
+					<b>Output</b> is defined by <i>vars.Print_Input_For_Ensembl_Specific</i> function (described below).<br>
+					<br>
+					Fill the following fields to have an appropriate example of the command.<br>
+					<p style="display: inline;" >Chromosome: <input id="ens_chr" SIZE="2" placeholder="13"></input>; gene name: <input id="ens_gene_name" SIZE="7" placeholder="RB1"></input>; gene begin position: <INPUT id="ens_gene_beginning" SIZE="9" placeholder="48877883"></input>; gene end position: <INPUT id="ens_gene_end" SIZE="9" placeholder="49056026"></input>;<br>using <input type='radio' id="ens_isNormal_t" name="ens_isNormal" value='true' checked>healthy</input> or <input type='radio' id="ens_isNormal_f" name="ens_isNormal" value='false'>leukemia</input> cell data;<br>find all the SNPs in the distance of <INPUT id="radiusCube" SIZE="3" placeholder="0.2"></input> from the beginning of gene promoter; gene is on the <input type='radio' id="ens_isPositive_t" name="ens_isPositive" value='true' checked>5'-3'</input> or <input type='radio' id="ens_isPositive_f" name="ens_isPositive" value='false'>3'-5'</input> strand.</p>
+					<br>
+					<button class="green" onclick="processGetRangesForGenePromoterCubicAreaInput(true)">Run it</button><button class="green"  onclick="processGetRangesForGenePromoterCubicAreaInput(false)">Get appropriate command</button><br>
+					<p id='commandLine1' style='display:none;'></p>
+					<hr>
+					<li><i><b>vars.getGenesInCubicAreaAroundGenePromoter</b></i></li>
+					Optional function that searches genes, which are located near (with some intersection) strands (+promoter) in cubic area around promoter region of specified gene
+					As an argument it takes <i>final_results</i>, which is <b>an array of arrays</b> with begin and end positions(bases) of the interesting. <i>final_results[0]</i> has to contain start and stop positions of promoter of any specific gene or any interesting area.)
+					<hr>
+					<li><i><b>vars.getjsonChrPositionFunction</b></i></li>
+					Function recursively searches left and right ends of interval within the chromosome. Defines left and right points - points which exist in the original database of 3D Genome Browser and are the "linearly" closest points to the original point.
+					<hr>
+					<li><b><i>vars.getApproximatedRangesStrandsForRadiusFunction</i></b></li>
+					Core function of the package - calculate approximation for parts of strand that fit into the cubic area based on the original points in the 3DGB database.
+					<hr>
+					<li><b><i>vars.Print_Input_For_Ensembl_Specific</i></b></li>
+					Creates input string(s) to ensembl database (<i>mysql  -u anonymous  -P 3306 -h 193.62.203.187</i>). Uses <i>homo_sapiens_variation</i> databases.<br>
+					There are 2 types of query for every interval of chromosome:
+					<ol>
+						<li>mapping of variations and phenotypes that are associated with these variations</li>
+						<li>comparison every interval's entities with first interval (results[0]) in terms of intersection of phenotype</li>
+					</ol>
+					Query automatically will save output of ensembl response in specific files
+				</ul>
+				</td>
+			</tr>
+			</table>
+			<br>
+			<h3>Test your code</h3>
+			<p>(Use standard javascript here. To output any results, use integrated <i>function print(value)</i>; to erase an output window - use <i>function clear()</i>. For global variables, use <i>vars</i> object. For example, vars.a = 1; vars.b = "Hello World"; vars.getCheers = function(name){print("Hello "+name+"!");})</p>
+			<p><textarea id="code" name="code"></textarea></p>
+			<button onclick="run()"> Run </button> <button onclick="save()"> Save </button>
+			<br><br>
+			<h3>Output</h3>
+			<textarea readonly id="display" style="height: 80px; width: 100%;"></textarea>
+			<br>
+			<p>If you want to share your script(s), please email to Alexander Butyaev <i>alexander . butyaev at mail . mcgill . ca</i></p>
+
+
+          </div>
+
+          	<div id="tabs-2">
+                <p><em>3D Genome Browser</em><br><hr><h4>Development Team</h4>
+                  <ul>
+                    <li><a style="color: rgb(0,0,255)" href="mailto:alexander.butyaev@mail.mcgill.ca?subject=[3D Genome Browser]">Alexander Butyaev</a></li>
+                    <li><a style="color: rgb(0,0,255)" href="mailto:ruslan@exascale.info?subject=[3D Genome Browser]">Ruslan Mavlyutov</a></li>
+                  </ul>
+                  <hr><h4>Principal Investigators</h4>
+                  <ul>
+                    <li><a style="color: rgb(0,0,255)" href="mailto:jeromew@cs.mcgill.ca?subject=[3D Genome Browser]">Jérôme Waldispühl</a> (<a target='_blank' href='http://csb.cs.mcgill.ca/'>CSB Group, McGill University</a>)</li>
+                    <li><a style="color: rgb(0,0,255)" href="mailto:phil@exascale.info?subject=[3D Genome Browser]">Philippe Cudre-Mauroux</a> (<a target='_blank' href='http://exascale.info/'>eXascale Infolab, University of Freiburg</a>)</li>
+                  </ul>
+                  </p>
+        	</div>
+	        <div id="tabs-4">
+	        	
+	        </div>
+
+	        <div id="tabs-6">
+	        	
+	        </div>
+    </div>
+	
 <script>
     var vars = {};
     var code = document.getElementById("code");
     var display=document.getElementById("display")
-    window.onload = function() {window.editor = CodeMirror.fromTextArea(code, {mode: "javascript",lineNumbers: true,matchBrackets: true,lineWrapping: true,theme : '3024-night'});editor.setValue("print('Curiosity is the key to creativity!');\nvar len = 1;\nfor(var i = 0; i < len; i++) {\n\tprint('Do you agree?');\n}");};
+    window.onload = function() {
+    	window.editor = CodeMirror.fromTextArea(code, {mode: "javascript",lineNumbers: true,matchBrackets: true,lineWrapping: true,theme : '3024-night'});editor.setValue("print('Curiosity is the key to creativity!');\nvar len = 1;\nfor(var i = 0; i < len; i++) {\n\tprint('Do you agree?');\n}");};
     function run(){var result = eval(editor.getValue());var elemLen = display.value.length;display.selectionStart = elemLen;display.selectionEnd = elemLen;display.focus();return result;}
     function save(){var mydata = 'var vars = {};\n\nfunction print(value) {console.log(value);}\n'+editor.getValue()+'\n';window.open('data:text/javascript;charset=UTF-8,'+encodeURIComponent(mydata),"_blank");}
     function print(value){display.innerHTML+= value + "\n";}
     function clear() {display.innerHTML="";}
+    function showHideHiddenRow(id){
+    	if (document.getElementById(id).style.display)
+    		document.getElementById(id).style.display = '';
+    	else
+    		document.getElementById(id).style.display = 'none';
+    }
+
+    function checkChromosome(id) {
+    	var _chr = document.getElementById(id);
+		_chr = _chr.value||_chr.placeholder
+		if (!_chr.match(/^([1-9]|1[0-9]|2[0-3]|[xy])$/i)) {
+			alert('Error: check the value of the chromosome');
+			return false;
+		}
+		return _chr;
+    }
+    function checkPosition(id, errorMessage){
+    	var _position = document.getElementById(id);
+		_position = _position.value||_position.placeholder
+		if (!_position.match(/^[\d]+$/i)) {
+			alert(errorMessage);
+			return false;
+		}
+		return _position;
+    }
+    function checkFloatNumerical(id, errorMessage){
+    	var _position = document.getElementById(id);
+		_position = _position.value||_position.placeholder
+		if (!_position.match(/^[\d\.]+$/i)) {
+			alert(errorMessage);
+			return false;
+		}
+		return _position;
+    }
+    function checkFloatMinusNumerical(id, errorMessage){
+    	var _position = document.getElementById(id);
+		_position = _position.value||_position.placeholder
+		if (!_position.match(/^[\d\.-]+$/i)) {
+			alert(errorMessage);
+			return false;
+		}
+		return _position;
+    }
+
+    function checkIsNormal(idBasis, isTriplet) {
+    	var _isNormal = document.getElementById(idBasis+'_t').checked;
+    	if (_isNormal) return true;
+    	else if (isTriplet) {
+    		_isNormal = document.getElementById(idBasis+'_f').checked;
+    		if (_isNormal) return false;
+    		else return undefined;
+    	} else return false;
+    }
+
+    function processWS3DStructure(isExec) {
+    	var X_Begin = checkFloatMinusNumerical('3DGB_URL_range_begin_X1', 'Error: check beginning of the X range.')
+    	if (!X_Begin) return;
+    	var X_End = checkFloatMinusNumerical('3DGB_URL_range_end_X1', 'Error: check end position of the X range.')
+    	if (!X_End) return;
+    	var Y_Begin = checkFloatMinusNumerical('3DGB_URL_range_begin_Y1', 'Error: check beginning of the Y range.')
+    	if (!Y_Begin) return;
+    	var Y_End = checkFloatMinusNumerical('3DGB_URL_range_end_Y1', 'Error: check end position of the Y range.')
+    	if (!Y_End) return;
+    	var Z_Begin = checkFloatMinusNumerical('3DGB_URL_range_begin_Z1', 'Error: check beginning of the Z range.')
+    	if (!Z_Begin) return;
+    	var Z_End = checkFloatMinusNumerical('3DGB_URL_range_end_Z1', 'Error: check end position of the Z range.')
+    	if (!Z_End) return;
+    	var isNormal = checkIsNormal("3DGB_URL_isNormal1", true);
+    	var _chr;
+    	if (isNormal!==undefined) {_chr = checkChromosome('3DGB_URL_chr1');if (!_chr) return;}
+		var tempV;
+    	if (isNormal === true) {
+    		tempV = 'http://1kgenome.exascale.info/3d?chr='+_chr+'&m=normal&xstart='+X_Begin+'&xend='+X_End+'&ystart='+Y_Begin+'&yend='+Y_End+'&zstart='+Z_Begin+'&zend='+Z_End
+    	} else if (isNormal === false) {
+    		tempV = 'http://1kgenome.exascale.info/3d?chr='+_chr+'&m=leukemia&xstart='+X_Begin+'&xend='+X_End+'&ystart='+Y_Begin+'&yend='+Y_End+'&zstart='+Z_Begin+'&zend='+Z_End
+    	} else {
+    		tempV = 'http://1kgenome.exascale.info/js_test?xstart='+X_Begin+'&xend='+X_End+'&ystart='+Y_Begin+'&yend='+Y_End+'&zstart='+Z_Begin+'&zend='+Z_End
+    	}
+    	$('#commandLine_3DGB_URL_1').text(tempV);
+		document.getElementById('commandLine_3DGB_URL_1').style.display = '';
+		if (isExec) {
+    		window.open(tempV, "_blank")
+    	}
+    }
+    function processWSNucleotides(isExec) {
+    	var _chr = checkChromosome('3DGB_URL_chr2');
+    	if (!_chr) return;
+
+    	var _beg_range = checkPosition('3DGB_URL_range_begin2', 'Error: check beginning of the range.');
+		if (!_beg_range) return;
+
+		var _end_range = checkPosition('3DGB_URL_range_end2', 'Error: check end of the range.');
+		if (!_end_range) return;
+		var tempV = 'http://1kgenome.exascale.info/range?chrid='+_chr+'&start='+_beg_range+'&end='+_end_range
+		$('#commandLine_3DGB_URL_2').text(tempV);
+		document.getElementById('commandLine_3DGB_URL_2').style.display = '';
+
+		if (isExec) {
+			window.open(tempV, "_blank")
+    	}
+    }
+    function processWSSNPs(isExec) {
+    	var _chr = checkChromosome('3DGB_URL_chr3');
+    	if (!_chr) return;
+    	var _beg_range = checkPosition('3DGB_URL_range_begin3', 'Error: check beginning of the range.');
+		if (!_beg_range) return;
+		var _end_range = checkPosition('3DGB_URL_range_end3', 'Error: check end of the range.');
+		if (!_end_range) return;
+		var tempV = 'http://1kgenome.exascale.info/js_snp?chr='+_chr+'&start='+_beg_range+'&end='+_end_range;
+		$('#commandLine_3DGB_URL_3').text(tempV);
+		document.getElementById('commandLine_3DGB_URL_3').style.display = '';
+		if (isExec) {
+    		window.open(tempV, "_blank")
+    	}
+    }
+
+    function processWSChIP_SEQ(isExec) {
+    	var _chr = checkChromosome('3DGB_URL_chr4');
+    	if (!_chr) return;
+    	var _beg_range = checkPosition('3DGB_URL_range_begin4', 'Error: check beginning of the range.');
+		if (!_beg_range) return;
+		var _end_range = checkPosition('3DGB_URL_range_end4', 'Error: check end of the range.');
+		if (!_end_range) return;
+		var _cell_line = document.getElementById('3DGB_URL_Celline4');
+		_cell_line = _cell_line.value
+		
+		var tempV = 'http://1kgenome.exascale.info/chipseq?chr='+_chr+'&start='+_beg_range+'&end='+_end_range+((_cell_line)?'&celline='+_cell_line:'')
+		$('#commandLine_3DGB_URL_4').text(tempV);
+		document.getElementById('commandLine_3DGB_URL_4').style.display = '';
+
+		if (isExec) {
+    		window.open(tempV, "_blank")
+    	}
+
+    }
+
+    function processWSClosest_Point(isExec) {
+    	var _chr = checkChromosome('3DGB_URL_chr5');
+    	if (!_chr) return;
+
+    	var _bp = checkPosition('3DGB_URL_bp5', 'Error: check chromosome position.');
+		if (!_bp) return;
+
+		var _isNormal = checkIsNormal("3DGB_URL_isNormal5", false);
+		var tempV = 'http://1kgenome.exascale.info/chr_pos?chrid='+_chr+'&bp='+_bp+((_isNormal)?'&m=normal':(_isNormal===false)?'&m=leukemia':'')
+		$('#commandLine_3DGB_URL_5').text(tempV);
+		document.getElementById('commandLine_3DGB_URL_5').style.display = '';
+
+		if (isExec) {
+    		window.open(tempV, "_blank")
+    	}
+
+    }
+
+
+
+
+
+    function processGet_JSON_3D_QueryInput(isExec) {
+    	var X_Begin = checkFloatMinusNumerical('3DGB_range_begin_X1', 'Error: check beginning of the X range.')
+    	if (!X_Begin) return;
+
+    	var X_End = checkFloatMinusNumerical('3DGB_range_end_X1', 'Error: check end position of the X range.')
+    	if (!X_End) return;
+
+    	var Y_Begin = checkFloatMinusNumerical('3DGB_range_begin_Y1', 'Error: check beginning of the Y range.')
+    	if (!Y_Begin) return;
+
+    	var Y_End = checkFloatMinusNumerical('3DGB_range_end_Y1', 'Error: check end position of the Y range.')
+    	if (!Y_End) return;
+
+    	var Z_Begin = checkFloatMinusNumerical('3DGB_range_begin_Z1', 'Error: check beginning of the Z range.')
+    	if (!Z_Begin) return;
+
+    	var Z_End = checkFloatMinusNumerical('3DGB_range_end_Z1', 'Error: check end position of the Z range.')
+    	if (!Z_End) return;
+
+    	var isNormal = checkIsNormal("3DGB_isNormal1", true);
+
+    	var _chr = checkChromosome('3DGB_chr1');
+    	if (!_chr) return;
+
+    	var callBackCustomFunction = function(data) {print(data);}
+
+    	document.getElementById('commandLine_3DGB_1').innerHTML = 'vars.get_JSON_3D_Query('+X_Begin+', '+X_End+', '+Y_Begin+', '+Y_End+', '+Z_Begin+', '+Z_End+', '+isNormal+', '+_chr+', '+callBackCustomFunction+' );' + ((isExec)?'<br>Output of the command in the output area in the bottom of the page':'');
+		document.getElementById('commandLine_3DGB_1').style.display = '';
+
+		if (isExec) {
+    		vars.get_JSON_3D_Query(X_Begin, X_End, Y_Begin, Y_End, Z_Begin, Z_End, isNormal, _chr, callBackCustomFunction );
+    	}
+    }
+
+    function processGet_JSON_Nucleotides_List_QueryInput(isExec) {
+    	var _chr = checkChromosome('3DGB_chr2');
+    	if (!_chr) return;
+
+    	var _beg_range = checkPosition('3DGB_range_begin2', 'Error: check beginning of the range.');
+		if (!_beg_range) return;
+
+		var _end_range = checkPosition('3DGB_range_end2', 'Error: check end of the range.');
+		if (!_end_range) return;
+
+		
+		var callBackCustomFunction = function(data) {print(data);}
+
+		document.getElementById('commandLine_3DGB_2').innerHTML = 'vars.get_JSON_Nucleotides_List_Query('+_chr+', '+_beg_range+', '+_end_range+', '+ callBackCustomFunction + '); ' + ((isExec)?'<br>Output of the command in the output area in the bottom of the page':'');
+		document.getElementById('commandLine_3DGB_2').style.display = '';
+
+		if (isExec) {
+    		vars.get_JSON_Nucleotides_List_Query(_chr, _beg_range, _end_range, callBackCustomFunction );
+    	}
+    }
+
+    function processGet_JSON_SNPs_in_Range_QueryInput(isExec) {
+    	var _chr = checkChromosome('3DGB_chr3');
+    	if (!_chr) return;
+
+    	var _beg_range = checkPosition('3DGB_range_begin3', 'Error: check beginning of the range.');
+		if (!_beg_range) return;
+
+		var _end_range = checkPosition('3DGB_range_end3', 'Error: check end of the range.');
+		if (!_end_range) return;
+		
+		var callBackCustomFunction = function(data) {print(data);}
+
+		document.getElementById('commandLine_3DGB_3').innerHTML = 'vars.get_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_Query('+_chr+', '+_beg_range+', '+_end_range+', '+ callBackCustomFunction + '); ' + ((isExec)?'<br>Output of the command in the output area in the bottom of the page':'');
+		document.getElementById('commandLine_3DGB_3').style.display = '';
+
+		if (isExec) {
+    		vars.get_JSON_SNPs_in_Range_Query(_chr, _beg_range, _end_range, callBackCustomFunction );
+    	}
+    }
+
+    function processGet_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_QueryInput(isExec) {
+    	var _chr = checkChromosome('3DGB_chr4');
+    	if (!_chr) return;
+
+    	var _beg_range = checkPosition('3DGB_range_begin4', 'Error: check beginning of the range.');
+		if (!_beg_range) return;
+
+		var _end_range = checkPosition('3DGB_range_end4', 'Error: check end of the range.');
+		if (!_end_range) return;
+
+		var _cell_line = document.getElementById('3DGB_Celline4');
+		if (_cell_line) _cell_line = _cell_line.value || _cell_line.placeholder
+		
+		var callBackCustomFunction = function(data) {print(data);}
+
+		document.getElementById('commandLine_3DGB_4').innerHTML = 'vars.get_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_Query('+_chr+', '+_beg_range+', '+_end_range+',' + _cell_line+', '+ callBackCustomFunction + '); ' + ((isExec)?'<br>Output of the command in the output area in the bottom of the page':'');
+		document.getElementById('commandLine_3DGB_4').style.display = '';
+
+		if (isExec) {
+    		vars.get_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_Query(_chr, _beg_range, _end_range, _cell_line, callBackCustomFunction );
+    	}
+
+    }
+
+    function processGet_JSON_Closest_Point_To_Current_Pos_QueryInput(isExec) {
+    	var _chr = checkChromosome('3DGB_chr5');
+    	if (!_chr) return;
+
+    	var _bp = checkPosition('3DGB_bp5', 'Error: check chromosome position.');
+		if (!_bp) return;
+
+		var _isNormal = checkIsNormal("3DGB_isNormal5", false);
+		
+		var callBackCustomFunction = function(data) {print(data);}
+		document.getElementById('commandLine_3DGB_5').innerHTML = 'vars.get_JSON_Closest_Point_To_Current_Pos_Query('+_chr+', '+_bp+', '+_isNormal+', '+ callBackCustomFunction + '); ' + ((isExec)?'<br>Output of the command in the output area in the bottom of the page':'');
+		document.getElementById('commandLine_3DGB_5').style.display = '';
+
+		if (isExec) {
+    		vars.get_JSON_Closest_Point_To_Current_Pos_Query(_chr, _bp, _isNormal, callBackCustomFunction );
+    	}
+
+    }
+
+    function processGetRangesForGenePromoterCubicAreaInput(isExec) {
+    	var _chr = checkChromosome('ens_chr');
+    	if (!_chr) return;
+
+		var _gene_name = document.getElementById('ens_gene_name');
+		_gene_name = _gene_name.value || _gene_name.placeholder
+
+		var _beg_position = checkPosition('ens_gene_beginning', 'Error: check the position of the beginning of gene.');
+		if (!_beg_position) return;
+
+		var _end_position = checkPosition('ens_gene_end', 'Error: check the position of the end of gene.');
+		if(!_end_position) return;
+
+		var _isNormal = checkIsNormal("ens_isNormal", false);
+		var _radius_cube = checkFloatNumerical('radiusCube','Error: check the distance value.');
+		if (!_radius_cube) return;
+		var _isPositive = document.getElementById("ens_isPositive_t").checked;
+
+		document.getElementById('commandLine1').innerHTML = 'vars.getRangesForGenePromoterCubicArea('+_chr+', \''+_gene_name+'\', '+_beg_position+', '+_end_position+', '+_isNormal+', '+_radius_cube+', '+_isPositive + '); ' + ((isExec)?'<br>Output of the command in the output area in the bottom of the page':'');
+		document.getElementById('commandLine1').style.display = '';
+    	
+    	if (isExec) {
+    		vars.getRangesForGenePromoterCubicArea(_chr, _gene_name, _beg_position, _end_position, _isNormal, _radius_cube, _isPositive);
+    	}
+    }
+
+
+	document.getElementById("tabs-6").innerHTML = helpSection[0];
+	document.getElementById("tabs-4").innerHTML = helpSection[1];//about
 </script>
+<script type="text/javascript" src="scripting/Ensembl_snps&phenotype_for_gene_promoter_in_cubic_area.js"></script>
+<script type="text/javascript" src="scripting/general_functions_to_access_3DGB_data_JSON.js"></script>
+
 </body>
 </html>

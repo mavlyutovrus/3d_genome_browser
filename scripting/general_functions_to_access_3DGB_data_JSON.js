@@ -84,7 +84,7 @@ vars.get_JSON_ChIP_SEQ_For_Spec_Cell_Line_in_Range_Query = function(chr, rangeSt
 *		Leukemia cell -			http://1kgenome.exascale.info/chr_pos?chrid=1&bp=59146954&m=leukemia
 *		Simulated K562 Cell - 	http://1kgenome.exascale.info/chr_pos?chrid=1&bp=59146954
 */
-vars.get_JSON_3D_Query = function(chr, bp, callBackCustomFunction) {
+vars.get_JSON_Closest_Point_To_Current_Pos_Query = function(chr, bp, isNormal, callBackCustomFunction) {
 	if (isNormal == true) {
 		print("Info: Healthy cell(GM06990), " + chr + " chromosome model has been chosen.");
 		$.getJSON("http://1kgenome.exascale.info/chr_pos?chrid="+chr+"&bp="+bp+"&m=normal?callback=?", null, function(data) {if (callBackCustomFunction) callBackCustomFunction(data);})
